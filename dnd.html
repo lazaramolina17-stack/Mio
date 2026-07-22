@@ -417,6 +417,45 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 
 const D = window.DND || {};
 
+// ---- Compatibility: map Spanish data keys to English names ----
+(function(D){
+  // Top-level aliases
+  if(D.razas){
+    D.races = D.razas;
+    D.races.forEach(r => { r.name = r.nombre; r.bonuses = r.bonos; r.bonusChoice = r.bonos_eleccion; });
+  }
+  if(D.clases){
+    D.classes = D.clases;
+    D.classes.forEach(c => {
+      c.name = c.nombre;
+      c.hitDie = parseInt((c.dado_golpe||'').replace('d','')) || 8;
+      if(c.competencias){
+        c.armor = c.competencias.armaduras ? c.competencias.armaduras.join(', ') : '';
+        c.weapons = c.competencias.armas ? c.competencias.armas.join(', ') : '';
+        c.savingThrows = c.competencias.salvaciones || [];
+        c.skills = c.competencias.habilidades || [];
+      }
+    });
+  }
+  if(D.trasfondos){
+    D.backgrounds = D.trasfondos;
+    D.backgrounds.forEach(b => { b.name = b.nombre; });
+  }
+  if(D.hechizos){
+    D.spells = D.hechizos;
+    D.spells.forEach(s => {
+      s.name = s.nombre; s.school = s.escuela;
+      s.castingTime = s.tiempo; s.range = s.alcance;
+      s.duration = s.duracion; s.description = s.descripcion;
+      s.level = s.nivel; s.classes = s.clases;
+    });
+  }
+  if(D.subrazas){
+    D.subraces = D.subrazas;
+    D.subraces.forEach(sr => { sr.bonuses = sr.bonos; });
+  }
+})(D);
+
 // ---- State ----
 const state = {
   rolledScores: [],
@@ -679,9 +718,9 @@ generateBtn.addEventListener('click', function(){
       }
     }
     // Subrace
-    if(subraceName && D.subraces && D.subraces[subraceName]){
-      const sr = D.subraces[subraceName];
-      if(sr.bonuses && sr.bonuses[a]) base += sr.bonuses[a];
+    if(subraceName && D.subraces){
+      const sr = D.subraces.find(s => s.nombre === subraceName);
+      if(sr && sr.bonuses && sr.bonuses[a]) base += sr.bonuses[a];
     }
     scores[a] = base;
   });
