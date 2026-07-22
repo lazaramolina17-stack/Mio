@@ -1,0 +1,224 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "opencode": {
+      "api": "https://opencode.ai/zen/v1",
+      "name": "OpenCode Zen",
+      "models": {
+        "deepseek-v4-flash-free": {
+          "id": "deepseek-v4-flash-free"
+        },
+        "nemotron-3-ultra-free": {
+          "id": "nemotron-3-ultra-free"
+        }
+      },
+      "options": {
+        "apiKey": "YOUR_API_KEY_HERE"
+      }
+    },
+    "groq": {
+      "api": "https://api.groq.com/openai/v1",
+      "name": "Groq",
+      "models": {
+        "llama-3.3-70b-versatile": {
+          "id": "llama-3.3-70b-versatile"
+        },
+        "llama-3.1-8b-instant": {
+          "id": "llama-3.1-8b-instant"
+        },
+        "qwen/qwen3.6-27b": {
+          "id": "qwen/qwen3.6-27b"
+        },
+        "openai/gpt-oss-20b": {
+          "id": "openai/gpt-oss-20b"
+        },
+        "openai/gpt-oss-120b": {
+          "id": "openai/gpt-oss-120b"
+        }
+      },
+      "options": {
+        "apiKey": "YOUR_API_KEY_HERE"
+      }
+    },
+    "custom": {
+      "api": "https://api.openai.com/v1",
+      "name": "Custom Provider",
+      "models": {
+        "gpt-4o": {
+          "id": "gpt-4o"
+        },
+        "gpt-4o-mini": {
+          "id": "gpt-4o-mini"
+        },
+        "gpt-3.5-turbo": {
+          "id": "gpt-3.5-turbo"
+        }
+      },
+      "options": {
+        "apiKey": "YOUR_API_KEY_HERE"
+      }
+    }
+  },
+  "agent": {
+    "jhon": {
+      "description": "Orquestador principal (Jhon) que coordina y delega a todos los subagentes.",
+      "mode": "primary",
+      "color": "#A855F7",
+      "model": "llama-3.3-70b-versatile",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    },
+    "reviewer": {
+      "description": "Revisor estricto de c\u00f3digo para PRs y calidad.",
+      "mode": "subagent",
+      "color": "error",
+      "model": "llama-3.3-70b-versatile",
+      "permission": {
+        "edit": "deny",
+        "bash": "ask"
+      }
+    },
+    "test": {
+      "description": "Especialista en testing: unitarios, integraci\u00f3n y E2E.",
+      "mode": "subagent",
+      "color": "success",
+      "model": "llama-3.1-8b-instant",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    },
+    "debug": {
+      "description": "Depurador experto para diagnosticar y corregir bugs.",
+      "mode": "subagent",
+      "color": "warning",
+      "model": "llama-3.3-70b-versatile",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    },
+    "refactor": {
+      "description": "Especialista en refactorizaci\u00f3n de c\u00f3digo.",
+      "mode": "subagent",
+      "color": "info",
+      "model": "llama-3.3-70b-versatile",
+      "permission": {
+        "edit": "allow",
+        "bash": "ask"
+      }
+    },
+    "docs": {
+      "description": "Escritor de documentaci\u00f3n t\u00e9cnica.",
+      "mode": "subagent",
+      "color": "accent",
+      "model": "llama-3.1-8b-instant",
+      "permission": {
+        "edit": "allow",
+        "bash": "ask"
+      }
+    },
+    "security": {
+      "description": "Auditor de seguridad para identificar vulnerabilidades.",
+      "mode": "subagent",
+      "color": "error",
+      "model": "llama-3.3-70b-versatile",
+      "permission": {
+        "edit": "deny",
+        "bash": "ask"
+      }
+    },
+    "frontend": {
+      "description": "Especialista en frontend UI/UX, componentes y frameworks modernos.",
+      "mode": "subagent",
+      "color": "#6366F1",
+      "model": "llama-3.3-70b-versatile",
+      "permission": {
+        "edit": "allow",
+        "bash": "ask"
+      }
+    },
+    "backend": {
+      "description": "Experto en backend, APIs, servidores y l\u00f3gica de negocio.",
+      "mode": "subagent",
+      "color": "#8B5CF6",
+      "model": "llama-3.3-70b-versatile",
+      "permission": {
+        "edit": "allow",
+        "bash": "ask"
+      }
+    },
+    "devops": {
+      "description": "Especialista en DevOps, CI/CD, Docker, infraestructura y despliegue.",
+      "mode": "subagent",
+      "color": "#F59E0B",
+      "model": "llama-3.1-8b-instant",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    },
+    "database": {
+      "description": "Experto en bases de datos, esquemas, migraciones y optimizaci\u00f3n SQL.",
+      "mode": "subagent",
+      "color": "#10B981",
+      "model": "llama-3.1-8b-instant",
+      "permission": {
+        "edit": "allow",
+        "bash": "ask"
+      }
+    },
+    "product": {
+      "description": "Product Manager para definir requisitos, user stories y priorizaci\u00f3n.",
+      "mode": "subagent",
+      "color": "#EC4899",
+      "model": "llama-3.1-8b-instant",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+    "architect": {
+      "description": "Arquitecto de software para dise\u00f1o de sistemas y decisiones t\u00e9cnicas.",
+      "mode": "subagent",
+      "color": "#3B82F6",
+      "model": "llama-3.3-70b-versatile",
+      "permission": {
+        "edit": "deny",
+        "bash": "ask"
+      }
+    },
+    "cli": {
+      "description": "Especialista en herramientas CLI, scripts y automatizaci\u00f3n.",
+      "mode": "subagent",
+      "color": "#14B8A6",
+      "model": "llama-3.1-8b-instant",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    },
+    "data": {
+      "description": "Especialista en datos, pipelines ETL, an\u00e1lisis y ML.",
+      "mode": "subagent",
+      "color": "#22D3EE",
+      "model": "llama-3.1-8b-instant",
+      "permission": {
+        "edit": "allow",
+        "bash": "ask"
+      }
+    },
+    "explore": {
+      "description": "Explorador r\u00e1pido de codebase. Busca archivos, definiciones y responde preguntas del c\u00f3digo.",
+      "mode": "subagent",
+      "color": "#22D3EE",
+      "model": "llama-3.1-8b-instant",
+      "permission": {
+        "edit": "deny",
+        "bash": "ask"
+      }
+    }
+  }
+}

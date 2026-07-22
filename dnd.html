@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>D&D 5e Toolkit</title>
+<script src="dnd-data.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0e0c;
+  --bg2:#1a1815;
+  --bg3:#252220;
+  --border:#3d3530;
+  --text:#d4cdc0;
+  --text-dim:#8a8075;
+  --accent:#c8a44e;
+  --accent2:#a83220;
+  --hp-red:#96281b;
+  --mana-blue:#2d5a7b;
+  --gold-glow:rgba(200,164,78,0.15);
+}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Courier New',Courier,monospace;
+  font-size:14px;
+  line-height:1.5;
+  display:flex;
+  flex-direction:column;
+}
+#app{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  max-width:600px;
+  margin:0 auto;
+  width:100%;
+}
+#header{
+  background:var(--bg2);
+  border-bottom:2px solid var(--border);
+  padding:10px 16px;
+  text-align:center;
+  flex-shrink:0;
+}
+#header h1{
+  color:var(--accent);
+  font-size:18px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  text-shadow:0 0 12px var(--gold-glow);
+}
+#header span{color:var(--text-dim);font-size:11px;display:block;margin-top:2px}
+#content{
+  flex:1;
+  overflow-y:auto;
+  padding:12px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border) transparent;
+}
+#content::-webkit-scrollbar{width:5px}
+#content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+/* ---- TABS ---- */
+#tab-bar{
+  display:flex;
+  flex-shrink:0;
+  background:var(--bg2);
+  border-top:2px solid var(--border);
+}
+.tab-btn{
+  flex:1;
+  background:transparent;
+  border:none;
+  color:var(--text-dim);
+  font-family:inherit;
+  font-size:11px;
+  padding:10px 4px 8px;
+  cursor:pointer;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  transition:all .15s;
+  border-top:2px solid transparent;
+  margin-top:-2px;
+}
+.tab-btn.active{
+  color:var(--accent);
+  border-top-color:var(--accent);
+  background:var(--bg3);
+}
+/* ---- FORM ELEMENTS ---- */
+label{display:block;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+select,input,textarea{
+  width:100%;
+  background:var(--bg);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:8px 10px;
+  border-radius:4px;
+  font-family:inherit;
+  font-size:13px;
+  outline:none;
+  transition:border-color .15s;
+}
+select:focus,input:focus,textarea:focus{border-color:var(--accent)}
+select option{background:var(--bg2);color:var(--text)}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.form-group{margin-bottom:10px}
+.form-row{display:flex;gap:8px}
+.form-row>*{flex:1}
+.btn{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:8px 16px;
+  border-radius:4px;
+  cursor:pointer;
+  font-family:inherit;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  transition:all .15s;
+}
+.btn:hover,.btn:focus{border-color:var(--accent);color:var(--accent);background:var(--bg2)}
+.btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:bold}
+.btn-primary:hover{background:#b8942e;border-color:#b8942e;color:var(--bg)}
+.btn-danger{background:var(--hp-red);border-color:var(--hp-red);color:#fff}
+.btn-danger:hover{background:#7a1f15;border-color:#7a1f15}
+.btn-sm{padding:4px 10px;font-size:11px}
+/* ---- SHEET ---- */
+.sheet{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:14px;
+  margin-bottom:12px;
+}
+.sheet h2{
+  color:var(--accent);
+  font-size:14px;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  border-bottom:1px solid var(--border);
+  padding-bottom:6px;
+  margin-bottom:10px;
+}
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:6px;
+  margin-bottom:10px;
+}
+.stat-card{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:4px;
+  text-align:center;
+  padding:6px 2px;
+  cursor:pointer;
+  transition:all .15s;
+}
+.stat-card.selected{border-color:var(--accent);box-shadow:0 0 8px var(--gold-glow)}
+.stat-card .stat-label{font-size:9px;color:var(--text-dim);text-transform:uppercase}
+.stat-card .stat-value{font-size:18px;font-weight:bold;color:var(--accent)}
+.stat-card .stat-mod{font-size:12px;color:var(--text)}
+/* ---- DICE ---- */
+.dice-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-bottom:12px;
+}
+.dice-btn{
+  aspect-ratio:1;
+  background:var(--bg3);
+  border:2px solid var(--border);
+  border-radius:8px;
+  color:var(--text);
+  font-size:22px;
+  font-weight:bold;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  transition:all .15s;
+  font-family:inherit;
+}
+.dice-btn:hover{border-color:var(--accent);color:var(--accent);transform:scale(1.05)}
+.dice-btn .label{font-size:10px;color:var(--text-dim);font-weight:normal;margin-top:2px}
+.dice-result{
+  text-align:center;
+  padding:20px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  margin-bottom:10px;
+  min-height:80px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+.dice-result .number{
+  font-size:52px;
+  font-weight:bold;
+  color:var(--accent);
+  text-shadow:0 0 20px var(--gold-glow);
+  transition:all .3s;
+  animation:none;
+}
+.dice-result .number.roll-anim{animation:dicePop .35s ease-out}
+@keyframes dicePop{
+  0%{transform:scale(0.3);opacity:0}
+  50%{transform:scale(1.2)}
+  100%{transform:scale(1);opacity:1}
+}
+.dice-result .detail{font-size:12px;color:var(--text-dim);margin-top:4px}
+.history{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px;
+  max-height:180px;
+  overflow-y:auto;
+}
+.history-item{
+  display:flex;
+  justify-content:space-between;
+  padding:4px 0;
+  border-bottom:1px solid var(--bg3);
+  font-size:12px;
+}
+.history-item:last-child{border-bottom:none}
+.history-item .roll{color:var(--accent);font-weight:bold}
+.history-item .total{color:var(--text)}
+.history-item .time{color:var(--text-dim);font-size:10px}
+/* ---- SPELLS ---- */
+.spell-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  transition:border-color .15s;
+}
+.spell-card:hover{border-color:var(--accent)}
+.spell-card .spell-name{color:var(--accent);font-weight:bold;font-size:14px}
+.spell-card .spell-meta{font-size:11px;color:var(--text-dim);margin:2px 0 4px}
+.spell-card .spell-meta span{margin-right:10px}
+.spell-card .spell-desc{font-size:12px;color:var(--text);line-height:1.4}
+.spell-tag{
+  display:inline-block;
+  background:var(--bg3);
+  padding:1px 6px;
+  border-radius:3px;
+  font-size:10px;
+  color:var(--text-dim);
+  margin-right:4px;
+}
+/* ---- RULES ---- */
+.rules-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px}
+.rules-table th,.rules-table td{
+  border:1px solid var(--border);
+  padding:6px 8px;
+  text-align:left;
+}
+.rules-table th{background:var(--bg3);color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.rules-table td{background:var(--bg2)}
+.condition-grid{display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:12px}
+.condition-item{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:8px 10px;
+}
+.condition-item strong{color:var(--accent);font-size:13px}
+.condition-item p{font-size:12px;color:var(--text-dim);margin-top:2px}
+.collapse{display:none}
+/* ---- FILTERS ---- */
+.filter-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.filter-bar select,.filter-bar input{flex:1;min-width:0}
+/* ---- RESPONSIVE ---- */
+@media(max-width:400px){
+  #content{padding:8px}
+  .stat-grid{grid-template-columns:repeat(3,1fr)}
+  .dice-grid{grid-template-columns:repeat(3,1fr)}
+  .dice-result .number{font-size:40px}
+  .tab-btn{font-size:10px;padding:8px 2px}
+}
+/* Misc */
+.text-center{text-align:center}
+.mt-8{margin-top:8px}
+.mb-8{margin-bottom:8px}
+.hidden{display:none!important}
+.badge{
+  display:inline-block;
+  background:var(--accent);
+  color:var(--bg);
+  padding:0 6px;
+  border-radius:3px;
+  font-size:10px;
+  font-weight:bold;
+}
+.badge-danger{background:var(--hp-red);color:#fff}
+.empty-state{padding:30px 20px;text-align:center;color:var(--text-dim);font-size:13px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header"><h1>D&amp;D 5e</h1><span>Toolkit</span></div>
+  <div id="content">
+    <!-- Tab: Personaje -->
+    <div class="tab-content active" id="tab-personaje">
+      <div id="char-form">
+        <div class="form-row">
+          <div class="form-group"><label>Nombre</label><input type="text" id="char-name" placeholder="Ej: Thorgrim"></div>
+          <div class="form-group"><label>Nivel</label><input type="number" id="char-level" min="1" max="20" value="1"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Raza</label><select id="char-race"><option value="">— Seleccionar —</option></select></div>
+          <div class="form-group" id="subrace-group" style="display:none"><label>Subraza</label><select id="char-subrace"><option value="">—</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Clase</label><select id="char-class"><option value="">— Seleccionar —</option></select></div>
+          <div class="form-group"><label>Trasfondo</label><select id="char-bg"><option value="">— Seleccionar —</option></select></div>
+        </div>
+        <div class="form-group"><label>Método de stats</label>
+          <select id="stat-method">
+            <option value="4d6">4d6 descartar menor</option>
+            <option value="standard">Puntaje estándar (15,14,13,12,10,8)</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm mb-8" id="roll-stats-btn">Generar Stats</button>
+        <div class="stat-grid" id="stat-grid"></div>
+        <div class="form-group" id="assign-section" style="display:none">
+          <label>Asignar habilidades (clickea stat arriba, luego habilidad abajo)</label>
+          <div id="assign-grid"></div>
+        </div>
+        <button class="btn btn-primary" id="generate-btn" style="width:100%">Generar Personaje</button>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="btn btn-sm" id="save-char-btn" style="flex:1">Guardar</button>
+          <select id="load-char-select" style="flex:2;font-size:11px;padding:4px"><option value="">— Cargar personaje —</option></select>
+          <button class="btn btn-sm btn-danger" id="delete-char-btn" style="flex:1">Eliminar</button>
+        </div>
+      </div>
+      <div id="char-output" class="hidden"></div>
+    </div>
+    <!-- Tab: Dados -->
+    <div class="tab-content" id="tab-dados">
+      <div class="dice-grid" id="dice-grid"></div>
+      <div class="form-row mb-8">
+        <div class="form-group"><label>Tirada personalizada</label><input type="text" id="custom-roll" placeholder="Ej: 2d20+4"></div>
+        <div style="display:flex;align-items:flex-end;flex-shrink:0"><button class="btn btn-primary" id="roll-custom-btn">¡Tirada!</button></div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button class="btn btn-sm" id="roll-adv-btn" style="flex:1">Ventaja</button>
+        <button class="btn btn-sm" id="roll-disadv-btn" style="flex:1">Desventaja</button>
+      </div>
+      <div class="dice-result"><div class="number" id="dice-number">—</div><div class="detail" id="dice-detail"></div></div>
+      <div class="history" id="roll-history"></div>
+    </div>
+    <!-- Tab: Hechizos -->
+    <div class="tab-content" id="tab-hechizos">
+      <div class="filter-bar">
+        <select id="spell-class-filter"><option value="">Todas las clases</option></select>
+        <select id="spell-level-filter"><option value="">Todos los niveles</option></select>
+        <select id="spell-school-filter"><option value="">Todas las escuelas</option></select>
+      </div>
+      <input type="text" id="spell-search" placeholder="Buscar hechizo..." style="margin-bottom:10px">
+      <div id="spell-list"></div>
+    </div>
+    <!-- Tab: Equipo -->
+    <div class="tab-content" id="tab-equipo">
+      <div class="filter-bar">
+        <select id="equip-category"><option value="">Todo el equipo</option><option value="armas_simples">Armas Simples</option><option value="armas_marciales">Armas Marciales</option><option value="armaduras">Armaduras</option><option value="equipo_aventurero">Equipo de Aventurero</option></select>
+        <input type="text" id="equip-search" placeholder="Buscar...">
+      </div>
+      <div id="equip-list"></div>
+    </div>
+    <!-- Tab: Bestiario -->
+    <div class="tab-content" id="tab-bestiario">
+      <div class="filter-bar">
+        <select id="monster-cr-filter"><option value="">Todos los CR</option></select>
+        <input type="text" id="monster-search" placeholder="Buscar monstruo...">
+      </div>
+      <div id="monster-list"></div>
+    </div>
+    <!-- Tab: Reglas -->
+    <div class="tab-content" id="tab-reglas">
+      <h2 style="color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Habilidades por Atributo</h2>
+      <table class="rules-table" id="skill-table"><tbody></tbody></table>
+      <h2 style="color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:2px;margin:12px 0 8px">Modificadores</h2>
+      <table class="rules-table" id="mod-table"><tbody></tbody></table>
+      <h2 style="color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:2px;margin:12px 0 8px">Clases de Armadura</h2>
+      <table class="rules-table" id="ac-table"><tbody></tbody></table>
+      <h2 style="color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:2px;margin:12px 0 8px">Condiciones</h2>
+      <div class="condition-grid" id="condition-list"></div>
+    </div>
+  </div>
+  <div id="tab-bar">
+    <button class="tab-btn active" data-tab="personaje">Personaje</button>
+    <button class="tab-btn" data-tab="dados">Dados</button>
+    <button class="tab-btn" data-tab="hechizos">Hechizos</button>
+    <button class="tab-btn" data-tab="equipo">Equipo</button>
+    <button class="tab-btn" data-tab="bestiario">Bestiario</button>
+    <button class="tab-btn" data-tab="reglas">Reglas</button>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+
+const D = window.DND || {};
+
+// ---- State ----
+const state = {
+  rolledScores: [],
+  assigned: {},       // ability -> score
+  selectedStat: null,
+  character: null,
+  history: [],
+};
+
+// ---- DOM refs ----
+const $ = id => document.getElementById(id);
+const charForm = $('char-form');
+const charOutput = $('char-output');
+const raceSel = $('char-race');
+const subraceSel = $('char-subrace');
+const subraceGroup = $('subrace-group');
+const classSel = $('char-class');
+const bgSel = $('char-bg');
+const statGrid = $('stat-grid');
+const assignGrid = $('assign-grid');
+const assignSection = $('assign-section');
+const generateBtn = $('generate-btn');
+
+// ---- Init selects ---- 
+function initSelects(){
+  // Races
+  const races = D.races || [];
+  races.forEach(r => {
+    const o = document.createElement('option');
+    o.value = r.name;
+    o.textContent = r.name;
+    raceSel.appendChild(o);
+  });
+  // Classes
+  const classes = D.classes || [];
+  classes.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.name;
+    o.textContent = c.name;
+    classSel.appendChild(o);
+  });
+  // Backgrounds
+  const bgs = D.backgrounds || [];
+  bgs.forEach(b => {
+    const o = document.createElement('option');
+    o.value = b.name;
+    o.textContent = b.name;
+    bgSel.appendChild(o);
+  });
+  // Spell filters
+  const spells = D.spells || [];
+  const classesSet = new Set();
+  spells.forEach(s => (s.classes||[]).forEach(cl => classesSet.add(cl)));
+  const sortedClasses = [...classesSet].sort();
+  const classFilter = $('spell-class-filter');
+  sortedClasses.forEach(cl => {
+    const o = document.createElement('option');
+    o.value = cl;
+    o.textContent = cl;
+    classFilter.appendChild(o);
+  });
+  const levelFilter = $('spell-level-filter');
+  for(let i=1;i<=9;i++){
+    const o = document.createElement('option');
+    o.value = i;
+    o.textContent = 'Nivel '+i;
+    levelFilter.appendChild(o);
+  }
+  const schoolsSet = new Set();
+  spells.forEach(s => {if(s.school) schoolsSet.add(s.school)});
+  const schoolFilter = $('spell-school-filter');
+  [...schoolsSet].sort().forEach(sc => {
+    const o = document.createElement('option');
+    o.value = sc;
+    o.textContent = sc;
+    schoolFilter.appendChild(o);
+  });
+  // Dice grid
+  const diceGrid = $('dice-grid');
+  [4,6,8,10,12,20,100].forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'dice-btn';
+    btn.innerHTML = 'd' + d + '<span class="label">' + (d===100?'&#37;':'') + '</span>';
+    btn.dataset.dice = d;
+    btn.addEventListener('click', ()=>rollDice(1,d));
+    diceGrid.appendChild(btn);
+  });
+}
+
+// ---- Subraces ----
+raceSel.addEventListener('change', function(){
+  const race = D.races ? D.races.find(r => r.name === this.value) : null;
+  subraceGroup.style.display = 'none';
+  subraceSel.innerHTML = '<option value="">—</option>';
+  if(race && race.subraces && race.subraces.length){
+    race.subraces.forEach(sr => {
+      const o = document.createElement('option');
+      o.value = sr;
+      o.textContent = sr;
+      subraceSel.appendChild(o);
+    });
+    subraceGroup.style.display = 'block';
+  }
+});
+
+// ---- Class info display ----
+let lastClassInfo = null;
+classSel.addEventListener('change', function(){
+  const cls = D.classes ? D.classes.find(c => c.name === this.value) : null;
+  // remove old info
+  if(lastClassInfo) { lastClassInfo.remove(); lastClassInfo = null; }
+  if(!cls) return;
+  const div = document.createElement('div');
+  div.className = 'sheet';
+  div.style.marginBottom = '8px';
+  div.style.fontSize = '12px';
+  let html = '<strong style="color:var(--accent)">' + cls.name + '</strong><br>';
+  if(cls.hitDie) html += 'Dado de Golpe: <span class="badge">d' + cls.hitDie + '</span><br>';
+  if(cls.armor) html += 'Armaduras: ' + cls.armor + '<br>';
+  if(cls.weapons) html += 'Armas: ' + cls.weapons + '<br>';
+  if(cls.savingThrows) html += 'Tiradas Salvación: ' + cls.savingThrows.join(', ') + '<br>';
+  if(cls.skills) html += 'Habilidades: ' + cls.skills.join(', ') + '<br>';
+  div.innerHTML = html;
+  classSel.parentNode.parentNode.insertAdjacentElement('afterend', div); // after the form-row containing class
+  lastClassInfo = div;
+});
+
+// ---- Stat generation ----
+$('roll-stats-btn').addEventListener('click', function(){
+  const method = $('stat-method').value;
+  let scores;
+  if(method === 'standard'){
+    scores = [15,14,13,12,10,8];
+  } else {
+    scores = [];
+    for(let i=0;i<6;i++){
+      const rolls = [];
+      for(let j=0;j<4;j++) rolls.push(Math.floor(Math.random()*6)+1);
+      rolls.sort((a,b)=>a-b);
+      rolls.shift();
+      scores.push(rolls.reduce((s,v)=>s+v,0));
+    }
+  }
+  state.rolledScores = scores;
+  state.selectedStat = null;
+  state.assigned = {};
+  renderStatGrid(scores);
+  assignSection.style.display = 'block';
+  renderAssignGrid();
+});
+
+function renderStatGrid(scores){
+  const abils = ['FUE','DES','CON','INT','SAB','CAR'];
+  statGrid.innerHTML = '';
+  scores.forEach((sc,i) => {
+    const card = document.createElement('div');
+    card.className = 'stat-card';
+    const mod = Math.floor((sc-10)/2);
+    const modStr = (mod>=0?'+':'')+mod;
+    card.innerHTML = '<div class="stat-label">' + abils[i] + '</div><div class="stat-value">' + sc + '</div><div class="stat-mod">(' + modStr + ')</div>';
+    card.dataset.idx = i;
+    card.addEventListener('click', function(e){
+      e.stopPropagation();
+      state.selectedStat = i;
+      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected');
+      renderAssignGrid();
+    });
+    statGrid.appendChild(card);
+  });
+}
+
+function renderAssignGrid(){
+  const abils = ['Fuerza','Destreza','Constitución','Inteligencia','Sabiduría','Carisma'];
+  const abilsShort = ['FUE','DES','CON','INT','SAB','CAR'];
+  assignGrid.innerHTML = '';
+  const usedScores = Object.values(state.assigned);
+  const available = state.rolledScores.filter((sc,i)=>!usedScores.includes(sc) || usedScores.filter(s=>s===sc).length < state.rolledScores.filter(s=>s===sc).length);
+  
+  const table = document.createElement('table');
+  table.className = 'rules-table';
+  table.style.marginBottom = '0';
+  let html = '<thead><tr><th>Habilidad</th><th>Puntaje</th><th>Mod</th><th></th></tr></thead><tbody>';
+  abils.forEach((a,i) => {
+    const assigned = state.assigned[abilsShort[i]];
+    const mod = assigned !== undefined ? Math.floor((assigned-10)/2) : 0;
+    const modStr = assigned !== undefined ? ((mod>=0?'+':'')+mod) : '—';
+    const valStr = assigned !== undefined ? assigned : '—';
+    const canAssign = assigned === undefined && state.selectedStat !== null && state.rolledScores[state.selectedStat] !== undefined;
+    const isSelectedScore = (assigned === undefined && i === state.selectedStat);
+    html += '<tr>';
+    html += '<td>' + a + '</td>';
+    html += '<td>' + valStr + '</td>';
+    html += '<td>' + modStr + '</td>';
+    html += '<td>';
+    if(canAssign && !isSelectedScore){
+      html += '<button class="btn btn-sm" data-abil="'+abilsShort[i]+'" data-idx="'+state.selectedStat+'">Asignar</button>';
+    } else if(assigned !== undefined){
+      html += '<button class="btn btn-sm btn-danger" data-clear="'+abilsShort[i]+'">X</button>';
+    }
+    html += '</td></tr>';
+  });
+  html += '</tbody></table>';
+  assignGrid.innerHTML = html;
+  
+  assignGrid.querySelectorAll('[data-abil]').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const abil = this.dataset.abil;
+      const idx = parseInt(this.dataset.idx);
+      const score = state.rolledScores[idx];
+      if(state.assigned[abil] !== undefined) return;
+      state.assigned[abil] = score;
+      state.selectedStat = null;
+      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('selected'));
+      renderAssignGrid();
+    });
+  });
+  assignGrid.querySelectorAll('[data-clear]').forEach(btn => {
+    btn.addEventListener('click', function(){
+      delete state.assigned[this.dataset.clear];
+      renderAssignGrid();
+    });
+  });
+}
+
+// ---- Generate character ----
+generateBtn.addEventListener('click', function(){
+  const name = $('char-name').value.trim() || 'Sin nombre';
+  const level = parseInt($('char-level').value) || 1;
+  const raceName = raceSel.value;
+  const subraceName = subraceSel.value;
+  const className = classSel.value;
+  const bgName = bgSel.value;
+  
+  if(!raceName || !className){
+    alert('Selecciona al menos raza y clase.');
+    return;
+  }
+  const assigned = state.assigned;
+  const abilsShort = ['FUE','DES','CON','INT','SAB','CAR'];
+  const missing = abilsShort.filter(a => assigned[a] === undefined);
+  if(missing.length){
+    alert('Asigna todos los puntajes de habilidad antes de generar.');
+    return;
+  }
+  
+  const race = D.races ? D.races.find(r => r.name === raceName) : null;
+  const cls = D.classes ? D.classes.find(c => c.name === className) : null;
+  const bg = D.backgrounds ? D.backgrounds.find(b => b.name === bgName) : null;
+  
+  // Build sheet
+  let scores = {};
+  abilsShort.forEach((a,i) => {
+    let base = assigned[a];
+    // Apply racial bonuses
+    if(race){
+      if(race.bonuses && race.bonuses[a]) base += race.bonuses[a];
+      if(race.bonusChoice && subraceName){
+        // In a full version we'd parse; for simplicity we'll apply subrace bonus manually or from DND data
+      }
+    }
+    // Subrace
+    if(subraceName && D.subraces && D.subraces[subraceName]){
+      const sr = D.subraces[subraceName];
+      if(sr.bonuses && sr.bonuses[a]) base += sr.bonuses[a];
+    }
+    scores[a] = base;
+  });
+  
+  const mods = {};
+  Object.keys(scores).forEach(k => {
+    mods[k] = Math.floor((scores[k]-10)/2);
+  });
+  
+  const hp = cls ? (cls.hitDie || 8) + mods['CON'] : 8 + mods['CON'];
+  
+  // Calculate AC with equipped armor
+  let ca = 10 + mods['DES'];
+  let caDetail = '';
+  const armorList = (D.equipo && D.equipo.armaduras) || [];
+  if(state.equippedItems && state.equippedItems.armor){
+    const armor = armorList.find(a => a.nombre === state.equippedItems.armor);
+    if(armor){
+      if(armor.tipo === 'Ligera'){
+        ca = armor.ca + mods['DES'];
+        caDetail = armor.nombre + ' (CA base ' + armor.ca + ' + DES)';
+      } else if(armor.tipo === 'Media'){
+        const desMax = Math.min(mods['DES'], 2);
+        ca = armor.ca + desMax;
+        caDetail = armor.nombre + ' (CA base ' + armor.ca + ' + DES máx 2)';
+      } else if(armor.tipo === 'Pesada'){
+        ca = armor.ca;
+        caDetail = armor.nombre + ' (CA fija ' + armor.ca + ')';
+      }
+    }
+  }
+  // Shield bonus
+  if(state.equippedItems && state.equippedItems.shield){
+    ca += 2;
+  }
+  
+  const speed = (race && race.velocidad) ? race.velocidad + (subraceName==='Wood Elf'?5:0) : 30;
+  const languages = (race && race.idiomas) ? race.idiomas.join(', ') : '—';
+  
+  let html = '<div class="sheet">';
+  html += '<h2>' + name + ' <span style="font-size:11px;color:var(--text-dim)">Nv.' + level + '</span></h2>';
+  html += '<div style="margin-bottom:8px;font-size:12px">';
+  html += '<span class="badge">' + raceName + '</span>';
+  if(subraceName) html += ' <span class="badge badge-danger">' + subraceName + '</span>';
+  html += ' <span class="badge">' + className + '</span>';
+  if(bg) html += ' <span class="badge">' + bgName + '</span>';
+  html += '</div>';
+  
+  // CA, Speed, Languages
+  html += '<div style="font-size:12px;display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px">';
+  html += '<div><span style="color:var(--text-dim)">CA:</span> <span style="font-weight:bold;color:var(--accent)">' + ca + '</span>' + (caDetail?' <span style="font-size:10px;color:var(--text-dim)">('+caDetail+')</span>':'') + '</div>';
+  html += '<div><span style="color:var(--text-dim)">Velocidad:</span> <span style="font-weight:bold">' + speed + ' pies</span></div>';
+  html += '<div><span style="color:var(--text-dim)">Idiomas:</span> <span style="font-weight:bold">' + languages + '</span></div>';
+  html += '</div>';
+  
+  // Stats
+  html += '<table class="rules-table" style="margin-bottom:8px"><thead><tr>';
+  abilsShort.forEach(a => { html += '<th>' + a + '</th>'; });
+  html += '</tr></thead><tbody><tr>';
+  abilsShort.forEach(a => { html += '<td style="text-align:center;font-weight:bold;font-size:15px;color:var(--accent)">' + scores[a] + '</td>'; });
+  html += '</tr><tr>';
+  abilsShort.forEach(a => {
+    const m = mods[a];
+    const ms = (m>=0?'+':'')+m;
+    html += '<td style="text-align:center;font-size:12px">(' + ms + ')</td>';
+  });
+  html += '</tr></tbody></table>';
+  
+  // HP, AC, etc
+  html += '<div style="font-size:12px;display:flex;gap:16px;flex-wrap:wrap">';
+  html += '<div><span style="color:var(--text-dim)">PG:</span> <span style="color:var(--hp-red);font-weight:bold">' + hp + '</span></div>';
+  html += '<div><span style="color:var(--text-dim)">Iniciativa:</span> <span style="font-weight:bold">' + (mods['DES']>=0?'+':'')+mods['DES'] + '</span></div>';
+  html += '<div><span style="color:var(--text-dim)">Percepción pasiva:</span> <span style="font-weight:bold">' + (10+mods['SAB']) + '</span></div>';
+  if(cls && cls.savingThrows){
+    html += '<div><span style="color:var(--text-dim)">Salvación:</span> ';
+    html += (cls.savingThrows||[]).map(st => '<span class="badge">' + st + '</span>').join(' ');
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '</div>';
+  
+  // Skills
+  (function(){
+    const abilityKeys = {'Fuerza':'FUE','Destreza':'DES','Constitución':'CON','Inteligencia':'INT','Sabiduría':'SAB','Carisma':'CAR'};
+    const skillData = D.skillsByAbility || {};
+    let skillHtml = '<div class="sheet"><h2>Habilidades</h2>';
+    Object.entries(skillData).forEach(([abil, skills]) => {
+      if(!skills || !skills.length) return;
+      skills.forEach(skill => {
+        const abilShort = abilityKeys[abil] || 'FUE';
+        const mod = typeof mods[abilShort] === 'number' ? mods[abilShort] : 0;
+        const modStr = (mod>=0?'+':'')+mod;
+        const isProf = cls && cls.competencias && cls.competencias.habilidades && cls.competencias.habilidades.includes(skill);
+        const profDot = isProf ? '●' : '○';
+        skillHtml += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>' + profDot + ' ' + skill + '</span><span style="color:var(--accent)">' + modStr + '</span></div>';
+      });
+    });
+    skillHtml += '</div>';
+    html += skillHtml;
+  })();
+  
+  // Spell Slots
+  if(cls && cls.spellSlots){
+    const slots = cls.spellSlots[level-1] || [];
+    if(slots.some(s => s > 0)){
+      let slotHtml = '<div class="sheet"><h2>Espacios de Hechizo</h2><div style="display:flex;flex-wrap:wrap;gap:4px">';
+      const levelNames = ['Nv.1','Nv.2','Nv.3','Nv.4','Nv.5','Nv.6','Nv.7','Nv.8','Nv.9'];
+      slots.forEach((s,i) => {
+        if(s > 0) slotHtml += '<span class="badge" style="background:var(--accent);color:#fff">' + levelNames[i] + ': x' + s + '</span>';
+      });
+      slotHtml += '</div></div>';
+      html += slotHtml;
+    }
+  }
+  
+  // Equipped items
+  if(state.equippedItems && (state.equippedItems.armor || state.equippedItems.weapon)){
+    let eqHtml = '<div class="sheet"><h2>Equipado</h2><div style="font-size:12px">';
+    if(state.equippedItems.weapon) eqHtml += '<div>🔪 ' + state.equippedItems.weapon + '</div>';
+    if(state.equippedItems.armor) eqHtml += '<div>🛡️ ' + state.equippedItems.armor + '</div>';
+    eqHtml += '</div></div>';
+    html += eqHtml;
+  }
+  
+  // Racial traits
+  if(race && race.rasgos && race.rasgos.length){
+    html += '<div class="sheet"><h2>Rasgos Raciales</h2>';
+    race.rasgos.forEach(t => {
+      html += '<div style="margin-bottom:6px"><strong style="color:var(--accent);font-size:12px">' + t.nombre + '</strong><p style="font-size:11px;color:var(--text-dim);margin-top:2px">' + (t.descripcion||'') + '</p></div>';
+    });
+    html += '</div>';
+  }
+  // Subrace traits
+  if(subraceName && D.subraces){
+    const srData = D.subraces.find(s => s.nombre === subraceName);
+    if(srData && srData.rasgos && srData.rasgos.length){
+      html += '<div class="sheet"><h2>Rasgos de ' + subraceName + '</h2>';
+      srData.rasgos.forEach(t => {
+        html += '<div style="margin-bottom:6px"><strong style="color:var(--accent);font-size:12px">' + t.nombre + '</strong><p style="font-size:11px;color:var(--text-dim);margin-top:2px">' + (t.descripcion||'') + '</p></div>';
+      });
+      html += '</div>';
+    }
+  }
+  
+  // Save character
+  state.character = {name,level,race:raceName,subrace:subraceName,class:className,bg:bgName,scores,mods,hp,equipment:state.equippedItems};
+  try { localStorage.setItem('dnd_last_char', JSON.stringify(state.character)); } catch(e){}
+  
+  charOutput.innerHTML = html;
+  charOutput.classList.remove('hidden');
+  charForm.querySelector('#generate-btn').textContent = 'Regenerar Personaje';
+});
+
+// ---- Dice ----
+function rollDice(count, sides){
+  const rolls = [];
+  for(let i=0;i<count;i++) rolls.push(Math.floor(Math.random()*sides)+1);
+  const total = rolls.reduce((s,v)=>s+v,0);
+  const numEl = $('dice-number');
+  const detailEl = $('dice-detail');
+  
+  if(numEl.classList.contains('roll-anim')){
+    numEl.classList.remove('roll-anim');
+    void numEl.offsetWidth;
+  }
+  numEl.textContent = total;
+  numEl.classList.add('roll-anim');
+  
+  if(count > 1){
+    detailEl.textContent = count + 'd' + sides + ' = [' + rolls.join(', ') + '] = ' + total;
+  } else {
+    detailEl.textContent = 'd' + sides + ' = ' + total;
+  }
+  
+  // History
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  state.history.unshift({
+    label: count + 'd' + sides,
+    total: total,
+    detail: '[' + rolls.join(', ') + ']',
+    time: timeStr
+  });
+  if(state.history.length > 10) state.history.pop();
+  renderHistory();
+}
+
+$('roll-custom-btn').addEventListener('click', function(){
+  const input = $('custom-roll').value.trim().toLowerCase();
+  if(!input) return;
+  // Parse simple pattern: NdX+Y or NdX-Y
+  const m = input.match(/^(\d+)?d(\d+)([+-]\d+)?$/);
+  if(!m){ alert('Formato: 2d20+4'); return; }
+  const count = parseInt(m[1]) || 1;
+  const sides = parseInt(m[2]);
+  const mod = parseInt(m[3]) || 0;
+  const rolls = [];
+  for(let i=0;i<count;i++) rolls.push(Math.floor(Math.random()*sides)+1);
+  const total = rolls.reduce((s,v)=>s+v,0) + mod;
+  const numEl = $('dice-number');
+  if(numEl.classList.contains('roll-anim')){
+    numEl.classList.remove('roll-anim');
+    void numEl.offsetWidth;
+  }
+  numEl.textContent = total;
+  numEl.classList.add('roll-anim');
+  let detail = count + 'd' + sides;
+  if(mod) detail += (mod>0?'+':'') + mod;
+  detail += ' = [' + rolls.join(', ') + ']';
+  if(mod) detail += ' + (' + (mod>=0?'+':'') + mod + ')';
+  detail += ' = ' + total;
+  $('dice-detail').textContent = detail;
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  state.history.unshift({
+    label: count + 'd' + sides + (mod?(mod>0?'+':'')+mod:''),
+    total: total,
+    detail: '[' + rolls.join(', ') + ']' + (mod?' '+(mod>=0?'+':'')+mod:''),
+    time: timeStr
+  });
+  if(state.history.length > 10) state.history.pop();
+  renderHistory();
+});
+
+function renderHistory(){
+  const el = $('roll-history');
+  if(!state.history.length){
+    el.innerHTML = '<div class="empty-state">Sin tiradas aún</div>';
+    return;
+  }
+  el.innerHTML = state.history.map(h => 
+    '<div class="history-item"><span><span class="roll">' + h.label + '</span> <span class="total">' + h.total + '</span> <span style="color:var(--text-dim)">' + h.detail + '</span></span><span class="time">' + h.time + '</span></div>'
+  ).join('');
+}
+
+// ---- Spells ----
+function renderSpells(){
+  const spells = D.spells || [];
+  const classFilter = $('spell-class-filter').value;
+  const levelFilter = $('spell-level-filter').value;
+  const schoolFilter = $('spell-school-filter').value;
+  const search = $('spell-search').value.trim().toLowerCase();
+  
+  let filtered = spells.filter(s => {
+    if(classFilter && (!s.classes || !s.classes.includes(classFilter))) return false;
+    if(levelFilter && s.level !== parseInt(levelFilter)) return false;
+    if(schoolFilter && s.school !== schoolFilter) return false;
+    if(search && !s.name.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  
+  const el = $('spell-list');
+  if(!filtered.length){
+    el.innerHTML = '<div class="empty-state">No se encontraron hechizos</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(s => {
+    const levelWord = s.level === 0 ? 'Truco' : (s.level === 1 ? 'Nivel 1' : 'Nivel '+s.level);
+    const schoolColor = s.school === 'Ilusión' ? '#b07cc9' : s.school === 'Nigromancia' ? '#6b8e6b' : s.school === 'Evocación' ? '#c97a3a' : s.school === 'Encantamiento' ? '#c97a9a' : s.school === 'Adivinación' ? '#7a9ac9' : s.school === 'Abaración' ? '#7ac9b0' : s.school === 'Transformación' ? '#c9b07a' : s.school === 'Conjuración' ? '#7ac97a' : 'var(--text-dim)';
+    return '<div class="spell-card"><div class="spell-name">' + s.name + '</div><div class="spell-meta"><span>🔮 ' + levelWord + ' ' + s.school + '</span><span>⏱ ' + (s.castingTime||'—') + '</span><span>📏 ' + (s.range||'—') + '</span><span>⏳ ' + (s.duration||'—') + '</span></div><div class="spell-desc">' + (s.description||'') + '</div></div>';
+  }).join('');
+}
+
+$('spell-class-filter').addEventListener('change', renderSpells);
+$('spell-level-filter').addEventListener('change', renderSpells);
+$('spell-school-filter').addEventListener('change', renderSpells);
+$('spell-search').addEventListener('input', renderSpells);
+
+// ---- Equipment (defined below) ----
+
+// ---- Rules ----
+function renderRules(){
+  // Skills by ability
+  const skillData = D.skillsByAbility || {
+    'Fuerza': ['Atletismo'],
+    'Destreza': ['Acrobacias','Juego de Manos','Sigilo'],
+    'Constitución': [],
+    'Inteligencia': ['Arcano','Historia','Investigación','Naturaleza','Religión'],
+    'Sabiduría': ['Trato con Animales','Perspicacia','Medicina','Percepción','Supervivencia'],
+    'Carisma': ['Engaño','Intimidación','Interpretación','Persuasión']
+  };
+  const skillTable = $('skill-table').querySelector('tbody');
+  skillTable.innerHTML = Object.entries(skillData).map(([abil, skills]) => 
+    '<tr><td style="font-weight:bold;color:var(--accent)">' + abil + '</td><td>' + (skills.length ? skills.join(', ') : '—') + '</td></tr>'
+  ).join('');
+  
+  // Modifiers
+  const modTable = $('mod-table').querySelector('tbody');
+  let modRows = '';
+  for(let i=1;i<=30;i++){
+    const mod = Math.floor((i-10)/2);
+    modRows += '<tr><td>' + i + '</td><td>' + (mod>=0?'+':'') + mod + '</td></tr>';
+  }
+  modTable.innerHTML = modRows;
+  
+  // AC table
+  const acItems = (D.equipo && D.equipo.armaduras) || [];
+  const acTable = $('ac-table').querySelector('tbody');
+  acTable.innerHTML = acItems.map(a => {
+    const acStr = a.tipo === 'Escudo' ? '+' + a.ca : a.ca + ' ' + (a.tipo==='Ligera'?'+DES': a.tipo==='Media'?'+DES (máx 2)':'');
+    return '<tr><td>' + a.nombre + '</td><td>' + acStr + '</td></tr>';
+  }).join('');
+  
+  // Conditions
+  const conditions = D.conditions || [
+    {name:'Cegado', desc:'No puede ver. Las tiradas de ataque contra la criatura tienen ventaja, y la criatura tiene desventaja en sus tiradas de ataque.'},
+    {name:'Encantado', desc:'No puede atacar al encantador ni atacarlo con sus características o efectos. El encantador tiene ventaja en habilidades sociales.'},
+    {name:'Ensordecido', desc:'No puede oír. Falla automáticamente cualquier prueba de habilidad que requiera oír.'},
+    {name:'Asustado', desc:'Tiene desventaja en pruebas de habilidad y tiradas de ataque mientras la fuente del miedo esté en línea de visión.'},
+    {name:'Agarrado', desc:'Su velocidad es 0. No puede beneficiarse de bonos de velocidad.'},
+    {name:'Incapacitado', desc:'No puede realizar acciones ni reacciones.'},
+    {name:'Invisible', desc:'No puede ser visto sin ayuda mágica. Tiene ventaja en ataques. Los ataques contra él tienen desventaja.'},
+    {name:'Paralizado', desc:'No puede moverse ni actuar. Los ataques cuerpo a cuerpo son críticos automáticos si están a 5 pies.'},
+    {name:'Petrificado', desc:'Transformado en piedra. No puede moverse ni actuar. Resistencia al daño. Inmune al veneno y enfermedad.'},
+    {name:'Envenenado', desc:'Tiene desventaja en todas las tiradas de ataque y pruebas de habilidad.'},
+    {name:'Derribado', desc:'Los ataques cuerpo a cuerpo tienen ventaja. Los ataques a distancia tienen desventaja. Debe gastar movimiento para levantarse.'},
+    {name:'Apresado', desc:'Su velocidad es 0. No puede teletransportarse ni viajar a otros planos.'},
+    {name:'Aturdido', desc:'No puede moverse ni actuar. Falla automáticamente las TS de FUE y DES. Ventaja en ataques contra él.'},
+    {name:'Inconsciente', desc:'No puede moverse ni actuar. Deja caer lo que sostiene. Falla automáticamente TS de FUE y DES. Ventaja en ataques contra él. Acierto automático si está a 5 pies.'},
+    {name:'Agotamiento', desc:'Nivel 1: desventaja en pruebas de habilidad. Nivel 2: velocidad reducida a la mitad. Nivel 3: desventaja en TS y ataques. Nivel 4: PG máximos reducidos a la mitad. Nivel 5: velocidad 0. Nivel 6: muerte.'},
+  ];
+  const condEl = $('condition-list');
+  condEl.innerHTML = conditions.map(c => '<div class="condition-item"><strong>' + c.name + '</strong><p>' + c.desc + '</p></div>').join('');
+}
+renderRules();
+
+// (Tab handler moved below)
+
+  // ---- Character Save/Load ----
+  function updateLoadList(){
+    const sel = $('load-char-select');
+    const current = sel.value;
+    sel.innerHTML = '<option value="">— Cargar personaje —</option>';
+    try {
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('dnd_char_'));
+      keys.sort().forEach(k => {
+        const o = document.createElement('option');
+        o.value = k;
+        o.textContent = k.replace('dnd_char_','');
+        sel.appendChild(o);
+      });
+    } catch(e){}
+    if(current && [...sel.options].some(o => o.value === current)) sel.value = current;
+  }
+  
+  $('save-char-btn').addEventListener('click', function(){
+    const name = $('char-name').value.trim() || 'Sin nombre';
+    if(!state.character){ alert('Primero genera un personaje.'); return; }
+    const key = 'dnd_char_' + name;
+    try {
+      localStorage.setItem(key, JSON.stringify(state.character));
+      updateLoadList();
+      alert('Personaje "' + name + '" guardado.');
+    } catch(e){ alert('Error al guardar.'); }
+  });
+  
+  $('load-char-select').addEventListener('change', function(){
+    if(!this.value) return;
+    try {
+      const data = JSON.parse(localStorage.getItem(this.value));
+      if(!data) return;
+      // Restore form
+      $('char-name').value = data.name || '';
+      raceSel.value = data.race || '';
+      raceSel.dispatchEvent(new Event('change'));
+      if(data.subrace) { subraceSel.value = data.subrace; }
+      classSel.value = data.class || '';
+      classSel.dispatchEvent(new Event('change'));
+      bgSel.value = data.bg || '';
+      // Restore scores in state
+      if(data.scores){
+        state.assigned = {};
+        const abilsShort = ['FUE','DES','CON','INT','SAB','CAR'];
+        abilsShort.forEach(a => {
+          if(data.scores[a] !== undefined) state.assigned[a] = data.scores[a];
+        });
+        state.rolledScores = abilsShort.map(a => data.scores[a] || 10);
+        renderStatGrid(state.rolledScores);
+        assignSection.style.display = 'block';
+        renderAssignGrid();
+      }
+      // Trigger generate
+      generateBtn.click();
+    } catch(e){ alert('Error al cargar personaje.'); }
+  });
+  
+  $('delete-char-btn').addEventListener('click', function(){
+    const name = $('load-char-select').value;
+    if(!name){ alert('Selecciona un personaje para eliminar.'); return; }
+    if(!confirm('Eliminar "' + name.replace('dnd_char_','') + '"?')) return;
+    try {
+      localStorage.removeItem(name);
+      updateLoadList();
+      alert('Eliminado.');
+    } catch(e){}
+  });
+  
+  // ---- Bestiary ----
+  function renderMonsters(){
+    const monsters = D.bestiario || [];
+    const crFilter = $('monster-cr-filter').value;
+    const search = $('monster-search').value.trim().toLowerCase();
+    
+    let filtered = monsters.filter(m => {
+      if(crFilter && m.cr !== crFilter) return false;
+      if(search && !m.nombre.toLowerCase().includes(search)) return false;
+      return true;
+    });
+    
+    const el = $('monster-list');
+    if(!filtered.length){
+      el.innerHTML = '<div class="empty-state">No se encontraron monstruos</div>';
+      return;
+    }
+    
+    el.innerHTML = filtered.map(m => {
+      const abils = ['FUE','DES','CON','INT','SAB','CAR'];
+      const statVals = [m.fuer||10, m.des||10, m.con||10, m.int||10, m.sab||10, m.car||10];
+      const statRow = abils.map((a,i) => {
+        const mod = Math.floor((statVals[i]-10)/2);
+        return a + ' ' + statVals[i] + ' (' + (mod>=0?'+':'') + mod + ')';
+      }).join(' | ');
+      
+      const skillsHtml = m.habilidades && Object.keys(m.habilidades).length ? 
+        Object.entries(m.habilidades).map(([s,v]) => '<span class="spell-tag">' + s + ' ' + v + '</span>').join('') : '';
+      
+      const actionsHtml = (m.acciones||[]).map(a => 
+        '<div style="font-size:11px;margin:2px 0"><strong style="color:var(--accent)">' + a.nombre + '.</strong> ' + a.desc + '</div>'
+      ).join('');
+      
+      const traitsHtml = (m.rasgos||[]).map(t => 
+        '<div style="font-size:11px;margin:2px 0"><strong>' + t.nombre + '.</strong> ' + t.desc + '</div>'
+      ).join('');
+      
+      return '<div class="spell-card"><div class="spell-name">' + m.nombre + ' <span style="font-size:11px;color:var(--text-dim);font-weight:normal">CR ' + m.cr + ' · ' + (m.tamaño||'') + ' ' + (m.tipo||'') + '</span></div>' +
+        '<div class="spell-meta"><span>CA ' + m.ca + '</span><span>PG ' + m.pg + '</span><span>Vel ' + (m.velocidad||'—') + '</span></div>' +
+        '<div style="font-size:10px;color:var(--text-dim);margin:4px 0">' + statRow + '</div>' +
+        (skillsHtml ? '<div style="margin:2px 0">' + skillsHtml + '</div>' : '') +
+        (traitsHtml ? '<div style="margin:4px 0;border-top:1px solid var(--bg3);padding-top:4px">' + traitsHtml + '</div>' : '') +
+        (actionsHtml ? '<div style="margin:4px 0;border-top:1px solid var(--bg3);padding-top:4px"><strong style="font-size:11px;color:var(--accent)">Acciones</strong>' + actionsHtml + '</div>' : '') +
+        '</div>';
+    }).join('');
+  }
+  
+  // Init monster CR filter
+  (function(){
+    const crs = new Set();
+    (D.bestiario||[]).forEach(m => crs.add(m.cr));
+    const crFilter = $('monster-cr-filter');
+    [...crs].sort().forEach(cr => {
+      const o = document.createElement('option');
+      o.value = cr;
+      o.textContent = 'CR ' + cr;
+      crFilter.appendChild(o);
+    });
+  })();
+  
+  $('monster-cr-filter').addEventListener('change', renderMonsters);
+  $('monster-search').addEventListener('input', renderMonsters);
+  
+  // ---- Advantage/Disadvantage ----
+  $('roll-adv-btn').addEventListener('click', function(){
+    const r1 = Math.floor(Math.random()*20)+1;
+    const r2 = Math.floor(Math.random()*20)+1;
+    const best = Math.max(r1, r2);
+    const numEl = $('dice-number');
+    if(numEl.classList.contains('roll-anim')){ numEl.classList.remove('roll-anim'); void numEl.offsetWidth; }
+    numEl.textContent = best;
+    numEl.classList.add('roll-anim');
+    $('dice-detail').textContent = 'Ventaja: [' + r1 + ', ' + r2 + '] = ' + best;
+    const now = new Date();
+    const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    state.history.unshift({label:'Ventaja', total:best, detail:'[' + r1 + ', ' + r2 + ']', time:timeStr});
+    if(state.history.length > 10) state.history.pop();
+    renderHistory();
+  });
+  
+  $('roll-disadv-btn').addEventListener('click', function(){
+    const r1 = Math.floor(Math.random()*20)+1;
+    const r2 = Math.floor(Math.random()*20)+1;
+    const worst = Math.min(r1, r2);
+    const numEl = $('dice-number');
+    if(numEl.classList.contains('roll-anim')){ numEl.classList.remove('roll-anim'); void numEl.offsetWidth; }
+    numEl.textContent = worst;
+    numEl.classList.add('roll-anim');
+    $('dice-detail').textContent = 'Desventaja: [' + r1 + ', ' + r2 + '] = ' + worst;
+    const now = new Date();
+    const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    state.history.unshift({label:'Desventaja', total:worst, detail:'[' + r1 + ', ' + r2 + ']', time:timeStr});
+    if(state.history.length > 10) state.history.pop();
+    renderHistory();
+  });
+  
+  // ---- Add equip buttons to equipment tab ----
+  var renderEquipment = function(){
+    const equip = D.equipo || {};
+    const cat = $('equip-category').value;
+    const search = $('equip-search').value.trim().toLowerCase();
+    let items = [];
+    if(!cat || cat === 'armas_simples') (equip.armas_simples||[]).forEach(i => items.push({...i, _cat:'Arma Simple'}));
+    if(!cat || cat === 'armas_marciales') (equip.armas_marciales||[]).forEach(i => items.push({...i, _cat:'Arma Marcial'}));
+    if(!cat || cat === 'armaduras') (equip.armaduras||[]).forEach(i => items.push({...i, _cat:'Armadura'}));
+    if(!cat || cat === 'equipo_aventurero') (equip.equipo_aventurero||[]).forEach(i => items.push({...i, _cat:'Equipo'}));
+    
+    if(search) items = items.filter(i => (i.nombre||'').toLowerCase().includes(search));
+    
+    const el = $('equip-list');
+    if(!items.length){
+      el.innerHTML = '<div class="empty-state">Sin equipo</div>';
+      return;
+    }
+    el.innerHTML = items.map(i => {
+      let detail = '';
+      if(i.daño) detail += '<span class="spell-tag">' + i.daño + ' ' + (i.tipo||'') + '</span>';
+      if(i.ca) detail += '<span class="spell-tag">CA ' + i.ca + '</span>';
+      if(i.propiedades) detail += '<span class="spell-tag">' + i.propiedades + '</span>';
+      if(i.precio) detail += '<span class="spell-tag" style="color:var(--accent)">' + i.precio + '</span>';
+      const canEquip = (i._cat === 'Arma Simple' || i._cat === 'Arma Marcial' || i._cat === 'Armadura');
+      const isEquipped = state.equippedItems && (state.equippedItems.weapon === i.nombre || state.equippedItems.armor === i.nombre);
+      const equipBtn = canEquip ? '<button class="btn btn-sm equip-btn" style="margin-left:8px" data-name="' + i.nombre + '" data-cat="' + i._cat + '">' + (isEquipped ? '✓' : 'Equipar') + '</button>' : '';
+      return '<div class="spell-card"><div class="spell-name">' + (i.nombre||'') + equipBtn + '</div><div class="spell-meta"><span>' + i._cat + '</span>' + detail + '</div></div>';
+    }).join('');
+    
+    // Add equip event listeners
+    el.querySelectorAll('.equip-btn').forEach(btn => {
+      btn.addEventListener('click', function(){
+        const name = this.dataset.name;
+        const cat = this.dataset.cat;
+        if(!state.character){ alert('Primero genera un personaje.'); return; }
+        if(!state.equippedItems) state.equippedItems = {armor: null, weapon: null};
+        if(cat === 'Armadura'){
+          // Unequip old armor
+          if(state.equippedItems.armor) alert('Armadura cambiada: ' + state.equippedItems.armor + ' → ' + name);
+          state.equippedItems.armor = (state.equippedItems.armor === name) ? null : name;
+        } else {
+          state.equippedItems.weapon = (state.equippedItems.weapon === name) ? null : name;
+        }
+        renderEquipment();
+        // Regenerate character display
+        if(state.character) generateBtn.click();
+      });
+    });
+  };
+  
+  // Re-bind equipment filter listeners to new renderEquipment
+  $('equip-category').addEventListener('change', renderEquipment);
+  $('equip-search').addEventListener('input', renderEquipment);
+  
+  // ---- Update tabs handler for Bestiary ----
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      $('tab-'+this.dataset.tab).classList.add('active');
+      if(this.dataset.tab === 'hechizos') renderSpells();
+      if(this.dataset.tab === 'equipo') renderEquipment();
+      if(this.dataset.tab === 'bestiario') renderMonsters();
+    });
+  });
+  
+  // ---- Init ----
+  initSelects();
+  // Init stat assign
+  $('stat-method').value = '4d6';
+  $('roll-stats-btn').click();
+  // Init history
+  renderHistory();
+  // Init save/load list
+  updateLoadList();
+  // Init equipped state
+  state.equippedItems = {armor: null, weapon: null};
+
+})();
+</script>
+</body>
+</html>
