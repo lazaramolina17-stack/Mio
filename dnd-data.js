@@ -1113,12 +1113,10 @@ var DND = {
     armas_simples: [
       {nombre: 'Clava', daño: '1d4', tipo: 'Contundente', propiedades: 'Ligera'},
       {nombre: 'Daga', daño: '1d4', tipo: 'Perforante', propiedades: 'Sutil, ligera, arrojadiza (20/60)'},
-      {nombre: 'Gran Hacha', daño: '1d12', tipo: 'Cortante', propiedades: 'Pesada, de dos manos'},
       {nombre: 'Hacha de Mano', daño: '1d6', tipo: 'Cortante', propiedades: 'Ligera, arrojadiza (20/60)'},
       {nombre: 'Jabalina', daño: '1d6', tipo: 'Perforante', propiedades: 'Arrojadiza (30/120)'},
       {nombre: 'Maza', daño: '1d6', tipo: 'Contundente', propiedades: '-'},
       {nombre: 'Bastón', daño: '1d6', tipo: 'Contundente', propiedades: 'Versátil (1d8)'},
-      {nombre: 'Cimitarra', daño: '1d6', tipo: 'Cortante', propiedades: 'Ligera, sutil'},
       {nombre: 'Hoz', daño: '1d4', tipo: 'Cortante', propiedades: 'Ligera'},
       {nombre: 'Honda', daño: '1d4', tipo: 'Contundente', propiedades: 'Munición (30/120)'},
       {nombre: 'Lanza', daño: '1d6', tipo: 'Perforante', propiedades: 'Versátil (1d8), arrojadiza (20/60)'},
@@ -1126,6 +1124,8 @@ var DND = {
       {nombre: 'Dardo', daño: '1d4', tipo: 'Perforante', propiedades: 'Sutil, arrojadiza (20/60)'}
     ],
     armas_marciales: [
+      {nombre: 'Gran Hacha', daño: '1d12', tipo: 'Cortante', propiedades: 'Pesada, de dos manos'},
+      {nombre: 'Cimitarra', daño: '1d6', tipo: 'Cortante', propiedades: 'Ligera, sutil'},
       {nombre: 'Estoque', daño: '1d8', tipo: 'Perforante', propiedades: 'Sutil'},
       {nombre: 'Espada Larga', daño: '1d8', tipo: 'Cortante', propiedades: 'Versátil (1d10)'},
       {nombre: 'Hacha de Batalla', daño: '1d8', tipo: 'Cortante', propiedades: 'Versátil (1d10)'},
@@ -1184,24 +1184,6 @@ var DND = {
       {nombre: 'Ganzúas', precio: '25 gp'}
     ]
   },
-  bestiario: [
-    {nombre:'Goblin', tamaño:'Pequeño', tipo:'Humanoide', ca:15, pg:'7 (2d6)', velocidad:'30 pies', des:14, fuer:8, con:10, int:10, sab:8, car:8, habilidades:{Sigilo:'+6'}, sentidos:'Visión oscura 60 pies', idiomas:'Común, Goblin', cr:'1/4', acciones:[{nombre:'Espada Corta', desc:'+4 a golpear, 1d6+2 perforante'},{nombre:'Arco Corto', desc:'+4 a golpear, 1d6+2 perforante'}], rasgos:[{nombre:'Huida Astuta', desc:'Puede esquivar o esconderse como acción bonus.'},{nombre:'Ataque Furtivo', desc:'Causa 2d6 de daño extra si tiene ventaja.'}]},
-    {nombre:'Orco', tamaño:'Mediano', tipo:'Humanoide', ca:13, pg:'15 (2d8+6)', velocidad:'30 pies', des:12, fuer:16, con:16, int:7, sab:11, car:10, habilidades:{Intimidación:'+2'}, sentidos:'Visión oscura 60 pies', idiomas:'Común, Orco', cr:'1/2', acciones:[{nombre:'Gran Hacha', desc:'+5 a golpear, 1d12+3 cortante'},{nombre:'Jabalina', desc:'+5 a golpear, 1d6+3 perforante'}], rasgos:[{nombre:'Aguante', desc:'Cuando el orco es reducido a 0 PG pero no muerto, puede quedar a 1 PG.'},{nombre:'Carga Agresiva', desc:'El orco puede moverse hasta su velocidad hacia una criatura hostil que pueda ver como acción bonus.'}]},
-    {nombre:'Hobgoblin', tamaño:'Mediano', tipo:'Humanoide', ca:18, pg:'11 (2d8+2)', velocidad:'30 pies', des:12, fuer:15, con:12, int:10, sab:10, car:9, habilidades:{}, sentidos:'Visión oscura 60 pies', idiomas:'Común, Goblin', cr:'1/2', acciones:[{nombre:'Espada Larga', desc:'+4 a golpear, 1d8+2 cortante (1d10+2 a dos manos)'},{nombre:'Arco Largo', desc:'+3 a golpear, 1d8+1 perforante'}], rasgos:[{nombre:'Ventaja Marcial', desc:'Una vez por turno, si el hobgoblin tiene aliados a 5 pies, causa 2d6 de daño extra.'}]},
-    {nombre:'Esqueleto', tamaño:'Mediano', tipo:'No-muerto', ca:13, pg:'13 (2d8+4)', velocidad:'30 pies', des:14, fuer:10, con:15, int:6, sab:8, car:5, habilidades:{}, sentidos:'Visión oscura 60 pies', idiomas:'Común', cr:'1/4', acciones:[{nombre:'Espada Corta', desc:'+4 a golpear, 1d6+2 perforante'},{nombre:'Arco Corto', desc:'+4 a golpear, 1d6+2 perforante'}], rasgos:[{nombre:'Vulnerabilidades', desc:'Daño contundente.'},{nombre:'Inmunidades', desc:'Veneno, agotamiento.'}]},
-    {nombre:'Zombi', tamaño:'Mediano', tipo:'No-muerto', ca:8, pg:'22 (3d8+9)', velocidad:'20 pies', des:6, fuer:13, con:16, int:3, sab:6, car:5, habilidades:{}, sentidos:'Visión oscura 60 pies', idiomas:'Común', cr:'1/4', acciones:[{nombre:'Puñetazo', desc:'+3 a golpear, 1d6+1 contundente'}], rasgos:[{nombre:'Fortaleza de No-muerto', desc:'Si el daño lo reduce a 0 PG, hace una TS de CON CD 5+daño recibido. Si tiene éxito, queda a 1 PG.'},{nombre:'Inmunidades', desc:'Veneno, agotamiento.'}]},
-    {nombre:'Lobo', tamaño:'Mediano', tipo:'Bestia', ca:13, pg:'11 (2d8+2)', velocidad:'40 pies', des:15, fuer:12, con:12, int:3, sab:12, car:6, habilidades:{Percepción:'+3',Sigilo:'+4'}, sentidos:'Percepción 40 pies', idiomas:'—', cr:'1/4', acciones:[{nombre:'Mordisco', desc:'+4 a golpear, 2d4+2 perforante. TS de FUE CD 11 o derribado.'}], rasgos:[{nombre:'Olfato Agudo', desc:'Ventaja en pruebas de Sabiduría (Percepción) que usen olfato.'},{nombre:'Tácticas de Manada', desc:'Ventaja en ataques si un aliado está a 5 pies del objetivo.'}]},
-    {nombre:'Oso Negro', tamaño:'Grande', tipo:'Bestia', ca:11, pg:'19 (3d10+3)', velocidad:'40 pies, trepar 30 pies', des:10, fuer:15, con:14, int:2, sab:12, car:7, habilidades:{Percepción:'+3'}, sentidos:'Percepción 30 pies', idiomas:'—', cr:'1/2', acciones:[{nombre:'Golpe', desc:'+3 a golpear, 1d6+1 contundente'},{nombre:'Mordisco', desc:'+3 a golpear, 1d8+1 perforante'}], rasgos:[{nombre:'Olfato Agudo', desc:'Ventaja en Percepción usando olfato.'}]},
-    {nombre:'Bandido', tamaño:'Mediano', tipo:'Humanoide', ca:12, pg:'11 (2d8+2)', velocidad:'30 pies', des:12, fuer:11, con:12, int:10, sab:10, car:10, habilidades:{}, sentidos:'—', idiomas:'Común', cr:'1/8', acciones:[{nombre:'Cimitarra', desc:'+3 a golpear, 1d6+1 cortante'},{nombre:'Ballesta Ligera', desc:'+3 a golpear, 1d8+1 perforante'}], rasgos:[]},
-    {nombre:'Ladrón', tamaño:'Mediano', tipo:'Humanoide', ca:14, pg:'13 (3d8)', velocidad:'30 pies', des:15, fuer:10, con:10, int:12, sab:10, car:12, habilidades:{Acrobacias:'+4',Juego_de_Manos:'+4',Sigilo:'+6',Percepción:'+2'}, sentidos:'—', idiomas:'Común, Jerga de ladrones', cr:'1/2', acciones:[{nombre:'Espada Corta', desc:'+4 a golpear, 1d6+2 perforante'},{nombre:'Ballesta de Mano', desc:'+4 a golpear, 1d6+2 perforante'}], rasgos:[{nombre:'Ataque Furtivo', desc:'Causa 1d6 extra si tiene ventaja.'},{nombre:'Evasión', desc:'Sin daño en TS de DES exitosas.'}]},
-    {nombre:'Gnoll', tamaño:'Mediano', tipo:'Humanoide', ca:15, pg:'22 (5d8)', velocidad:'30 pies', des:12, fuer:14, con:11, int:6, sab:10, car:7, habilidades:{}, sentidos:'Visión oscura 60 pies', idiomas:'Gnoll, Común', cr:'1/2', acciones:[{nombre:'Mordisco', desc:'+4 a golpear, 1d4+2 perforante'},{nombre:'Lanza', desc:'+4 a golpear, 1d6+2 perforante (1d8 a dos manos)'},{nombre:'Arco Corto', desc:'+3 a golpear, 1d6+1 perforante'}], rasgos:[{nombre:'Rastro de Sangre', desc:'Ventaja en ataques contra criaturas sin PG máximos.'}]},
-    {nombre:'Espectro', tamaño:'Mediano', tipo:'No-muerto', ca:11, pg:'22 (5d8)', velocidad:'0 pies, volar 50 pies', des:11, fuer:1, con:10, int:10, sab:10, car:11, habilidades:{}, sentidos:'Visión oscura 60 pies', idiomas:'Común', cr:'1', acciones:[{nombre:'Toque Drenador', desc:'+3 a golpear, 3d6 de daño necrótico. El objetivo reduce su máximo de PG.'}], rasgos:[{nombre:'Movimiento Incorpóreo', desc:'Puede atravesar criaturas y objetos.'},{nombre:'Inmunidades', desc:'Veneno, necrótico, agotamiento, derribado, agarrado, paralizado.'}]},
-    {nombre:'Gelatina Verde', tamaño:'Grande', tipo:'Cieno', ca:6, pg:'84 (8d10+40)', velocidad:'15 pies, trepar 15 pies', des:1, fuer:12, con:20, int:1, sab:6, car:1, habilidades:{}, sentidos:'Ciego más allá de 60 pies, visión ciega 60 pies', idiomas:'—', cr:'2', acciones:[{nombre:'Seudo-pie', desc:'+3 a golpear, 2d6+1 contundente + 2d6 ácido'}], rasgos:[{nombre:'Dividirse', desc:'Si recibe daño cortante/relámpago se divide en dos.'},{nombre:'Disolver', desc:'Corroe armadura/arma al contacto.'},{nombre:'Abrasión', desc:'2d6 de daño ácido a cualquier criatura que lo toque.'}]},
-    {nombre:'Arpía', tamaño:'Mediano', tipo:'Monstruosidad', ca:11, pg:'38 (7d8+7)', velocidad:'20 pies, volar 40 pies', des:13, fuer:12, con:12, int:7, sab:10, car:13, habilidades:{}, sentidos:'—', idiomas:'Común', cr:'1', acciones:[{nombre:'Garras', desc:'+3 a golpear, 2d4+1 cortante'},{nombre:'Canto Seductor', desc:'TS de SAB CD 11 o la criatura se acerca a la arpía.'}], rasgos:[]},
-    {nombre:'Basilisco', tamaño:'Mediano', tipo:'Monstruosidad', ca:15, pg:'45 (6d8+18)', velocidad:'20 pies', des:8, fuer:15, con:16, int:2, sab:8, car:7, habilidades:{}, sentidos:'Visión oscura 60 pies', idiomas:'—', cr:'3', acciones:[{nombre:'Mordisco', desc:'+5 a golpear, 2d6+2 perforante + 2d6 veneno'}], rasgos:[{nombre:'Mirada Petrificante', desc:'Si el basilisco ve a una criatura a 30 pies, esta debe hacer TS de CON CD 12. Si falla dos veces, queda petrificada.'}]},
-    {nombre:'Quimera', tamaño:'Grande', tipo:'Monstruosidad', ca:14, pg:'62 (9d10+36)', velocidad:'30 pies, volar 60 pies', des:11, fuer:19, con:17, int:3, sab:12, car:10, habilidades:{Percepción:'+8'}, sentidos:'Visión oscura 60 pies', idiomas:'Común', cr:'6', acciones:[{nombre:'Mordisco', desc:'+7 a golpear, 2d6+4 perforante'},{nombre:'Cornada', desc:'+7 a golpear, 1d12+4 contundente'},{nombre:'Garras', desc:'+7 a golpear, 2d6+4 cortante'},{nombre:'Aliento de Fuego', desc:'CD 15 DES, 7d8 de daño de fuego en cono.'}], rasgos:[]},
-    {nombre:'Dragón Joven (Rojo)', tamaño:'Grande', tipo:'Dragón', ca:18, pg:'119 (14d10+42)', velocidad:'40 pies, volar 80 pies', des:10, fuer:23, con:19, int:14, sab:11, car:19, habilidades:{Percepción:'+9',Sigilo:'+5'}, sentidos:'Visión ciega 30 pies, visión oscura 120 pies', idiomas:'Común, Dragónico', cr:'10', acciones:[{nombre:'Mordisco', desc:'+10 a golpear, 2d10+6 perforante + 2d6 fuego'},{nombre:'Garras', desc:'+10 a golpear, 2d6+6 cortante'},{nombre:'Aliento de Fuego', desc:'CD 19 DES, 16d6 de daño de fuego en cono.'}], rasgos:[{nombre:'Resistencia Legendaria', desc:'3 veces al día, puede tener éxito en una TS fallida.'}]},
-  ],
   alineamientos: ['Legal Bueno', 'Neutral Bueno', 'Caótico Bueno', 'Legal Neutral', 'Neutral', 'Caótico Neutral', 'Legal Malvado', 'Neutral Malvado', 'Caótico Malvado'],
   tiradas_dados_golpe: {
     'Barbarian': 'd12',
@@ -1216,6 +1198,272 @@ var DND = {
     'Sorcerer': 'd6',
     'Warlock': 'd8',
     'Wizard': 'd6'
+  },
+  bestiario: [
+    {nombre:'Murciélago Gigante', tamaño:'Mediano', tipo:'Bestia', ca:13, pg:'11 (2d8+2)', velocidad:'10 pies, volar 60 pies', des:16, fuer:10, con:11, int:2, sab:12, car:6, habilidades:{}, sentidos:'Visión ciega 60 pies', idiomas:'—', cr:'1/8', acciones:[{nombre:'Mordisco', desc:'+4 a golpear, 1d6+2 perforante'}], rasgos:[{nombre:'Ecolocalización', desc:'El murciélago no puede usar su vista ciega mientras esté ensordecido.'},{nombre:'Oído Agudo', desc:'Ventaja en pruebas de Sabiduría (Percepción) que usen oído.'}]},
+    {nombre:'Cocodrilo', tamaño:'Grande', tipo:'Bestia', ca:12, pg:'19 (3d10+3)', velocidad:'20 pies, nadar 30 pies', des:10, fuer:15, con:13, int:2, sab:10, car:5, habilidades:{Sigilo:'+4'}, sentidos:'—', idiomas:'—', cr:'1/2', acciones:[{nombre:'Mordisco', desc:'+4 a golpear, 2d6+2 perforante. El objetivo queda agarrado (CD 12).'}], rasgos:[{nombre:'Contención', desc:'El cocodrilo puede derribar a una criatura que tenga agarrada como acción bonus.'}]},
+    {nombre:'Pantera', tamaño:'Mediano', tipo:'Bestia', ca:12, pg:'13 (3d8)', velocidad:'50 pies, trepar 40 pies', des:15, fuer:14, con:10, int:3, sab:14, car:7, habilidades:{Percepción:'+4',Sigilo:'+6'}, sentidos:'Visión oscura 60 pies', idiomas:'—', cr:'1/4', acciones:[{nombre:'Garra', desc:'+4 a golpear, 1d4+2 cortante'},{nombre:'Mordisco', desc:'+4 a golpear, 1d6+2 perforante'}], rasgos:[{nombre:'Salto Poderoso', desc:'La pantera puede saltar hasta 20 pies sin carrera.'},{nombre:'Olfato Agudo', desc:'Ventaja en Percepción usando olfato.'}]},
+    {nombre:'Escorpión Gigante', tamaño:'Grande', tipo:'Bestia', ca:15, pg:'52 (7d10+14)', velocidad:'40 pies', des:13, fuer:15, con:14, int:1, sab:9, car:3, habilidades:{}, sentidos:'Visión ciega 60 pies', idiomas:'—', cr:'3', acciones:[{nombre:'Pinza', desc:'+4 a golpear, 1d8+2 contundente y el objetivo queda agarrado.'},{nombre:'Aguijón', desc:'+4 a golpear, 1d10+2 perforante + 4d10 veneno (CD 12 CON para mitad).'}], rasgos:[]},
+    {nombre:'Gargantúa', tamaño:'Enorme', tipo:'Gigante', ca:17, pg:'138 (12d12+60)', velocidad:'40 pies', des:9, fuer:22, con:20, int:8, sab:10, car:8, habilidades:{}, sentidos:'—', idiomas:'Común, Gigante', cr:'5', acciones:[{nombre:'Puñetazo', desc:'+9 a golpear, 3d8+6 contundente'},{nombre:'Roca', desc:'+9 a golpear, 3d10+6 contundente'}], rasgos:[]},
+    {nombre:'Minotauro', tamaño:'Grande', tipo:'Monstruosidad', ca:14, pg:'76 (9d10+27)', velocidad:'40 pies', des:11, fuer:18, con:16, int:6, sab:16, car:9, habilidades:{Percepción:'+7'}, sentidos:'Visión oscura 60 pies', idiomas:'Común, Abismal', cr:'3', acciones:[{nombre:'Gran Hacha', desc:'+6 a golpear, 2d12+4 cortante'},{nombre:'Cornada', desc:'+6 a golpear, 2d8+4 perforante'}], rasgos:[{nombre:'Carga Cornada', desc:'Si se mueve 10+ pies en línea recta hacia el objetivo y lo golpea con cornada, causa 2d8+4 adicional y el objetivo debe hacer TS de FUE CD 14 o ser empujado.'},{nombre:'Memoria del Laberinto', desc:'El minotauro nunca se pierde.'}]},
+    {nombre:'Golem de Carne', tamaño:'Grande', tipo:'Constructor', ca:9, pg:'93 (11d10+33)', velocidad:'30 pies', des:9, fuer:19, con:17, int:6, sab:10, car:5, habilidades:{}, sentidos:'Visión oscura 60 pies', idiomas:'—', cr:'5', acciones:[{nombre:'Puñetazo', desc:'+7 a golpear, 2d8+4 contundente'}], rasgos:[{nombre:'Inmunidad Mágica', desc:'El golem es inmune a hechizos de nivel 5 o inferior. Puede ser ralentizado por daño de fuego y curado por daño de relámpago.'},{nombre:'Inmunidades', desc:'Veneno, psíquico, agotamiento, hechizado, paralizado.'}]},
+    {nombre:'Vampiro Escudero', tamaño:'Mediano', tipo:'No-muerto', ca:15, pg:'63 (14d8)', velocidad:'30 pies', des:14, fuer:14, con:10, int:10, sab:14, car:14, habilidades:{Percepción:'+6',Sigilo:'+6'}, sentidos:'Visión oscura 60 pies', idiomas:'Común', cr:'3', acciones:[{nombre:'Puñetazo', desc:'+4 a golpear, 1d6+2 contundente + 2d6 necrótico'},{nombre:'Mordisco', desc:'+4 a golpear, 1d4+2 perforante + 2d6 necrótico. Reduce máximo de PG.'}], rasgos:[{nombre:'Regeneración', desc:'Recupera 5 PG al inicio de su turno si tiene al menos 1 PG.'},{nombre:'Resistencia', desc:'Resistencia a daño necrótico y contundente, perforante y cortante de ataques no mágicos.'},{nombre:'Debilidades', desc:'Agua corriente, luz solar, estaca en el corazón.'}]},
+    {nombre:'Ninfa del Bosque', tamaño:'Mediano', tipo:'Feérico', ca:12, pg:'27 (6d8)', velocidad:'30 pies', des:13, fuer:10, con:11, int:14, sab:15, car:18, habilidades:{Sigilo:'+5',Persuasión:'+6'}, sentidos:'Visión oscura 60 pies', idiomas:'Común, Silvano, Élfico', cr:'1', acciones:[{nombre:'Puñetazo', desc:'+2 a golpear, 1d4 contundente'}], rasgos:[{nombre:'Belleza Deslumbrante', desc:'Cualquier humanoide que vea a la ninfa debe hacer TS de SAB CD 13 o quedar hechizado 1 minuto.'},{nombre:'Paso Etéreo', desc:'La ninfa puede atravesar objetos y terreno difícil sin penalización.'}]},
+    {nombre:'Wyvern', tamaño:'Grande', tipo:'Dragón', ca:13, pg:'110 (13d10+39)', velocidad:'20 pies, volar 80 pies', des:10, fuer:19, con:16, int:5, sab:12, car:6, habilidades:{Percepción:'+4'}, sentidos:'Visión oscura 60 pies', idiomas:'—', cr:'6', acciones:[{nombre:'Mordisco', desc:'+7 a golpear, 2d6+4 perforante'},{nombre:'Aguijón', desc:'+7 a golpear, 2d6+4 perforante + 7d6 veneno (CD 15 CON para mitad).'}], rasgos:[]},
+    {nombre:'Troll', tamaño:'Grande', tipo:'Gigante', ca:15, pg:'84 (8d10+40)', velocidad:'30 pies', des:13, fuer:18, con:20, int:7, sab:9, car:7, habilidades:{Percepción:'+2'}, sentidos:'Visión oscura 60 pies', idiomas:'Común, Gigante', cr:'5', acciones:[{nombre:'Golpe', desc:'+7 a golpear, 2d6+4 contundente'},{nombre:'Mordisco', desc:'+7 a golpear, 1d6+4 perforante'}], rasgos:[{nombre:'Regeneración', desc:'El troll recupera 10 PG al inicio de su turno. Muere realmente solo si recibe daño de fuego o ácido.'},{nombre:'Olfato Agudo', desc:'Ventaja en Percepción usando olfato.'}]},
+    {nombre:'Yeti', tamaño:'Grande', tipo:'Monstruosidad', ca:12, pg:'51 (6d10+18)', velocidad:'40 pies, trepar 40 pies', des:13, fuer:17, con:16, int:8, sab:12, car:9, habilidades:{Percepción:'+3',Sigilo:'+3'}, sentidos:'Visión oscura 60 pies', idiomas:'Común, Gigante', cr:'3', acciones:[{nombre:'Garra', desc:'+5 a golpear, 1d6+3 cortante + 1d6 frío'},{nombre:'Mirada Aterradora', desc:'TS de SAB CD 12 o queda asustado.'}], rasgos:[{nombre:'Inmunidad al Frío', desc:'Inmune al daño por frío.'},{nombre:'Visión en la Nieve', desc:'No tiene penalización por ventisca o niebla.'}]},
+    {nombre:'Araña Gigante', tamaño:'Grande', tipo:'Bestia', ca:14, pg:'26 (4d10+4)', velocidad:'30 pies, trepar 30 pies', des:16, fuer:14, con:12, int:2, sab:11, car:4, habilidades:{Sigilo:'+7'}, sentidos:'Visión ciega 10 pies, visión oscura 60 pies', idiomas:'—', cr:'1', acciones:[{nombre:'Mordisco', desc:'+5 a golpear, 1d8+3 perforante + 2d6 veneno (CD 11 CON para mitad).'}], rasgos:[{nombre:'Telaraña', desc:'La araña puede lanzar telarañas. TS de FUE CD 11 o queda agarrado.'},{nombre:'Trepar Telarañas', desc:'Ignora restricciones de movimiento de telarañas.'},{nombre:'Escaladora', desc:'Puede trepar superficies difíciles sin prueba.'}]},
+    {nombre:'Lobo Sombrio', tamaño:'Grande', tipo:'Monstruosidad', ca:14, pg:'27 (5d8+5)', velocidad:'50 pies', des:15, fuer:16, con:13, int:6, sab:12, car:10, habilidades:{Percepción:'+3',Sigilo:'+4'}, sentidos:'Visión oscura 60 pies', idiomas:'—', cr:'1/4', acciones:[{nombre:'Mordisco', desc:'+5 a golpear, 2d4+3 perforante. TS de FUE CD 12 o derribado.'}], rasgos:[{nombre:'Olfato Agudo', desc:'Ventaja en Percepción usando olfato.'},{nombre:'Tácticas de Manada', desc:'Ventaja en ataques si un aliado está a 5 pies.'},{nombre:'Paso Sombrío', desc:'En luz tenue u oscuridad, puede esconderse como acción bonus.'}]},
+    {nombre:'Bandido Jefe', tamaño:'Mediano', tipo:'Humanoide', ca:15, pg:'65 (10d8+20)', velocidad:'30 pies', des:16, fuer:14, con:14, int:12, sab:10, car:14, habilidades:{Acrobacias:'+5',Percepción:'+2',Persuasión:'+4'}, sentidos:'—', idiomas:'Común', cr:'2', acciones:[{nombre:'Estoque', desc:'+5 a golpear, 1d8+3 perforante'},{nombre:'Ballesta de Mano', desc:'+5 a golpear, 1d6+3 perforante'}], rasgos:[{nombre:'Ataque Furtivo', desc:'Causa 3d6 de daño extra si tiene ventaja.'},{nombre:'Acción Astuta', desc:'Puede esprintar, separarse o esconderse como acción bonus.'}]}
+  ],
+  escenas: {
+    entrada_mazmorra: {
+      nombre: 'Entrada a la Cripta',
+      desc: 'Ante ti se alza una antigua cripta de piedra cubierta de musgo. La puerta de hierro está entreabierta, y un hedor a humedad y muerte escapa de su interior. El viento susurra entre las grietas de la mampostería.',
+      tipo: 'explore',
+      opciones: [
+        { texto: 'Entrar directamente', resultado: 'pasillo_principal', desc: 'Empujas la puerta oxidada y te adentras en la oscuridad. El sonido de tus pasos retumba en la piedra.' },
+        { texto: 'Buscar una entrada secreta', resultado: 'pasillo_principal', desc: 'Palpas las paredes en busca de algún mecanismo oculto.', checks: { habilidad: 'Percepción', cd: 12, fallo: 'No encuentras nada y pierdes varios minutos. Entras por la puerta principal.' } },
+        { texto: 'Acampar fuera y descansar', resultado: 'entrada_mazmorra', desc: 'Montas un pequeño campamento junto a la entrada. Descansas un par de horas, recuperando fuerzas.', checks: { fallo: 'Apenas logras conciliar el sueño. Descansas mal.' } }
+      ]
+    },
+    pasillo_principal: {
+      nombre: 'El Pasillo de las Estatuas',
+      desc: 'Un largo pasillo flanqueado por imponentes estatuas de guerreros cubiertas de polvo y telarañas. Sus ojos de ónice parecen seguirte. Al fondo se divisan dos puertas: una de madera tallada y otra de piedra lisa.',
+      tipo: 'explore',
+      opciones: [
+        { texto: 'Seguir derecho por el pasillo', resultado: 'sala_guardia', desc: 'Cruzas el pasillo con paso firme, sintiendo las miradas pétreas sobre ti.' },
+        { texto: 'Investigar las estatuas', resultado: 'cripta_arcana', desc: 'Examinas de cerca las estatuas y notas runas grabadas en sus bases.', checks: { habilidad: 'Arcano', cd: 14, fallo: 'Las runas no te dicen nada. Sigues adelante.' } },
+        { texto: 'Volver a la entrada de la mazmorra', resultado: 'entrada_mazmorra', desc: 'Decides retroceder a la entrada.' }
+      ]
+    },
+    sala_guardia: {
+      nombre: 'Sala de la Guardia Caída',
+      desc: 'Esta sala antaño fue una guardia. Los restos de mobiliario de madera yacen podridos en el suelo. Dos esqueletos vestidos con restos de armaduras se incorporan al sentir tu presencia, sus cuencas vacías brillan con luz violeta.',
+      tipo: 'combat',
+      opciones: [
+        { texto: '¡Luchar contra los esqueletos!', resultado: 'cripta_arcana', desc: 'Desenvainas tu arma y te lanzas al combate.' },
+        { texto: 'Intentar negociar', resultado: 'cripta_arcana', desc: 'Intentas hablar con los esqueletos, pero solo responden con un escalofriante crujir de huesos. Se preparan para atacar.' },
+        { texto: 'Huir de vuelta al pasillo', resultado: 'pasillo_principal', desc: 'Sales corriendo de vuelta al pasillo de las estatuas.' }
+      ],
+      encuentro: { monstruos: [{ nombre: 'Esqueleto', cantidad: 2 }], probabilidad: 1 }
+    },
+    cripta_arcana: {
+      nombre: 'La Cripta Arcana',
+      desc: 'Una cámara circular cuyas paredes están cubiertas de runas brillantes que pulsan con luz azulada. En el centro hay un pedestal con un cofre de madera oscura. El aire chisporrotea con energía mágica.',
+      tipo: 'loot',
+      opciones: [
+        { texto: 'Leer las runas de las paredes', resultado: 'puente_colgante', desc: 'Estudias los símbolos arcanos y logras descifrar un conocimiento olvidado.', checks: { habilidad: 'Arcano', cd: 12, fallo: 'Las runas te resultan indescifrables. El cofre parece más interesante.' } },
+        { texto: 'Abrir el cofre del pedestal', resultado: 'puente_colgante', desc: 'Te acercas al cofre con cuidado. Al abrirlo, una aguja envenenada sale de la cerradura.', checks: { habilidad: 'Percepción', cd: 14, fallo: 'La aguja te alcanza. Sientes un dolor punzante.' } },
+        { texto: 'Ignorar todo y seguir', resultado: 'puente_colgante', desc: 'Decides no tentar a la suerte y continuas por la puerta del fondo.' }
+      ],
+      tesoro: { oro: '50 mo', objetos: ['Pergamino Mágico', 'Gema Opaca'] }
+    },
+    puente_colgante: {
+      nombre: 'El Puente Colgante',
+      desc: 'Un abismo profundo se extiende ante ti. Un puente de cuerda y madera podrida cruza el foso, meciéndose sobre las sombras. Del otro lado se ve una puerta dorada. Gotas de agua caen desde las alturas.',
+      tipo: 'explore',
+      opciones: [
+        { texto: 'Cruzar el puente con cuidado', resultado: 'tesoro_reino', desc: 'Pisas con cautela las tablas podridas. El puente cruje pero aguanta.', checks: { habilidad: 'Destreza', cd: 13, fallo: 'Una tabla se parte bajo tu peso. Caes y te golpeas contra el borde, pero logras aferrarte y subir.' } },
+        { texto: 'Intentar saltar el abismo', resultado: 'tesoro_reino', desc: 'Tomas impulso y saltas con todas tus fuerzas.', checks: { habilidad: 'Fuerza', cd: 15, fallo: 'No alcanzas el otro lado. Caes al vacío, golpeándote contra las rocas.' } },
+        { texto: 'Rodear por un pasaje lateral', resultado: 'salida', desc: 'Encuentras un angosto pasaje que rodea el abismo, pero te lleva en dirección contraria.' }
+      ]
+    },
+    tesoro_reino: {
+      nombre: 'La Cámara del Tesoro',
+      desc: 'Una sala resplandeciente llena de monedas de oro, joyas y objetos de valor apilados en montones. Un esqueleto con armadura oxidada y un zombi harapiento custodian el tesoro, moviéndose lentamente hacia ti.',
+      tipo: 'boss',
+      opciones: [
+        { texto: 'Luchar por el tesoro', resultado: 'salida', desc: 'Te abres paso entre los no-muertos para reclamar tu recompensa.' },
+        { texto: 'Tomar lo que puedas y huir', resultado: 'salida', desc: 'Agarras un puñado de monedas y corres hacia la salida.' }
+      ],
+      encuentro: { monstruos: [{ nombre: 'Esqueleto', cantidad: 1 }, { nombre: 'Zombi', cantidad: 1 }], probabilidad: 1 },
+      tesoro: { oro: '100 mo', objetos: ['Gema', 'Anillo de Plata', 'Collar de Perlas'] }
+    },
+    salida: {
+      nombre: '¡Libertad!',
+      desc: 'La luz del sol te da en el rostro mientras emerges de la cripta. Has sobrevivido a las profundidades y llevas contigo el botín y la gloria. La mazmorra ha sido vencida... por ahora.',
+      tipo: 'rest',
+      opciones: [
+        { texto: 'Celebrar la victoria', resultado: 'salida', desc: 'Alzas el puño al cielo. ¡Has triunfado!' }
+      ]
+    }
+  },
+  narrador: {
+    ambiente_mazmorra: [
+      'La oscuridad es casi absoluta. Solo el eco de tus pasos rompe el silencio sepulcral.',
+      'El aire es pesado y húmedo, cargado con el olor a piedra mojada y moho ancestral.',
+      'Gotas de agua caen desde el techo invisible, marcando un ritmo constante en las sombras.',
+      'Una corriente de aire frío recorre el pasillo, trayendo consigo un susurro que parece una voz lejana.',
+      'Las paredes están cubiertas de extraños símbolos y grietas que se asemejan a venas petrificadas.',
+      'El crujido de tus pisadas sobre losas sueltas resuena en la galería. Nunca estás solo aquí.',
+      'Telarañas cuelgan del techo como cortinas olvidadas. Algo se mueve en la periferia de tu visión.',
+      'El hedor a muerte y descomposición se intensifica a medida que avanzas. Hay algo maligno aquí.'
+    ],
+    ambiente_bosque: [
+      'La luz del sol se filtra entre las copas de los árboles, creando un mosaico dorado sobre el suelo.',
+      'El canto de los pájaros se mezcla con el crujir de las hojas secas bajo tus pies.',
+      'Un ciervo levanta la cabeza y te observa desde la espesura antes de desaparecer entre los árboles.',
+      'El viento mece las ramas y un murmullo vegetal te envuelve como un abrazo de la naturaleza.',
+      'El sendero se pierde entre la maleza. La maleza parece susurrar secretos antiguos.',
+      'Huele a tierra mojada y a flores silvestres. Una ardilla te observa desde una rama cercana.',
+      'Un arroyo cristalino cruza tu camino, cantando su melodía entre las piedras.',
+      'La neblina matinal se enreda en los troncos, dando al bosque un aire místico y antiguo.'
+    ],
+    ambiente_montana: [
+      'El viento helado azota tu rostro mientras escalas la ladera rocosa. El paisaje es sobrecogedor.',
+      'A lo lejos, un águila planea sobre los picos nevados, dueña absoluta del cielo.',
+      'El sendero serpentea entre rocas afiladas. Cada paso debe ser firme o el abismo te reclamará.',
+      'El trueno retumba entre las montañas. La tormenta se acerca rápidamente.',
+      'Encuentras una cueva natural que se adentra en la montaña. De su interior emana un calor extraño.',
+      'El suelo tiembla ligeramente. Tal vez sea un terremoto... o algo más grande moviéndose bajo la tierra.',
+      'La nieve cruje bajo tus botas. El silencio aquí es tan vasto como las montañas mismas.',
+      'Una cascada helada cuelga del acantilado como una cortina de cristal. La luz la hace brillar.'
+    ],
+    combate_inicio: [
+      '—¡En guardia! —gritas mientras desenvainas tu arma. El combate ha comenzado.',
+      'El enemigo carga contra ti con ferocidad. No hay tiempo para pensar, solo para actuar.',
+      'El choque de acero contra acero rompe el silencio. ¡Que comience la batalla!',
+      'Un grueso de batalla surge de las sombras. Te preparas para lo peor.',
+      'El aire se tensa. Los dos os miráis fijamente, sabiendo que solo uno saldrá de pie.',
+      'Con un rugido ensordecedor, la criatura se abalanza. ¡El momento de la verdad ha llegado!'
+    ],
+    combate_golpe_acertado: [
+      'Tu arma encuentra su objetivo con un golpe seco y satisfactorio.',
+      'El acero penetra la defensa enemiga. Un grito de dolor confirma tu acierto.',
+      'Golpeas con precisión. El enemigo tambalea hacia atrás, herido.',
+      'Tu ataque impacta de lleno, levantando una nube de polvo y chispas.',
+      'Sientes la vibración del impacto recorrer tu brazo. Buen golpe.',
+      'La hoja se hunde en la carne. El enemigo retrocede, visiblemente afectado.',
+      'Un golpe limpio y directo. La criatura gruñe de dolor y rabia.',
+      'Golpeas con tal fuerza que el enemigo pierde el equilibrio por un instante.'
+    ],
+    combate_golpe_fallido: [
+      'Tu arma corta el aire, pero el enemigo esquiva hábilmente.',
+      'Fallaste por poco. La criatura se burla de tu torpeza.',
+      'El golpe rebota contra la armadura sin causar daño.',
+      'Tu ataque es demasiado lento. El enemigo lo ve venir y lo esquiva con facilidad.',
+      'El suelo cede bajo tu pie y el golpe se desvía lamentablemente.',
+      'La criatura se mueve con una agilidad inesperada, evitando tu ataque.'
+    ],
+    combate_golpe_critico: [
+      '¡Golpe maestro! Tu ataque encuentra un punto vulnerable con precisión letal.',
+      '¡Impacto devastador! El enemigo retrocede aturdido por la fuerza del golpe.',
+      '¡Certero! Tu golpe alcanza su marca con una perfección brutal.',
+      '¡Golpe perfecto! La criatura apenas puede mantenerse en pie.',
+      '¡Golpe demoledor! El enemigo siente la furia de tu ataque en todo su ser.',
+      '¡Precisión absoluta! El arma se hunde profundamente, causando un daño terrible.'
+    ],
+    combate_muerte: [
+      'Con un último estertor, el enemigo cae al suelo y no vuelve a moverse.',
+      'El cuerpo de tu oponente se desploma, la vida se apaga en sus ojos.',
+      'Un último y débil gemido escapa de sus labios antes de quedar inmóvil.',
+      'La criatura se desmorona, sus restos quedan esparcidos en el suelo.',
+      'El enemigo cae de rodillas y luego de bruces. El combate ha terminado para él.',
+      'Suelta su arma y se desploma. Un enemigo menos en este mundo.'
+    ],
+    combate_victoria: [
+      'El último enemigo cae. La batalla ha terminado. Por ahora, hay paz.',
+      'Guardas tu arma mientras observas el campo de batalla. Has vencido.',
+      'Respiras hondo. El peligro ha pasado. Has salido victorioso.',
+      'La adrenalina disminuye lentamente. Miras a tu alrededor: has sobrevivido.',
+      'Limpias el sudor de tu frente. La victoria es tuya.',
+      'Un sentimiento de triunfo te embarga. Nada se interpone en tu camino ahora.'
+    ],
+    exploracion_exito: [
+      'Tu instinto no falló. Encuentras exactamente lo que buscabas.',
+      'La suerte está de tu lado. El camino se revela ante ti.',
+      'Tu agudeza mental da frutos. Descubres un detalle que otros habrían pasado por alto.',
+      'El conocimiento que posees resulta invaluable en esta situación.',
+      'Tu paciencia se ve recompensada. El secreto se revela ante tus ojos.',
+      'Tus dedos hábiles logran lo que parecía imposible. El mecanismo cede.'
+    ],
+    exploracion_fracaso: [
+      'No fue suficiente. El mecanismo sigue cerrado, el secreto permanece oculto.',
+      'Mal calculaste. Ahora tendrás que buscar otra alternativa.',
+      'El destino parece estar en tu contra. No hay nada útil aquí.',
+      'Tu falta de conocimiento te juega una mala pasada. Deberías haber estudiado más.',
+      'El tiempo se agota y no logras tu objetivo. Tendrás que intentarlo de otra forma.',
+      'Fallas estrepitosamente. La situación se vuelve más complicada.'
+    ],
+    descanso_corto: [
+      'Te sientas a recuperar el aliento. El silencio te envuelve como un manto.',
+      'Aprovechas el momento para vendar tus heridas y beber un poco de agua.',
+      'Encuentras un rincón apartado y te permites un breve respiro.',
+      'Cierras los ojos un momento. Las fuerzas vuelven lentamente a tu cuerpo.',
+      'El descanso te sienta bien. Tus músculos dejan de doler y tu mente se aclara.'
+    ],
+    tesoro_encontrado: [
+      'Ante tus ojos aparece un brillo dorado. ¡Tesoro!',
+      'Tus manos tiemblan de emoción mientras examinas el hallazgo.',
+      'El contenido del cofre supera tus expectativas. ¡Qué maravilla!',
+      'Entre el polvo y las telarañas, algo valioso brilla con luz propia.',
+      'No puedes creer lo que ves. Este tesoro cambiará tu vida.',
+      'El peso del oro en tu bolsa es reconfortante. La aventura vale la pena.'
+    ],
+    evento_aleatorio: [
+      'Un puñado de murciélagos sale volando de una grieta en el techo.',
+      'Escuchas un ruido metálico a lo lejos. ¿Otro aventurero? ¿O algo peor?',
+      'Una pequeña criatura se cruza en tu camino y desaparece entre las sombras.',
+      'El suelo tiembla ligeramente bajo tus pies. Podría ser un terremoto lejano.',
+      'Encuentras los restos de un campamento abandonado. La hoguera aún humea.',
+      'Un extraño símbolo está grabado en la pared. Parece un marcador de algún tipo.',
+      'Oyes risas apagadas provenientes de algún lugar más allá de la pared. No puedes identificar la dirección.',
+      'Tu antorcha parpadea. Una corriente de aire helado recorre el pasaje.'
+    ]
+  },
+  tesoro: {
+    menor: [
+      { nombre: 'Bolsa de Monedas de Plata', desc: 'Una pequeña bolsa de cuero con 25 monedas de plata.', valor: '25 pp' },
+      { nombre: 'Anillo de Cobre', desc: 'Un anillo simple de cobre con una piedra verde engastada.', valor: '5 po' },
+      { nombre: 'Collar de Dientes de Lobo', desc: 'Un collar hecho con dientes de lobo ensartados en un cordón de cuero.', valor: '10 po' },
+      { nombre: 'Gemilla Opaca', desc: 'Una pequeña gema sin tallar de color azul apagado.', valor: '50 po' },
+      { nombre: 'Pluma de Grifo', desc: 'Una pluma grande y dorada de grifo. Los coleccionistas pagan bien por ella.', valor: '30 po' },
+      { nombre: 'Botella de Vino Añejo', desc: 'Una botella polvorienta de vino de hace décadas.', valor: '25 po' },
+      { nombre: 'Estatua de Jade', desc: 'Una pequeña estatua de un sapo tallada en jade.', valor: '40 po' },
+      { nombre: 'Mapa del Viejo Mundo', desc: 'Un pergamino amarillento con un mapa de tierras lejanas.', valor: '20 po' }
+    ],
+    mayor: [
+      { nombre: 'Cetro de Marfil', desc: 'Un cetro tallado en marfil con incrustaciones de oro.', valor: '250 po' },
+      { nombre: 'Corona de Latón con Rubíes', desc: 'Una corona ornamentada con tres rubíes pequeños.', valor: '350 po' },
+      { nombre: 'Espada Decorativa', desc: 'Una espada larga ceremonial con empuñadura enjoyada.', valor: '200 po' },
+      { nombre: 'Cáliz de Plata', desc: 'Un cáliz de plata purísima con grabados de escenas de caza.', valor: '150 po' },
+      { nombre: 'Pergamino de Poder Arcano', desc: 'Un antiguo pergamino que contiene un hechizo de nivel 3.', valor: '300 po' },
+      { nombre: 'Armadura Golemita', desc: 'Piezas de una armadura de placas decoradas con runas.', valor: '500 po' }
+    ],
+    armas_magicas: [
+      { nombre: 'Espada Corta del Cazador', desc: 'Una espada corta que brilla tenuemente cuando hay no-muertos cerca.', bonificacion: '+1' },
+      { nombre: 'Arco Largo del Viento', desc: 'Un arco largo de madera pálida. Las flechas disparadas viajan más rápido.', bonificacion: '+1' },
+      { nombre: 'Martillo del Trueno', desc: 'Un martillo de guerra que emite un sonido atronador al impactar.', bonificacion: '+1' },
+      { nombre: 'Daga del Veneno Eterno', desc: 'Una daga negra cuya hoja siempre está cubierta de un veneno letal.', bonificacion: '+1' },
+      { nombre: 'Bastón del Archimago', desc: 'Un bastón nudoso que potencia los hechizos de quien lo empuña.', bonificacion: '+2' }
+    ],
+    pociones: [
+      { nombre: 'Poción de Curación', desc: 'Vial de líquido rojo burbujeante. Restaura puntos de golpe.', efecto: 'Recuperas 2d4+2 PG' },
+      { nombre: 'Poción de Curación Superior', desc: 'Vial de líquido rojo brillante. Cura heridas graves.', efecto: 'Recuperas 4d4+4 PG' },
+      { nombre: 'Poción de Fuerza de Gigante', desc: 'Líquido turbio y espeso. Otorga fuerza sobrehumana.', efecto: 'Fuerza 21 durante 1 hora' },
+      { nombre: 'Poción de Invisibilidad', desc: 'Líquido claro como el agua, pero con burbujas plateadas.', efecto: 'Invisibilidad durante 1 hora' },
+      { nombre: 'Poción de Velocidad', desc: 'Líquido amarillo chispeante. Acelera el cuerpo y la mente.', efecto: 'Acción adicional extra durante 1 minuto' },
+      { nombre: 'Poción de Respiración Acuática', desc: 'Líquido azul neblinoso. Huele a mar.', efecto: 'Respirar bajo el agua durante 1 hora' },
+      { nombre: 'Poción de Escalada de Araña', desc: 'Líquido verde viscoso que tiembla en el vial.', efecto: 'Trepar superficies sin esfuerzo durante 1 hora' }
+    ]
+  },
+  encuentros: {
+    facil: [
+      { monstruos: [{ nombre: 'Goblin', cantidad: 2 }], desc: 'Dos goblins discuten ruidosamente sobre un botín miserable. No te han visto aún.' },
+      { monstruos: [{ nombre: 'Bandido', cantidad: 3 }], desc: 'Un grupo de bandidos flacuchos te sale al paso exigiendo tu bolsa.' },
+      { monstruos: [{ nombre: 'Lobo Sombrio', cantidad: 1 }], desc: 'Un lobo sombrío emerge de entre las sombras, mostrando los colmillos.' }
+    ],
+    medio: [
+      { monstruos: [{ nombre: 'Orco', cantidad: 2 }], desc: 'Dos orcos armados con grandes hachas custodian el camino. Gruñen al verte.' },
+      { monstruos: [{ nombre: 'Esqueleto', cantidad: 3 }], desc: 'Tres esqueletos se levantan de entre los escombros, armados con espadas oxidadas.' },
+      { monstruos: [{ nombre: 'Ladrón', cantidad: 1 }, { nombre: 'Bandido', cantidad: 2 }], desc: 'Un ladrón con dos secuaces bandidos te tiende una emboscada.' }
+    ],
+    dificil: [
+      { monstruos: [{ nombre: 'Minotauro', cantidad: 1 }], desc: 'Un minotauro furioso patea el suelo y carga contra ti con sus cuernos.' },
+      { monstruos: [{ nombre: 'Troll', cantidad: 1 }], desc: 'Un troll emerge de las sombras, su carne ya comenzando a regenerarse.' },
+      { monstruos: [{ nombre: 'Golem de Carne', cantidad: 1 }], desc: 'Un golem de carne hecho con restos de docenas de criaturas bloquea tu paso.' }
+    ]
   }
 };
 // English aliases for HTML interface
@@ -1223,7 +1471,7 @@ var DND = {
   e.races=e.razas; e.subraces=e.subrazas; e.classes=e.clases; e.backgrounds=e.trasfondos;
   e.spells=e.hechizos; e.skillsByAbility=e.habilidades;
   e.armor=e.equipo&&e.equipo.armaduras?e.equipo.armaduras:[];
-  e.conditions=[];
+  
   // Add computed aliases for class properties
   var clsList = e.clases || [];
   clsList.forEach(function(c){
