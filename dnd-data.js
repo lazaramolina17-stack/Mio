@@ -1,1481 +1,2126 @@
-var DND = {
-  razas: [
-    {
-      nombre: 'Dragonborn',
-      subrazas: [],
-      bonos: {str:2, cha:1},
-      velocidad: 30,
-      idiomas: ['Común', 'Dragónico'],
-      rasgos: [
-        {nombre: 'Ascendencia Dracónica', descripcion: 'Eliges un tipo de dragón. El daño de tu arma de aliento y tu resistencia se determinan por ese tipo.'},
-        {nombre: 'Arma de Aliento', descripcion: 'Puedes usar tu acción para exhalar energía destructiva. Tu aliento inflige daño según tu ascendencia en un área (cono de 15 pies o línea de 30 pies). CD = 8 + tu bonificador de Competencia + tu modificador de Constitución. Puedes usarlo una vez por descanso corto o largo.'},
-        {nombre: 'Resistencia Dracónica', descripcion: 'Tienes resistencia al tipo de daño asociado a tu ascendencia dracónica.'}
-      ]
-    },
-    {
-      nombre: 'Dwarf',
-      subrazas: ['Hill Dwarf', 'Mountain Dwarf'],
-      bonos: {con:2},
-      velocidad: 25,
-      idiomas: ['Común', 'Enano'],
-      rasgos: [
-        {nombre: 'Visión en la Oscuridad', descripcion: 'Puedes ver en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue.'},
-        {nombre: 'Resistencia Enana', descripcion: 'Tienes ventaja en tiradas de salvación contra veneno y resistencia al daño por veneno.'},
-        {nombre: 'Entrenamiento de Combate Enano', descripcion: 'Tienes competencia con hachas de batalla, hachas de mano, martillos de guerra y martillos ligeros.'},
-        {nombre: 'Competencia con Herramientas', descripcion: 'Tienes competencia con herramientas de artesano a tu elección: herramientas de herrero, suministros de cervecero o herramientas de albañil.'},
-        {nombre: 'Conocimiento de Piedra', descripcion: 'Siempre que hagas una prueba de Inteligencia (Historia) relacionada con el origen de un trabajo de piedra, eres considerado competente y puedes duplicar tu bonificador de competencia.'}
-      ]
-    },
-    {
-      nombre: 'Elf',
-      subrazas: ['High Elf', 'Wood Elf', 'Dark Elf (Drow)'],
-      bonos: {dex:2},
-      velocidad: 30,
-      idiomas: ['Común', 'Élfico'],
-      rasgos: [
-        {nombre: 'Visión en la Oscuridad', descripcion: 'Puedes ver en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue.'},
-        {nombre: 'Ascendencia Feérica', descripcion: 'Tienes ventaja en tiradas de salvación contra ser hechizado y la magia no puede ponerte a dormir.'},
-        {nombre: 'Trance', descripcion: 'Los elfos no duermen. En lugar de dormir, entran en un trance profundo durante 4 horas. Descansas como si hubieras dormido 8 horas.'},
-        {nombre: 'Percepción Aguda', descripcion: 'Tienes competencia en la habilidad de Percepción.'}
-      ]
-    },
-    {
-      nombre: 'Gnome',
-      subrazas: ['Forest Gnome', 'Rock Gnome'],
-      bonos: {int:2},
-      velocidad: 25,
-      idiomas: ['Común', 'Gnómico'],
-      rasgos: [
-        {nombre: 'Visión en la Oscuridad', descripcion: 'Puedes ver en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue.'},
-        {nombre: 'Astucia Gnómica', descripcion: 'Tienes ventaja en tiradas de salvación de Inteligencia, Sabiduría y Carisma contra magia.'}
-      ]
-    },
-    {
-      nombre: 'Half-Elf',
-      subrazas: [],
-      bonos: {cha:2},
-      bonos_eleccion: 2,
-      velocidad: 30,
-      idiomas: ['Común', 'Élfico'],
-      rasgos: [
-        {nombre: 'Visión en la Oscuridad', descripcion: 'Puedes ver en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue.'},
-        {nombre: 'Ascendencia Feérica', descripcion: 'Tienes ventaja en tiradas de salvación contra ser hechizado y la magia no puede ponerte a dormir.'},
-        {nombre: 'Versatilidad en Habilidades', descripcion: 'Obtienes competencia en dos habilidades a tu elección.'}
-      ]
-    },
-    {
-      nombre: 'Half-Orc',
-      subrazas: [],
-      bonos: {str:2, con:1},
-      velocidad: 30,
-      idiomas: ['Común', 'Orco'],
-      rasgos: [
-        {nombre: 'Visión en la Oscuridad', descripcion: 'Puedes ver en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue.'},
-        {nombre: 'Aguante Incansable', descripcion: 'Cuando recibes daño que reduce tus puntos de golpe a 0 pero no te mata directamente, puedes reducir ese daño a 1. No puedes usar este rasgo de nuevo hasta que completes un descanso largo.'},
-        {nombre: 'Ataques Salvajes', descripcion: 'Cuando obtienes un golpe crítico con un ataque de arma cuerpo a cuerpo, puedes tirar uno de los dados de daño del arma adicionalmente y añadirlo al daño extra del crítico.'},
-        {nombre: 'Intimidación Poderosa', descripcion: 'Tienes competencia en la habilidad de Intimidación.'}
-      ]
-    },
-    {
-      nombre: 'Halfling',
-      subrazas: ['Lightfoot Halfling', 'Stout Halfling'],
-      bonos: {dex:2},
-      velocidad: 25,
-      idiomas: ['Común', 'Mediano'],
-      rasgos: [
-        {nombre: 'Afortunado', descripcion: 'Cuando obtienes un 1 natural en una tirada de ataque, prueba de habilidad o tirada de salvación, puedes volver a tirar el dado y debes usar el nuevo resultado.'},
-        {nombre: 'Valiente', descripcion: 'Tienes ventaja en tiradas de salvación contra ser asustado.'},
-        {nombre: 'Sigilo Natural', descripcion: 'Puedes intentar esconderte incluso cuando solo estés oculto por una criatura que sea al menos un tamaño más grande que tú.'}
-      ]
-    },
-    {
-      nombre: 'Human',
-      subrazas: ['Human', 'Variant Human'],
-      bonos: {str:1, dex:1, con:1, int:1, wis:1, cha:1},
-      velocidad: 30,
-      idiomas: ['Común'],
-      rasgos_extra: [
-        {nombre: 'Idioma Adicional', descripcion: 'Puedes hablar, leer y escribir un idioma adicional a tu elección.'}
-      ]
-    },
-    {
-      nombre: 'Tiefling',
-      subrazas: [],
-      bonos: {cha:2, int:1},
-      velocidad: 30,
-      idiomas: ['Común', 'Infernal'],
-      rasgos: [
-        {nombre: 'Visión en la Oscuridad', descripcion: 'Puedes ver en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue.'},
-        {nombre: 'Resistencia Infernal', descripcion: 'Tienes resistencia al daño por fuego.'},
-        {nombre: 'Legado Infernal', descripcion: 'Conoces el truco Taumaturgia. Cuando alcanzas el nivel 3, puedes lanzar el hechizo Reprensión Infernal como un hechizo de nivel 2 una vez por descanso largo. Cuando alcanzas el nivel 5, puedes lanzar el hechizo Oscuridad una vez por descanso largo. El Carisma es tu habilidad para lanzar estos hechizos.'}
-      ]
-    }
-  ],
-  subrazas: [
-    {nombre: 'Hill Dwarf', raza: 'Dwarf', bonos: {wis:1, con:0}, rasgos: [{nombre: 'Tenacidad Enana', descripcion: 'Tu máximo de puntos de golpe aumenta en 1 y aumenta en 1 adicional cada vez que ganas un nivel.'}]},
-    {nombre: 'Mountain Dwarf', raza: 'Dwarf', bonos: {str:2}, rasgos: [{nombre: 'Entrenamiento en Armadura Enana', descripcion: 'Tienes competencia con armaduras ligeras y medias.'}]},
-    {nombre: 'High Elf', raza: 'Elf', bonos: {int:1}, rasgos: [{nombre: 'Entrenamiento Élfico con Armas', descripcion: 'Tienes competencia con espadas largas, espadas cortas, arcos cortos y arcos largos.'}, {nombre: 'Truco', descripcion: 'Conoces un truco a tu elección de la lista de hechizos de mago. La Inteligencia es tu habilidad para lanzarlo.'}, {nombre: 'Idioma Adicional', descripcion: 'Puedes hablar, leer y escribir un idioma adicional a tu elección.'}]},
-    {nombre: 'Wood Elf', raza: 'Elf', bonos: {wis:1}, rasgos: [{nombre: 'Entrenamiento Élfico con Armas', descripcion: 'Tienes competencia con espadas largas, espadas cortas, arcos cortos y arcos largos.'}, {nombre: 'Paso Rápido', descripcion: 'Tu velocidad de caminata aumenta a 35 pies.'}, {nombre: 'Máscara Salvaje', descripcion: 'Puedes intentar esconderte incluso cuando solo estés ligeramente oscurecido por follaje, lluvia, nieve, niebla u otro fenómeno natural.'}]},
-    {nombre: 'Dark Elf (Drow)', raza: 'Elf', bonos: {cha:1}, rasgos: [{nombre: 'Entrenamiento Drow con Armas', descripcion: 'Tienes competencia con espadas cortas, estoques y ballestas de mano.'}, {nombre: 'Vista Superior en la Oscuridad', descripcion: 'Tu visión en la oscuridad se extiende a 120 pies.'}, {nombre: 'Sensibilidad a la Luz Solar', descripcion: 'Tienes desventaja en tiradas de ataque y pruebas de Sabiduría (Percepción) relacionadas con la vista cuando tú, tu objetivo o lo que intentas percibir está bajo luz solar directa.'}, {nombre: 'Magia Drow', descripcion: 'Conoces el truco Luces Danzantes. Cuando alcanzas el nivel 3, puedes lanzar Hechizar Persona una vez por descanso largo. Cuando alcanzas el nivel 5, puedes lanzar Oscuridad una vez por descanso largo. El Carisma es tu habilidad para lanzarlos.'}]},
-    {nombre: 'Forest Gnome', raza: 'Gnome', bonos: {dex:1}, rasgos: [{nombre: 'Ilusionista Menor', descripcion: 'Conoces el truco Ilusión Menor. La Inteligencia es tu habilidad para lanzarlo.'}, {nombre: 'Hablar con Bestias Menores', descripcion: 'Puedes comunicar ideas simples a bestias pequeñas o más pequeñas.'}]},
-    {nombre: 'Rock Gnome', raza: 'Gnome', bonos: {con:1}, rasgos: [{nombre: 'Conocimiento de Artesano', descripcion: 'Siempre que hagas una prueba de Inteligencia (Historia) relacionada con un objeto mágico, alquímico o tecnológico, puedes duplicar tu bonificador de competencia.'}, {nombre: 'Inventor', descripcion: 'Tienes competencia con herramientas de artesano. Puedes pasar 1 hora y 10 gp para construir un artefacto mecánico pequeño: ingenio de cuerda, mechero, molinillo de música, juguete de cuerda, o reloj autolimpiante.'}]},
-    {nombre: 'Lightfoot Halfling', raza: 'Halfling', bonos: {cha:1}, rasgos: [{nombre: 'Sigilo Natural', descripcion: 'Puedes intentar esconderte incluso cuando solo estés oculto por una criatura que sea al menos un tamaño más grande que tú.'}]},
-    {nombre: 'Stout Halfling', raza: 'Halfling', bonos: {con:1}, rasgos: [{nombre: 'Resistencia Fuerte', descripcion: 'Tienes ventaja en tiradas de salvación contra veneno y resistencia al daño por veneno.'}]},
-    {nombre: 'Human', raza: 'Human', bonos: {str:1, dex:1, con:1, int:1, wis:1, cha:1}, rasgos: []},
-    {nombre: 'Variant Human', raza: 'Human', bonos: {str:1, dex:1, con:1, int:1, wis:1, cha:1}, rasgos: [{nombre: 'Dote', descripcion: 'Obtienes una dote a tu elección.'}, {nombre: 'Competencia en Habilidad', descripcion: 'Obtienes competencia en una habilidad a tu elección.'}]}
-  ],
-  clases: [
-    {
-      nombre: 'Barbarian',
-      dado_golpe: 'd12',
-      competencias: {
-        armaduras: ['Armadura ligera', 'Armadura media', 'Escudos'],
-        armas: ['Armas simples', 'Armas marciales'],
-        salvaciones: ['Fuerza', 'Constitución'],
-        habilidades: ['Animal Handling', 'Athletics', 'Intimidation', 'Nature', 'Perception', 'Survival'],
-        habilidades_elige: 2
-      },
-      equipo: ['Un hacha de batalla o cualquier arma marcial cuerpo a cuerpo', 'Dos hachas de mano o cualquier arma simple', 'Un equipo de explorador y cuatro jabalinas'],
-      rasgos_por_nivel: {
-        1: [
-          {nombre: 'Ira', descripcion: 'En tu turno, puedes entrar en ira como acción bonus. Mientras estés en ira, ganas ventaja en pruebas de Fuerza y tiradas de salvación de Fuerza, bonificador de daño cuerpo a cuerpo igual a tu bonificador de Competencia, resistencia a daño contundente, perforante y cortante, y no puedes lanzar hechizos ni concentrarte. Dura 1 minuto o hasta que termines como acción bonus, caigas inconsciente o no ataques o recibas daño en un turno. Tienes 2 usos por nivel 1, aumentan a 3 en nivel 3, 4 en nivel 6, 5 en nivel 12, 6 en nivel 17. Recuperas todos los usos en un descanso largo.'},
-          {nombre: 'Defensa Sin Armadura', descripcion: 'Mientras no lleves armadura, tu CA es igual a 10 + tu modificador de Destreza + tu modificador de Constitución.'}
-        ],
-        2: [
-          {nombre: 'Ataque Temerario', descripcion: 'Puedes realizar un ataque cuerpo a cuerpo con ventaja. Hasta tu próximo turno, todos los ataques contra ti tienen ventaja.'},
-          {nombre: 'Sentido del Peligro', descripcion: 'Tienes ventaja en tiradas de salvación de Destreza contra efectos que puedas ver, como trampas y hechizos.'}
-        ],
-        3: [
-          {nombre: 'Camino Primitivo', descripcion: 'Eliges un camino primitivo. Otorga rasgos en niveles 3, 6, 10 y 14.'}
-        ],
-        4: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1. No puedes exceder 20.'}],
-        5: [
-          {nombre: 'Ataque Extra', descripcion: 'Puedes atacar dos veces en lugar de una cuando realizas la acción de Atacar en tu turno.'},
-          {nombre: 'Movimiento Rápido', descripcion: 'Tu velocidad aumenta en 10 pies mientras no lleves armadura pesada.'}
-        ],
-        6: [{nombre: 'Rasgo de Camino', descripcion: 'Obtienes un rasgo de tu camino primitivo.'}],
-        7: [
-          {nombre: 'Instinto Salvaje', descripcion: 'Tienes ventaja en tiradas de iniciativa. Además, si eres sorprendido al inicio del combate, puedes actuar normalmente en tu primer turno si entras en ira.'}
-        ],
-        8: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        9: [
-          {nombre: 'Crítico Brutal', descripcion: 'Tiras un dado de daño adicional al determinar el daño extra de un golpe crítico con un ataque cuerpo a cuerpo.'}
-        ],
-        10: [
-          {nombre: 'Rasgo de Camino', descripcion: 'Obtienes un rasgo de tu camino primitivo.'},
-          {nombre: 'Resistencia Totémica', descripcion: 'Obtienes resistencia a un tipo de daño adicional.'}
-        ],
-        11: [
-          {nombre: 'Ira Implacable', descripcion: 'Mientras estás en ira, no puedes morir por fallar tiradas de salvación de muerte si tienes 0 puntos de golpe. Sigues haciendo tiradas de salvación de muerte y recibes daño normalmente.'}
-        ],
-        12: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        13: [
-          {nombre: 'Crítico Brutal', descripcion: 'Tiras dos dados de daño adicional al determinar el daño extra de un golpe crítico.'}
-        ],
-        14: [{nombre: 'Rasgo de Camino', descripcion: 'Obtienes un rasgo de tu camino primitivo.'}],
-        15: [
-          {nombre: 'Ira Persistente', descripcion: 'Tu ira solo termina si caes inconsciente o eliges terminarla como acción bonus.'}
-        ],
-        16: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        17: [
-          {nombre: 'Crítico Brutal', descripcion: 'Tiras tres dados de daño adicional al determinar el daño extra de un golpe crítico.'}
-        ],
-        18: [
-          {nombre: 'Poderío Indomable', descripcion: 'Si tu total de una prueba de Fuerza es menor que tu puntuación de Fuerza, puedes usar ese número en su lugar.'}
-        ],
-        19: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        20: [
-          {nombre: 'Campeón Primitivo', descripcion: 'Tu máximo de Fuerza y Constitución aumentan en 4 y tu máximo aumenta a 24.'}
-        ]
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>D&D 5e Toolkit</title>
+<script src="dnd-data.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0e0c;
+  --bg2:#1a1815;
+  --bg3:#252220;
+  --border:#3d3530;
+  --text:#d4cdc0;
+  --text-dim:#8a8075;
+  --accent:#c8a44e;
+  --accent2:#a83220;
+  --hp-red:#96281b;
+  --mana-blue:#2d5a7b;
+  --gold-glow:rgba(200,164,78,0.15);
+}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Courier New',Courier,monospace;
+  font-size:14px;
+  line-height:1.5;
+  display:flex;
+  flex-direction:column;
+}
+#app{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  max-width:600px;
+  margin:0 auto;
+  width:100%;
+}
+#header{
+  background:var(--bg2);
+  border-bottom:2px solid var(--border);
+  padding:10px 16px;
+  text-align:center;
+  flex-shrink:0;
+}
+#header h1{
+  color:var(--accent);
+  font-size:18px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  text-shadow:0 0 12px var(--gold-glow);
+}
+#header span{color:var(--text-dim);font-size:11px;display:block;margin-top:2px}
+#content{
+  flex:1;
+  overflow-y:auto;
+  padding:12px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border) transparent;
+}
+#content::-webkit-scrollbar{width:5px}
+#content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+/* ---- TABS ---- */
+#tab-bar{
+  display:flex;
+  flex-shrink:0;
+  background:var(--bg2);
+  border-top:2px solid var(--border);
+}
+.tab-btn{
+  flex:1;
+  background:transparent;
+  border:none;
+  color:var(--text-dim);
+  font-family:inherit;
+  font-size:11px;
+  padding:10px 4px 8px;
+  cursor:pointer;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  transition:all .15s;
+  border-top:2px solid transparent;
+  margin-top:-2px;
+}
+.tab-btn.active{
+  color:var(--accent);
+  border-top-color:var(--accent);
+  background:var(--bg3);
+}
+/* ---- FORM ELEMENTS ---- */
+label{display:block;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+select,input,textarea{
+  width:100%;
+  background:var(--bg);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:8px 10px;
+  border-radius:4px;
+  font-family:inherit;
+  font-size:13px;
+  outline:none;
+  transition:border-color .15s;
+}
+select:focus,input:focus,textarea:focus{border-color:var(--accent)}
+select option{background:var(--bg2);color:var(--text)}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.form-group{margin-bottom:10px}
+.form-row{display:flex;gap:8px}
+.form-row>*{flex:1}
+.btn{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:8px 16px;
+  border-radius:4px;
+  cursor:pointer;
+  font-family:inherit;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  transition:all .15s;
+}
+.btn:hover,.btn:focus{border-color:var(--accent);color:var(--accent);background:var(--bg2)}
+.btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:bold}
+.btn-primary:hover{background:#b8942e;border-color:#b8942e;color:var(--bg)}
+.btn-danger{background:var(--hp-red);border-color:var(--hp-red);color:#fff}
+.btn-danger:hover{background:#7a1f15;border-color:#7a1f15}
+.btn-sm{padding:4px 10px;font-size:11px}
+/* ---- SHEET ---- */
+.sheet{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:14px;
+  margin-bottom:12px;
+}
+.sheet h2{
+  color:var(--accent);
+  font-size:14px;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  border-bottom:1px solid var(--border);
+  padding-bottom:6px;
+  margin-bottom:10px;
+}
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:6px;
+  margin-bottom:10px;
+}
+.stat-card{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:4px;
+  text-align:center;
+  padding:6px 2px;
+  cursor:pointer;
+  transition:all .15s;
+}
+.stat-card.selected{border-color:var(--accent);box-shadow:0 0 8px var(--gold-glow)}
+.stat-card .stat-label{font-size:9px;color:var(--text-dim);text-transform:uppercase}
+.stat-card .stat-value{font-size:18px;font-weight:bold;color:var(--accent)}
+.stat-card .stat-mod{font-size:12px;color:var(--text)}
+/* ---- DICE ---- */
+.dice-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-bottom:12px;
+}
+.dice-btn{
+  aspect-ratio:1;
+  background:var(--bg3);
+  border:2px solid var(--border);
+  border-radius:8px;
+  color:var(--text);
+  font-size:22px;
+  font-weight:bold;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  transition:all .15s;
+  font-family:inherit;
+}
+.dice-btn:hover{border-color:var(--accent);color:var(--accent);transform:scale(1.05)}
+.dice-btn .label{font-size:10px;color:var(--text-dim);font-weight:normal;margin-top:2px}
+.dice-result{
+  text-align:center;
+  padding:20px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  margin-bottom:10px;
+  min-height:80px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+.dice-result .number{
+  font-size:52px;
+  font-weight:bold;
+  color:var(--accent);
+  text-shadow:0 0 20px var(--gold-glow);
+  transition:all .3s;
+  animation:none;
+}
+.dice-result .number.roll-anim{animation:dicePop .35s ease-out}
+@keyframes dicePop{
+  0%{transform:scale(0.3);opacity:0}
+  50%{transform:scale(1.2)}
+  100%{transform:scale(1);opacity:1}
+}
+.dice-result .detail{font-size:12px;color:var(--text-dim);margin-top:4px}
+.history{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px;
+  max-height:180px;
+  overflow-y:auto;
+}
+.history-item{
+  display:flex;
+  justify-content:space-between;
+  padding:4px 0;
+  border-bottom:1px solid var(--bg3);
+  font-size:12px;
+}
+.history-item:last-child{border-bottom:none}
+.history-item .roll{color:var(--accent);font-weight:bold}
+.history-item .total{color:var(--text)}
+.history-item .time{color:var(--text-dim);font-size:10px}
+/* ---- SPELLS ---- */
+.spell-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  transition:border-color .15s;
+}
+.spell-card:hover{border-color:var(--accent)}
+.spell-card .spell-name{color:var(--accent);font-weight:bold;font-size:14px}
+.spell-card .spell-meta{font-size:11px;color:var(--text-dim);margin:2px 0 4px}
+.spell-card .spell-meta span{margin-right:10px}
+.spell-card .spell-desc{font-size:12px;color:var(--text);line-height:1.4}
+.spell-tag{
+  display:inline-block;
+  background:var(--bg3);
+  padding:1px 6px;
+  border-radius:3px;
+  font-size:10px;
+  color:var(--text-dim);
+  margin-right:4px;
+}
+/* ---- RULES ---- */
+.rules-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px}
+.rules-table th,.rules-table td{
+  border:1px solid var(--border);
+  padding:6px 8px;
+  text-align:left;
+}
+.rules-table th{background:var(--bg3);color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.rules-table td{background:var(--bg2)}
+.condition-grid{display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:12px}
+.condition-item{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:8px 10px;
+}
+.condition-item strong{color:var(--accent);font-size:13px}
+.condition-item p{font-size:12px;color:var(--text-dim);margin-top:2px}
+.collapse{display:none}
+/* ---- FILTERS ---- */
+.filter-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.filter-bar select,.filter-bar input{flex:1;min-width:0}
+/* ---- RESPONSIVE ---- */
+@media(max-width:400px){
+  #content{padding:8px}
+  .stat-grid{grid-template-columns:repeat(3,1fr)}
+  .dice-grid{grid-template-columns:repeat(3,1fr)}
+  .dice-result .number{font-size:40px}
+  .tab-btn{font-size:10px;padding:8px 2px}
+}
+/* Misc */
+.text-center{text-align:center}
+.mt-8{margin-top:8px}
+.mb-8{margin-bottom:8px}
+.hidden{display:none!important}
+.badge{
+  display:inline-block;
+  background:var(--accent);
+  color:var(--bg);
+  padding:0 6px;
+  border-radius:3px;
+  font-size:10px;
+  font-weight:bold;
+}
+.badge-danger{background:var(--hp-red);color:#fff}
+.empty-state{padding:30px 20px;text-align:center;color:var(--text-dim);font-size:13px}
+
+/* ===== GAME STYLES ===== */
+.game-panel{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:12px;
+  margin-bottom:10px;
+}
+.narrator-panel{
+  flex:1;
+  min-height:200px;
+  max-height:280px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.narrator-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+  padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+.narrator-title{color:var(--accent);font-weight:bold;font-size:12px;text-transform:uppercase;letter-spacing:1px}
+.location-badge{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  padding:2px 8px;
+  border-radius:3px;
+  font-size:10px;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.narrator-text{
+  flex:1;
+  overflow-y:auto;
+  font-size:13px;
+  line-height:1.6;
+  color:var(--text);
+  padding:4px 2px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border) transparent;
+}
+.narrator-text::-webkit-scrollbar{width:4px}
+.narrator-text::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.narrator-entry{
+  margin-bottom:10px;
+  padding:6px 8px;
+  background:var(--bg);
+  border-radius:4px;
+  border-left:3px solid var(--accent);
+  animation:fadeIn .4s ease-out;
+}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.narrator-entry.combat{background:rgba(150,40,27,0.15);border-left-color:var(--hp-red)}
+.narrator-entry.explore{background:rgba(200,164,78,0.1);border-left-color:var(--accent)}
+.narrator-entry.loot{background:rgba(45,90,123,0.15);border-left-color:var(--mana-blue)}
+.narrator-entry.rest{background:rgba(0,120,60,0.15);border-left-color:#2e8b57}
+.narrator-entry .type-tag{
+  display:inline-block;
+  font-size:8px;
+  text-transform:uppercase;
+  padding:0 4px;
+  border-radius:2px;
+  margin-right:6px;
+  font-weight:bold;
+}
+.narrator-entry.combat .type-tag{background:var(--hp-red);color:#fff}
+.narrator-entry.explore .type-tag{background:var(--accent);color:var(--bg)}
+.narrator-entry.loot .type-tag{background:var(--mana-blue);color:#fff}
+.narrator-entry.rest .type-tag{background:#2e8b57;color:#fff}
+
+.status-bar{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px;
+  margin-bottom:10px;
+  flex-shrink:0;
+}
+.status-item{text-align:center}
+.status-label{display:block;font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.status-value{font-size:16px;font-weight:bold;color:var(--accent)}
+#status-hp{color:var(--hp-red)}
+#status-gold{color:#c8a44e}
+
+.combat-tracker{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px;
+  margin-bottom:10px;
+  flex-shrink:0;
+}
+.combat-header{color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:bold}
+.initiative-entry{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:6px 10px;
+  background:var(--bg);
+  border-radius:4px;
+  margin-bottom:4px;
+  font-size:12px;
+  border-left:3px solid var(--text-dim);
+}
+.initiative-entry.player{border-left-color:var(--accent);background:rgba(200,164,78,0.1)}
+.initiative-entry.current{box-shadow:0 0 0 2px var(--accent);transform:scale(1.01)}
+.initiative-name{font-weight:bold}
+.initiative-hp{color:var(--hp-red);font-family:monospace}
+.initiative-badge{
+  background:var(--bg3);
+  padding:1px 6px;
+  border-radius:3px;
+  font-size:9px;
+  color:var(--text-dim);
+}
+
+.enemies-panel{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px;
+  margin-bottom:10px;
+  flex-shrink:0;
+}
+.enemies-header{color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:bold}
+.enemy-card{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:8px;
+  margin-bottom:6px;
+}
+.enemy-card.dead{opacity:0.4;text-decoration:line-through}
+.enemy-name{font-weight:bold;color:var(--accent);font-size:13px}
+.enemy-stats{font-size:11px;color:var(--text-dim);margin:2px 0}
+.enemy-hp-bar{
+  height:6px;
+  background:var(--bg3);
+  border-radius:3px;
+  overflow:hidden;
+  margin-top:4px;
+}
+.enemy-hp-fill{
+  height:100%;
+  background:var(--hp-red);
+  transition:width .3s ease;
+}
+.enemy-hp-text{font-size:10px;color:var(--text-dim);text-align:right;margin-top:2px;font-family:monospace}
+
+.action-panel{
+  flex-shrink:0;
+}
+.action-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+.action-btn{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:12px;
+  border-radius:6px;
+  font-family:inherit;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition:all .15s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+}
+.action-btn:hover,.action-btn:focus{border-color:var(--accent);color:var(--accent);background:var(--bg2);transform:translateY(-1px)}
+.action-btn:disabled{opacity:0.4;cursor:not-allowed}
+.action-btn.primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.action-btn.primary:hover{background:#b8942e;border-color:#b8942e}
+.action-btn.danger{background:var(--hp-red);border-color:var(--hp-red);color:#fff}
+.action-btn.danger:hover{background:#7a1f15;border-color:#7a1f15}
+.action-icon{font-size:18px}
+.action-label{font-size:11px;text-transform:uppercase;letter-spacing:1px}
+
+#game-menu{text-align:center}
+#menu-buttons{margin-top:20px}
+
+@media(max-width:400px){
+  .status-bar{grid-template-columns:repeat(2,1fr);gap:6px;padding:8px}
+  .action-grid{grid-template-columns:1fr}
+  .narrator-text{font-size:12px}
+  .initiative-entry{font-size:11px;padding:4px 8px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header"><h1>D&amp;D 5e</h1><span>Toolkit</span></div>
+  <div id="content">
+    <!-- Tab: Personaje -->
+    <div class="tab-content active" id="tab-personaje">
+      <div id="char-form">
+        <div class="form-row">
+          <div class="form-group"><label>Nombre</label><input type="text" id="char-name" placeholder="Ej: Thorgrim"></div>
+          <div class="form-group"><label>Nivel</label><input type="number" id="char-level" min="1" max="20" value="1"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Raza</label><select id="char-race"><option value="">— Seleccionar —</option></select></div>
+          <div class="form-group" id="subrace-group" style="display:none"><label>Subraza</label><select id="char-subrace"><option value="">—</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Clase</label><select id="char-class"><option value="">— Seleccionar —</option></select></div>
+          <div class="form-group"><label>Trasfondo</label><select id="char-bg"><option value="">— Seleccionar —</option></select></div>
+        </div>
+        <div class="form-group"><label>Método de stats</label>
+          <select id="stat-method">
+            <option value="4d6">4d6 descartar menor</option>
+            <option value="standard">Puntaje estándar (15,14,13,12,10,8)</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm mb-8" id="roll-stats-btn">Generar Stats</button>
+        <div class="stat-grid" id="stat-grid"></div>
+        <div class="form-group" id="assign-section" style="display:none">
+          <label>Asignar habilidades (clickea stat arriba, luego habilidad abajo)</label>
+          <div id="assign-grid"></div>
+        </div>
+        <button class="btn btn-primary" id="generate-btn" style="width:100%">Generar Personaje</button>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="btn btn-sm" id="save-char-btn" style="flex:1">Guardar</button>
+          <select id="load-char-select" style="flex:2;font-size:11px;padding:4px"><option value="">— Cargar personaje —</option></select>
+          <button class="btn btn-sm btn-danger" id="delete-char-btn" style="flex:1">Eliminar</button>
+        </div>
+      </div>
+      <div id="char-output" class="hidden"></div>
+    </div>
+    <!-- Tab: Dados -->
+    <div class="tab-content" id="tab-dados">
+      <div class="dice-grid" id="dice-grid"></div>
+      <div class="form-row mb-8">
+        <div class="form-group"><label>Tirada personalizada</label><input type="text" id="custom-roll" placeholder="Ej: 2d20+4"></div>
+        <div style="display:flex;align-items:flex-end;flex-shrink:0"><button class="btn btn-primary" id="roll-custom-btn">¡Tirada!</button></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button class="btn btn-sm" id="roll-adv-btn" style="flex:1">Ventaja</button>
+        <button class="btn btn-sm" id="roll-disadv-btn" style="flex:1">Desventaja</button>
+      </div>
+      <div class="dice-result"><div class="number" id="dice-number">—</div><div class="detail" id="dice-detail"></div></div>
+      <div class="history" id="roll-history"></div>
+    </div>
+    <!-- Tab: Hechizos -->
+    <div class="tab-content" id="tab-hechizos">
+      <div class="filter-bar">
+        <select id="spell-class-filter"><option value="">Todas las clases</option></select>
+        <select id="spell-level-filter"><option value="">Todos los niveles</option></select>
+        <select id="spell-school-filter"><option value="">Todas las escuelas</option></select>
+      </div>
+      <input type="text" id="spell-search" placeholder="Buscar hechizo..." style="margin-bottom:10px">
+      <div id="spell-list"></div>
+    </div>
+    <!-- Tab: Equipo -->
+    <div class="tab-content" id="tab-equipo">
+      <div class="filter-bar">
+        <select id="equip-category"><option value="">Todo el equipo</option><option value="armas_simples">Armas Simples</option><option value="armas_marciales">Armas Marciales</option><option value="armaduras">Armaduras</option><option value="equipo_aventurero">Equipo de Aventurero</option></select>
+        <input type="text" id="equip-search" placeholder="Buscar...">
+      </div>
+      <div id="equip-list"></div>
+    </div>
+    <!-- Tab: Bestiario -->
+    <div class="tab-content" id="tab-bestiario">
+      <div class="filter-bar">
+        <select id="monster-cr-filter"><option value="">Todos los CR</option></select>
+        <input type="text" id="monster-search" placeholder="Buscar monstruo...">
+      </div>
+      <div id="monster-list"></div>
+    </div>
+    <!-- Tab: Reglas -->
+    <div class="tab-content" id="tab-reglas">
+      <h2 style="color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Habilidades por Atributo</h2>
+      <table class="rules-table" id="skill-table"><tbody></tbody></table>
+      <h2 style="color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:2px;margin:12px 0 8px">Modificadores</h2>
+      <table class="rules-table" id="mod-table"><tbody></tbody></table>
+      <h2 style="color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:2px;margin:12px 0 8px">Clases de Armadura</h2>
+      <table class="rules-table" id="ac-table"><tbody></tbody></table>
+      <h2 style="color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:2px;margin:12px 0 8px">Condiciones</h2>
+      <div class="condition-grid" id="condition-list"></div>
+    </div>
+    <!-- Tab: Jugar (Game) -->
+    <div class="tab-content" id="tab-jugar">
+      <div id="game-screen">
+        <!-- Game Menu -->
+        <div id="game-menu" class="game-panel">
+          <h2 style="color:var(--accent);text-align:center;margin-bottom:16px">D&D 5e · Aventura</h2>
+          <div id="menu-buttons">
+            <button class="btn btn-primary" id="btn-new-game" style="width:100%;margin-bottom:8px">Nueva Partida</button>
+            <button class="btn" id="btn-load-game" style="width:100%;margin-bottom:8px">Cargar Partida</button>
+            <button class="btn" id="btn-back-to-toolkit" style="width:100%">Volver al Toolkit</button>
+          </div>
+        </div>
+        <!-- Game View -->
+        <div id="game-view" class="hidden">
+          <div id="narrator-panel" class="game-panel narrator-panel">
+            <div class="narrator-header">
+              <span class="narrator-title">📜 Narrador</span>
+              <span id="game-location" class="location-badge"></span>
+            </div>
+            <div id="narrator-text" class="narrator-text"></div>
+          </div>
+          <div id="status-bar" class="status-bar">
+            <div class="status-item"><span class="status-label">❤️ PG</span><span id="status-hp" class="status-value">—</span></div>
+            <div class="status-item"><span class="status-label">⭐ Nv</span><span id="status-level" class="status-value">—</span></div>
+            <div class="status-item"><span class="status-label">✨ XP</span><span id="status-xp" class="status-value">—</span></div>
+            <div class="status-item"><span class="status-label">💰 Oro</span><span id="status-gold" class="status-value">0</span></div>
+          </div>
+          <div id="combat-tracker" class="combat-tracker hidden">
+            <div class="combat-header">⚔️ Combate — Iniciativa</div>
+            <div id="initiative-list"></div>
+          </div>
+          <div id="enemies-panel" class="enemies-panel hidden">
+            <div class="enemies-header">👹 Enemigos</div>
+            <div id="enemies-list"></div>
+          </div>
+          <div id="action-panel" class="game-panel action-panel">
+            <div id="action-buttons"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="tab-bar">
+    <button class="tab-btn active" data-tab="personaje">Personaje</button>
+    <button class="tab-btn" data-tab="dados">Dados</button>
+    <button class="tab-btn" data-tab="hechizos">Hechizos</button>
+    <button class="tab-btn" data-tab="equipo">Equipo</button>
+    <button class="tab-btn" data-tab="bestiario">Bestiario</button>
+    <button class="tab-btn" data-tab="reglas">Reglas</button>
+    <button class="tab-btn" data-tab="jugar">Jugar</button>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+
+const D = window.DND || {};
+
+// ---- Compatibility: map Spanish data keys to English names ----
+(function(D){
+  // Top-level aliases
+  if(D.razas){
+    D.races = D.razas;
+    D.races.forEach(r => {
+      r.name = r.nombre; r.bonuses = r.bonos; r.bonusChoice = r.bonos_eleccion;
+      var abilMap = {str:'FUE', dex:'DES', con:'CON', int:'INT', wis:'SAB', cha:'CAR'};
+      if(r.bonuses){
+        var newBonuses = {};
+        Object.keys(r.bonuses).forEach(function(k){
+          if(abilMap[k]) newBonuses[abilMap[k]] = r.bonuses[k];
+        });
+        r.bonuses = newBonuses;
       }
-    },
-    {
-      nombre: 'Bard',
-      dado_golpe: 'd8',
-      spellSlots: [
-        [2,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [4,2,0,0,0,0,0,0,0],
-        [4,3,0,0,0,0,0,0,0],
-        [4,3,2,0,0,0,0,0,0],
-        [4,3,3,0,0,0,0,0,0],
-        [4,3,3,1,0,0,0,0,0],
-        [4,3,3,2,0,0,0,0,0],
-        [4,3,3,3,1,0,0,0,0],
-        [4,3,3,3,2,0,0,0,0],
-        [4,3,3,3,2,1,0,0,0],
-        [4,3,3,3,2,1,0,0,0],
-        [4,3,3,3,2,1,1,0,0],
-        [4,3,3,3,2,1,1,0,0],
-        [4,3,3,3,2,1,1,1,0],
-        [4,3,3,3,2,1,1,1,0],
-        [4,3,3,3,2,1,1,1,1],
-        [4,3,3,3,3,1,1,1,1],
-        [4,3,3,3,3,2,1,1,1],
-        [4,3,3,3,3,2,2,1,1],
-      ],
-      competencias: {
-        armaduras: ['Armadura ligera'],
-        armas: ['Armas simples', 'Ballesta de mano', 'Espada larga', 'Estoque', 'Espada corta'],
-        salvaciones: ['Destreza', 'Carisma'],
-        habilidades: ['Cualquier'],
-        habilidades_elige: 3
-      },
-      equipo: ['Un estoque o una espada larga o cualquier arma simple', 'Un equipo de diplomático o un equipo de entretenido', 'Un laúd u otro instrumento musical', 'Armadura de cuero y una daga'],
-      rasgos_por_nivel: {
-        1: [
-          {nombre: 'Lanzamiento de Conjuros', descripcion: 'Puedes lanzar hechizos de la lista de bardos. Conoces dos trucos y cuatro hechizos de nivel 1. El Carisma es tu habilidad de lanzamiento de conjuros.'},
-          {nombre: 'Inspiración de Bardo', descripcion: 'Como acción bonus, puedes inspirar a una criatura a 60 pies. Gana un dado de Inspiración de Bardo (d6) que puede añadir a una prueba de habilidad, tirada de ataque o salvación. Dura 10 minutos. Tienes tantos usos como tu modificador de Carisma (mínimo 1). Los usos se recuperan en un descanso largo. El dado aumenta a d8 en nivel 5, d10 en nivel 10, d12 en nivel 15.'}
-        ],
-        2: [
-          {nombre: 'Canción de Descanso', descripcion: 'Durante un descanso corto, si tú o cualquier aliado que pueda escucharte gasta Dados de Golpe para recuperar puntos de golpe, recupera puntos de golpe adicionales iguales a tu dado de Inspiración de Bardo.'},
-          {nombre: 'Versatilidad Experta', descripcion: 'Eliges dos competencias de habilidad o una competencia de habilidad y competencia con herramientas. Tu bonificador de competencia se duplica para cualquier prueba que uses esas competencias.'}
-        ],
-        3: [
-          {nombre: 'Colegio de Bardos', descripcion: 'Eliges un colegio de bardos. Otorga rasgos en niveles 3, 6 y 14.'},
-          {nombre: 'Experto', descripcion: 'Eliges dos competencias de habilidad más y tu bonificador de competencia se duplica para cualquier prueba que las use.'}
-        ],
-        4: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        5: [
-          {nombre: 'Inspiración de Bardo (d8)', descripcion: 'Tu dado de Inspiración de Bardo pasa a ser d8.'},
-          {nombre: 'Fuente de Inspiración', descripcion: 'Recuperas todos tus usos de Inspiración de Bardo en un descanso corto o largo.'}
-        ],
-        6: [
-          {nombre: 'Contrahechizo', descripcion: 'Puedes usar tu reacción para intentar interrumpir un hechizo cuando una criatura a 60 pies lo lanza. Haz una prueba de Carisma CD 10 + nivel del hechizo. En éxito, el hechizo falla.'},
-          {nombre: 'Rasgo de Colegio', descripcion: 'Obtienes un rasgo de tu colegio de bardos.'}
-        ],
-        7: [{nombre: 'Conocimiento de Colegio', descripcion: 'Puedes añadir la mitad de tu bonificador de competencia a cualquier prueba de habilidad que no incluya tu bonificador de competencia.'}],
-        8: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        9: [{nombre: 'Canción de Descanso (d10)', descripcion: 'Los puntos de golpe adicionales de tu Canción de Descanso pasan a ser d10.'}],
-        10: [
-          {nombre: 'Inspiración de Bardo (d10)', descripcion: 'Tu dado de Inspiración de Bardo pasa a ser d10.'},
-          {nombre: 'Secretos Mágicos', descripcion: 'Aprendes dos hechizos de cualquier clase de nivel 3 o menor. Son hechizos de bardo para ti.'}
-        ],
-        11: [{nombre: 'Conocimiento de Colegio', descripcion: 'Puedes añadir la mitad de tu bonificador de competencia a cualquier prueba de habilidad que no incluya tu bonificador de competencia.'}],
-        12: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        13: [{nombre: 'Canción de Descanso (d12)', descripcion: 'Los puntos de golpe adicionales de tu Canción de Descanso pasan a ser d12.'}],
-        14: [
-          {nombre: 'Inspiración de Bardo (d12)', descripcion: 'Tu dado de Inspiración de Bardo pasa a ser d12.'},
-          {nombre: 'Rasgo de Colegio', descripcion: 'Obtienes un rasgo de tu colegio de bardos.'},
-          {nombre: 'Secretos Mágicos', descripcion: 'Aprendes dos hechizos de cualquier clase de nivel 5 o menor.'}
-        ],
-        15: [{nombre: 'Conocimiento de Colegio', descripcion: 'Puedes añadir la mitad de tu bonificador de competencia a cualquier prueba de habilidad que no incluya tu bonificador de competencia.'}],
-        16: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        17: [{nombre: 'Canción de Descanso (d12)', descripcion: 'Los puntos de golpe adicionales de tu Canción de Descanso usan d12.'}],
-        18: [{nombre: 'Secretos Mágicos', descripcion: 'Aprendes dos hechizos de cualquier clase de nivel 7 o menor.'}],
-        19: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        20: [
-          {nombre: 'Inspiración Superior', descripcion: 'Cuando realizas una tirada de iniciativa y no te quedan usos de Inspiración de Bardo, recuperas un uso.'}
-        ]
-      }
-    },
-    {
-      nombre: 'Cleric',
-      dado_golpe: 'd8',
-      spellSlots: [
-        [2,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [4,2,0,0,0,0,0,0,0],
-        [4,3,0,0,0,0,0,0,0],
-        [4,3,2,0,0,0,0,0,0],
-        [4,3,3,0,0,0,0,0,0],
-        [4,3,3,1,0,0,0,0,0],
-        [4,3,3,2,0,0,0,0,0],
-        [4,3,3,3,1,0,0,0,0],
-        [4,3,3,3,2,0,0,0,0],
-        [4,3,3,3,2,1,0,0,0],
-        [4,3,3,3,2,1,0,0,0],
-        [4,3,3,3,2,1,1,0,0],
-        [4,3,3,3,2,1,1,0,0],
-        [4,3,3,3,2,1,1,1,0],
-        [4,3,3,3,2,1,1,1,0],
-        [4,3,3,3,2,1,1,1,1],
-        [4,3,3,3,3,1,1,1,1],
-        [4,3,3,3,3,2,1,1,1],
-        [4,3,3,3,3,2,2,1,1],
-      ],
-      competencias: {
-        armaduras: ['Armadura ligera', 'Armadura media', 'Escudos'],
-        armas: ['Armas simples'],
-        salvaciones: ['Sabiduría', 'Carisma'],
-        habilidades: ['History', 'Insight', 'Medicine', 'Persuasion', 'Religion'],
-        habilidades_elige: 2
-      },
-      equipo: ['Una maza o un martillo de guerra', 'Armadura de escamas, armadura de cuero o cota de mallas', 'Un escudo o un arma simple', 'Un emblema sagrado', 'Un equipo de sacerdote'],
-      rasgos_por_nivel: {
-        1: [
-          {nombre: 'Lanzamiento de Conjuros', descripcion: 'Puedes lanzar hechizos de clérigo. Conoces tres trucos y preparas un número de hechizos igual a tu modificador de Sabiduría + tu nivel de clérigo. La Sabiduría es tu habilidad de lanzamiento de conjuros.'},
-          {nombre: 'Dominio Divino', descripcion: 'Eliges un dominio divino que otorga hechizos de dominio y rasgos en niveles 1, 2, 6, 8 y 17.'}
-        ],
-        2: [
-          {nombre: 'Canalizar Divinidad', descripcion: 'Puedes canalizar energía divina. Obtienes un uso por descanso corto o largo. Los usos aumentan en nivel 6 y 18.'},
-          {nombre: 'Rasgo de Dominio', descripcion: 'Obtienes un rasgo de tu dominio.'}
-        ],
-        3: [{nombre: 'Hechizos de Nivel 2', descripcion: 'Puedes lanzar hechizos de nivel 2.'}],
-        4: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        5: [{nombre: 'Destruir No Muertos (CD)', descripcion: 'Los no muertos con CR menor o igual a la mitad de tu nivel de clérigo son destruidos si fallan su salvación.'}],
-        6: [
-          {nombre: 'Canalizar Divinidad (2 usos)', descripcion: 'Ahora tienes dos usos de Canalizar Divinidad entre descansos.'},
-          {nombre: 'Rasgo de Dominio', descripcion: 'Obtienes un rasgo de tu dominio.'}
-        ],
-        7: [{nombre: 'Hechizos de Nivel 4', descripcion: 'Puedes lanzar hechizos de nivel 4.'}],
-        8: [
-          {nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'},
-          {nombre: 'Rasgo de Dominio', descripcion: 'Obtienes un rasgo de tu dominio.'},
-          {nombre: 'Destruir No Muertos', descripcion: 'Aumenta el CR de no muertos que puedes destruir.'}
-        ],
-        9: [{nombre: 'Hechizos de Nivel 5', descripcion: 'Puedes lanzar hechizos de nivel 5.'}],
-        10: [{nombre: 'Intervención Divina', descripcion: 'Puedes pedir la intervención de tu deidad. Tira un porcentaje: 10 o menos tiene éxito. Al nivel 20 tiene éxito automático.'}],
-        11: [{nombre: 'Hechizos de Nivel 6', descripcion: 'Puedes lanzar hechizos de nivel 6.'}],
-        12: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        13: [{nombre: 'Hechizos de Nivel 7', descripcion: 'Puedes lanzar hechizos de nivel 7.'}],
-        14: [{nombre: 'Rasgo de Dominio', descripcion: 'Obtienes un rasgo de tu dominio.'}],
-        15: [{nombre: 'Hechizos de Nivel 8', descripcion: 'Puedes lanzar hechizos de nivel 8.'}],
-        16: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        17: [
-          {nombre: 'Hechizos de Nivel 9', descripcion: 'Puedes lanzar hechizos de nivel 9.'},
-          {nombre: 'Rasgo de Dominio', descripcion: 'Obtienes un rasgo de tu dominio.'}
-        ],
-        18: [{nombre: 'Canalizar Divinidad (3 usos)', descripcion: 'Ahora tienes tres usos de Canalizar Divinidad entre descansos.'}],
-        19: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        20: [{nombre: 'Intervención Divina (Automática)', descripcion: 'Tu petición de intervención divina tiene éxito automáticamente. Puedes usar este rasgo de nuevo después de 2d4 días.'}]
-      }
-    },
-    {
-      nombre: 'Druid',
-      dado_golpe: 'd8',
-      spellSlots: [
-        [2,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [4,2,0,0,0,0,0,0,0],
-        [4,3,0,0,0,0,0,0,0],
-        [4,3,2,0,0,0,0,0,0],
-        [4,3,3,0,0,0,0,0,0],
-        [4,3,3,1,0,0,0,0,0],
-        [4,3,3,2,0,0,0,0,0],
-        [4,3,3,3,1,0,0,0,0],
-        [4,3,3,3,2,0,0,0,0],
-        [4,3,3,3,2,1,0,0,0],
-        [4,3,3,3,2,1,0,0,0],
-        [4,3,3,3,2,1,1,0,0],
-        [4,3,3,3,2,1,1,0,0],
-        [4,3,3,3,2,1,1,1,0],
-        [4,3,3,3,2,1,1,1,0],
-        [4,3,3,3,2,1,1,1,1],
-        [4,3,3,3,3,1,1,1,1],
-        [4,3,3,3,3,2,1,1,1],
-        [4,3,3,3,3,2,2,1,1],
-      ],
-      competencias: {
-        armaduras: ['Armadura ligera', 'Armadura media', 'Escudos'],
-        armas: ['Clavas', 'Dagas', 'Dardos', 'Jabalinas', 'Mazas', 'Bastones', 'Cimitarras', 'Hoces', 'Hondas', 'Lanzas'],
-        salvaciones: ['Inteligencia', 'Sabiduría'],
-        habilidades: ['Animal Handling', 'Arcana', 'Insight', 'Medicine', 'Nature', 'Perception', 'Religion', 'Survival'],
-        habilidades_elige: 2
-      },
-      equipo: ['Un escudo de madera o cualquier arma simple', 'Una cimitarra o cualquier arma cuerpo a cuerpo simple', 'Una armadura de cuero o una cota de anillas', 'Un equipo de explorador', 'Un foco druídico'],
-      rasgos_por_nivel: {
-        1: [
-          {nombre: 'Lanzamiento de Conjuros', descripcion: 'Puedes lanzar hechizos de druida. Conoces dos trucos y preparas un número de hechizos igual a tu modificador de Sabiduría + tu nivel de druida. La Sabiduría es tu habilidad de lanzamiento.'},
-          {nombre: 'Druídico', descripcion: 'Conoces el idioma secreto de los druidas.'}
-        ],
-        2: [
-          {nombre: 'Forma Salvaje', descripcion: 'Puedes usar tu acción para transformarte en una bestia que hayas visto. Se aplican reglas según el CR. 2 usos por descanso corto/largo. Dura horas igual a la mitad de tu nivel de druida.'}
-        ],
-        3: [{nombre: 'Círculo Druídico', descripcion: 'Eliges un círculo druídico. Otorga rasgos en niveles 2, 3, 6, 10 y 14.'}],
-        4: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        5: [{nombre: 'Hechizos de Nivel 3', descripcion: 'Puedes lanzar hechizos de nivel 3.'}],
-        6: [{nombre: 'Rasgo de Círculo', descripcion: 'Obtienes un rasgo de tu círculo druídico.'}],
-        7: [{nombre: 'Hechizos de Nivel 4', descripcion: 'Puedes lanzar hechizos de nivel 4.'}],
-        8: [
-          {nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'},
-          {nombre: 'Forma Salvaje Mejorada', descripcion: 'Puedes transformarte en bestias de CR 1.'}
-        ],
-        9: [{nombre: 'Hechizos de Nivel 5', descripcion: 'Puedes lanzar hechizos de nivel 5.'}],
-        10: [
-          {nombre: 'Rasgo de Círculo', descripcion: 'Obtienes un rasgo de tu círculo druídico.'}
-        ],
-        11: [{nombre: 'Hechizos de Nivel 6', descripcion: 'Puedes lanzar hechizos de nivel 6.'}],
-        12: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        13: [{nombre: 'Hechizos de Nivel 7', descripcion: 'Puedes lanzar hechizos de nivel 7.'}],
-        14: [
-          {nombre: 'Rasgo de Círculo', descripcion: 'Obtienes un rasgo de tu círculo druídico.'}
-        ],
-        15: [{nombre: 'Hechizos de Nivel 8', descripcion: 'Puedes lanzar hechizos de nivel 8.'}],
-        16: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        17: [{nombre: 'Hechizos de Nivel 9', descripcion: 'Puedes lanzar hechizos de nivel 9.'}],
-        18: [
-          {nombre: 'Cuerpo Etéreo', descripcion: 'Puedes lanzar el hechizo de Caminar Etéreo sobre ti mismo sin gastar espacio de hechizo.'}
-        ],
-        19: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        20: [{nombre: 'Arconte Druídico', descripcion: 'Puedes usar Forma Salvaje un número ilimitado de veces. Puedes ignorar componentes verbales y somáticos al lanzar hechizos.'}]
-      }
-    },
-    {
-      nombre: 'Fighter',
-      dado_golpe: 'd10',
-      competencias: {
-        armaduras: ['Todas las armaduras', 'Escudos'],
-        armas: ['Armas simples', 'Armas marciales'],
-        salvaciones: ['Fuerza', 'Constitución'],
-        habilidades: ['Acrobatics', 'Animal Handling', 'Athletics', 'History', 'Insight', 'Intimidation', 'Perception', 'Survival'],
-        habilidades_elige: 2
-      },
-      equipo: ['Una cota de mallas o una armadura de cuero, arco largo y 20 flechas', 'Un arma marcial y un escudo o dos armas marciales', 'Un arma simple y un equipo de mazmorra'],
-      rasgos_por_nivel: {
-        1: [
-          {nombre: 'Estilo de Combate', descripcion: 'Eliges un estilo de combate que otorga un bonificador especial a tus ataques.'},
-          {nombre: 'Segundo Aliento', descripcion: 'En tu turno, puedes usar una acción bonus para recuperar 1d10 + tu nivel de guerrero puntos de golpe. Puedes usarlo una vez por descanso corto o largo.'}
-        ],
-        2: [
-          {nombre: 'Impulso Marcial', descripcion: 'Puedes tener un uso adicional de Impulso Marcial. Recuperas todos los usos al terminar un descanso corto o largo.'}
-        ],
-        3: [
-          {nombre: 'Arquetipo Marcial', descripcion: 'Eliges un arquetipo marcial. Otorga rasgos en niveles 3, 7, 10, 15 y 18.'}
-        ],
-        4: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        5: [
-          {nombre: 'Ataque Extra', descripcion: 'Puedes atacar dos veces en lugar de una cuando realizas la acción de Atacar.'}
-        ],
-        6: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        7: [{nombre: 'Rasgo de Arquetipo', descripcion: 'Obtienes un rasgo de tu arquetipo marcial.'}],
-        8: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        9: [{nombre: 'Indomable', descripcion: 'Puedes repetir una tirada de salvación fallida una vez por descanso largo. Se usa más veces en niveles 13 y 17.'}],
-        10: [{nombre: 'Rasgo de Arquetipo', descripcion: 'Obtienes un rasgo de tu arquetipo marcial.'}],
-        11: [
-          {nombre: 'Ataque Extra (2)', descripcion: 'Puedes atacar tres veces en lugar de una cuando realizas la acción de Atacar.'}
-        ],
-        12: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        13: [{nombre: 'Indomable (2 usos)', descripcion: 'Puedes usar Indomable dos veces entre descansos largos.'}],
-        14: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        15: [{nombre: 'Rasgo de Arquetipo', descripcion: 'Obtienes un rasgo de tu arquetipo marcial.'}],
-        16: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        17: [
-          {nombre: 'Indomable (3 usos)', descripcion: 'Puedes usar Indomable tres veces entre descansos largos.'},
-          {nombre: 'Impulso Marcial (2 usos)', descripcion: 'Tienes dos usos de Impulso Marcial.'}
-        ],
-        18: [{nombre: 'Rasgo de Arquetipo', descripcion: 'Obtienes un rasgo de tu arquetipo marcial.'}],
-        19: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        20: [
-          {nombre: 'Ataque Extra (3)', descripcion: 'Puedes atacar cuatro veces en lugar de una cuando realizas la acción de Atacar.'}
-        ]
-      }
-    },
-    {
-      nombre: 'Monk',
-      dado_golpe: 'd8',
-      competencias: {
-        armaduras: ['Ninguna'],
-        armas: ['Armas simples', 'Espadas cortas'],
-        salvaciones: ['Fuerza', 'Destreza'],
-        habilidades: ['Acrobatics', 'Athletics', 'History', 'Insight', 'Religion', 'Stealth'],
-        habilidades_elige: 2
-      },
-      equipo: ['Una espada corta o cualquier arma simple', 'Un equipo de mazmorra o un equipo de explorador', '10 dardos'],
-      rasgos_por_nivel: {
-        1: [
-          {nombre: 'Defensa Sin Armadura', descripcion: 'Mientras no lleves armadura ni escudo, tu CA es igual a 10 + tu modificador de Destreza + tu modificador de Sabiduría.'},
-          {nombre: 'Art Marcial', descripcion: 'Puedes usar Destreza en lugar de Fuerza para ataques desarmados y armas de monje. Tu dado de daño marcial es d4. Puedes hacer un ataque desarmado como acción bonus después de la acción de Atacar.'}
-        ],
-        2: [
-          {nombre: 'Puntos de Ki', descripcion: 'Tienes un número de puntos de Ki igual a tu nivel de monje. Se recuperan en un descanso corto o largo. Puedes usar tu acción bonus para gastar 1 punto de Ki y hacer dos ataques desarmados.'},
-          {nombre: 'Movimiento Sin Armadura', descripcion: 'Tu velocidad aumenta en 10 pies mientras no lleves armadura ni escudo.'}
-        ],
-        3: [
-          {nombre: 'Tradición Monástica', descripcion: 'Eliges una tradición monástica. Otorga rasgos en niveles 3, 6, 11 y 17.'},
-          {nombre: 'Desviar Proyectiles', descripcion: 'Puedes usar tu reacción para reducir el daño de un proyectil en 1d10 + tu nivel de monje + tu modificador de Destreza. Si reduces a 0, puedes gastar 1 punto de Ki para devolverlo.'}
-        ],
-        4: [
-          {nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'},
-          {nombre: 'Caída de Hoja', descripcion: 'Ignoras daño por caída hasta 5 veces tu nivel de monje.'}
-        ],
-        5: [
-          {nombre: 'Ataque Extra', descripcion: 'Puedes atacar dos veces en lugar de una.'},
-          {nombre: 'Golpe Aturdidor', descripcion: 'Gasta 1 punto de Ki al golpear con un ataque cuerpo a cuerpo para forzar una salvación de Constitución o quedar aturdido hasta el final de tu próximo turno.'},
-          {nombre: 'Dado de Art Marcial (d6)', descripcion: 'Tu dado de daño marcial aumenta a d6.'}
-        ],
-        6: [
-          {nombre: 'Rasgo de Tradición', descripcion: 'Obtienes un rasgo de tu tradición.'},
-          {nombre: 'Golpes Potenciados con Ki', descripcion: 'Tus ataques desarmados cuentan como mágicos para superar resistencias e inmunidades.'}
-        ],
-        7: [
-          {nombre: 'Evasión', descripcion: 'Si estás sujeto a un efecto que permite una salvación de Destreza para la mitad del daño, no recibes daño si tienes éxito y la mitad si fallas.'},
-          {nombre: 'Quietud Mental', descripcion: 'Tienes ventaja en tiradas de salvación contra ser hechizado o asustado.'}
-        ],
-        8: [
-          {nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}
-        ],
-        9: [
-          {nombre: 'Movimiento Sin Armadura (15 pies)', descripcion: 'Tu velocidad aumenta en 15 pies en lugar de 10.'}
-        ],
-        10: [
-          {nombre: 'Pureza Corporal', descripcion: 'Eres inmune a enfermedades y veneno.'}
-        ],
-        11: [
-          {nombre: 'Dado de Art Marcial (d8)', descripcion: 'Tu dado de daño marcial aumenta a d8.'},
-          {nombre: 'Rasgo de Tradición', descripcion: 'Obtienes un rasgo de tu tradición.'}
-        ],
-        12: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        13: [{nombre: 'Idioma del Sol y la Luna', descripcion: 'Puedes entender y ser entendido por cualquier ser vivo.'}],
-        14: [{nombre: 'Alma de Diamante', descripcion: 'Tienes competencia en todas las tiradas de salvación. Puedes gastar 1 punto de Ki para repetir una salvación fallida.'}],
-        15: [{nombre: 'Cuerpo Atemporal', descripcion: 'No sufres los efectos del envejecimiento ni puedes ser envejecido mágicamente.'}],
-        16: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        17: [
-          {nombre: 'Rasgo de Tradición', descripcion: 'Obtienes un rasgo de tu tradición.'},
-          {nombre: 'Dado de Art Marcial (d10)', descripcion: 'Tu dado de daño marcial aumenta a d10.'}
-        ],
-        18: [
-          {nombre: 'Movimiento Sin Armadura (30 pies)', descripcion: 'Tu velocidad aumenta en 30 pies en lugar de 10.'}
-        ],
-        19: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        20: [
-          {nombre: 'Autoperfección', descripcion: 'Si tienes 0 puntos de Ki al inicio de tu turno, ganas 4 puntos de Ki.'}
-        ]
-      }
-    },
-    {
-      nombre: 'Paladin',
-      dado_golpe: 'd10',
-      spellSlots: [
-        [0,0,0,0,0,0,0,0,0],
-        [2,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [4,2,0,0,0,0,0,0,0],
-        [4,2,0,0,0,0,0,0,0],
-        [4,3,0,0,0,0,0,0,0],
-        [4,3,0,0,0,0,0,0,0],
-        [4,3,2,0,0,0,0,0,0],
-        [4,3,2,0,0,0,0,0,0],
-        [4,3,3,0,0,0,0,0,0],
-        [4,3,3,0,0,0,0,0,0],
-        [4,3,3,1,0,0,0,0,0],
-        [4,3,3,1,0,0,0,0,0],
-        [4,3,3,2,0,0,0,0,0],
-        [4,3,3,2,0,0,0,0,0],
-        [4,3,3,3,1,0,0,0,0],
-        [4,3,3,3,1,0,0,0,0],
-        [4,3,3,3,2,0,0,0,0],
-        [4,3,3,3,2,0,0,0,0],
-      ],
-      competencias: {
-        armaduras: ['Todas las armaduras', 'Escudos'],
-        armas: ['Armas simples', 'Armas marciales'],
-        salvaciones: ['Sabiduría', 'Carisma'],
-        habilidades: ['Athletics', 'Insight', 'Intimidation', 'Medicine', 'Persuasion', 'Religion'],
-        habilidades_elige: 2
-      },
-      equipo: ['Un arma marcial y un escudo o dos armas marciales', 'Cinco jabalinas', 'Un equipo de sacerdote o un equipo de explorador', 'Una cota de mallas y un emblema sagrado'],
-      rasgos_por_nivel: {
-        1: [
-          {nombre: 'Sentido Divino', descripcion: 'Como acción, puedes detectar celestiales, infernales o no muertos a 60 pies. Dura hasta el final de tu próximo turno.'},
-          {nombre: 'Imposición de Manos', descripcion: 'Tienes una reserva de curación de 5 x tu nivel de paladín. Como acción, puedes curar a una criatura que tocas. También puedes gastar 5 puntos para curar una enfermedad o veneno.'}
-        ],
-        2: [
-          {nombre: 'Estilo de Combate', descripcion: 'Eliges un estilo de combate.'},
-          {nombre: 'Lanzamiento de Conjuros', descripcion: 'Puedes lanzar hechizos de paladín. Preparas un número de hechizos igual a tu modificador de Carisma + la mitad de tu nivel de paladín (mínimo 1). El Carisma es tu habilidad de lanzamiento.'}
-        ],
-        3: [
-          {nombre: 'Salud Divina', descripcion: 'Eres inmune a enfermedades.'},
-          {nombre: 'Juramento Divino', descripcion: 'Eliges un juramento. Otorga rasgos en niveles 3, 7, 15 y 20.'}
-        ],
-        4: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        5: [{nombre: 'Ataque Extra', descripcion: 'Puedes atacar dos veces en lugar de una.'}],
-        6: [
-          {nombre: 'Protección de Aura', descripcion: 'Tú y las criaturas amistosas a 10 pies tenéis un bonificador a las tiradas de salvación igual a tu modificador de Carisma (mínimo +1).'}
-        ],
-        7: [{nombre: 'Rasgo de Juramento', descripcion: 'Obtienes un rasgo de tu juramento.'}],
-        8: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        9: [{nombre: 'Hechizos de Nivel 3', descripcion: 'Puedes lanzar hechizos de nivel 3.'}],
-        10: [
-          {nombre: 'Aura de Valor', descripcion: 'Tú y las criaturas amistosas a 10 pies no podéis ser asustados.'}
-        ],
-        11: [
-          {nombre: 'Golpe Divino', descripcion: 'Cuando golpeas con un ataque cuerpo a cuerpo, infliges 1d8 de daño radiante adicional. 2d8 contra no muertos e infernales.'}
-        ],
-        12: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        13: [{nombre: 'Hechizos de Nivel 4', descripcion: 'Puedes lanzar hechizos de nivel 4.'}],
-        14: [
-          {nombre: 'Toque Purificador', descripcion: 'Puedes usar tu acción para terminar un hechizo sobre ti o una criatura que toques. Puedes usarlo un número de veces igual a tu modificador de Carisma (mínimo 1) por descanso largo.'}
-        ],
-        15: [{nombre: 'Rasgo de Juramento', descripcion: 'Obtienes un rasgo de tu juramento.'}],
-        16: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        17: [{nombre: 'Hechizos de Nivel 5', descripcion: 'Puedes lanzar hechizos de nivel 5.'}],
-        18: [
-          {nombre: 'Aura Mejorada', descripcion: 'El alcance de tus auras aumenta a 30 pies.'}
-        ],
-        19: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        20: [{nombre: 'Rasgo de Juramento', descripcion: 'Obtienes un rasgo de tu juramento.'}]
-      }
-    },
-    {
-      nombre: 'Ranger',
-      dado_golpe: 'd10',
-      spellSlots: [
-        [0,0,0,0,0,0,0,0,0],
-        [2,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [4,2,0,0,0,0,0,0,0],
-        [4,2,0,0,0,0,0,0,0],
-        [4,3,0,0,0,0,0,0,0],
-        [4,3,0,0,0,0,0,0,0],
-        [4,3,2,0,0,0,0,0,0],
-        [4,3,2,0,0,0,0,0,0],
-        [4,3,3,0,0,0,0,0,0],
-        [4,3,3,0,0,0,0,0,0],
-        [4,3,3,1,0,0,0,0,0],
-        [4,3,3,1,0,0,0,0,0],
-        [4,3,3,2,0,0,0,0,0],
-        [4,3,3,2,0,0,0,0,0],
-        [4,3,3,3,1,0,0,0,0],
-        [4,3,3,3,1,0,0,0,0],
-        [4,3,3,3,2,0,0,0,0],
-        [4,3,3,3,2,0,0,0,0],
-      ],
-      competencias: {
-        armaduras: ['Armadura ligera', 'Armadura media', 'Escudos'],
-        armas: ['Armas simples', 'Armas marciales'],
-        salvaciones: ['Fuerza', 'Destreza'],
-        habilidades: ['Animal Handling', 'Athletics', 'Insight', 'Investigation', 'Nature', 'Perception', 'Stealth', 'Survival'],
-        habilidades_elige: 3
-      },
-      equipo: ['Una cota de escamas o una armadura de cuero', 'Dos espadas cortas o dos armas simples cuerpo a cuerpo', 'Un equipo de mazmorra o un equipo de explorador', 'Un arco largo y una aljaba con 20 flechas'],
-      rasgos_por_nivel: {
-        1: [
-          {nombre: 'Enemigo Favorito', descripcion: 'Eliges un tipo de enemigo favorito: aberraciones, bestias, celestiales, constructos, dragones, elementales, feéricos, infernales, gigantes, monstruosidades, limos, plantas, no muertos. Tienes ventaja en pruebas de Supervivencia y ventaja en pruebas de Inteligencia para recordar información. Además, aprendes un idioma que hable tu enemigo.'},
-          {nombre: 'Explorador Natural', descripcion: 'Eliges un tipo de terreno favorito: ártico, costa, desierto, bosque, pradera, montaña, pantano, Infraoscuridad. Tus pruebas de Inteligencia y Sabiduría relacionadas con el terreno tienen bonificador duplicado.'}
-        ],
-        2: [
-          {nombre: 'Estilo de Combate', descripcion: 'Eliges un estilo de combate: Arquero, Combate con Dos Armas, o Defensa.'},
-          {nombre: 'Lanzamiento de Conjuros', descripcion: 'Puedes lanzar hechizos de explorador. Conoces dos trucos y preparas un número de hechizos igual a tu modificador de Sabiduría. La Sabiduría es tu habilidad de lanzamiento.'}
-        ],
-        3: [
-          {nombre: 'Arquetipo de Explorador', descripcion: 'Eliges un arquetipo de explorador. Otorga rasgos en niveles 3, 7, 11 y 15.'},
-          {nombre: 'Conciencia Primitiva', descripcion: 'Puedes gastar 1 minuto para sentir si hay enemigos favoritos a 5 millas.'}
-        ],
-        4: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        5: [
-          {nombre: 'Ataque Extra', descripcion: 'Puedes atacar dos veces en lugar de una.'}
-        ],
-        6: [
-          {nombre: 'Enemigo Favorito Mejorado', descripcion: 'Eliges un enemigo favorito adicional. Ganas un bonificador de +2 al daño contra tus enemigos favoritos.'}
-        ],
-        7: [{nombre: 'Rasgo de Arquetipo', descripcion: 'Obtienes un rasgo de tu arquetipo de explorador.'}],
-        8: [
-          {nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'},
-          {nombre: 'Pasos Agrestes', descripcion: 'Puedes moverte a través de terreno difícil no mágico sin penalización.'}
-        ],
-        9: [{nombre: 'Hechizos de Nivel 3', descripcion: 'Puedes lanzar hechizos de nivel 3.'}],
-        10: [
-          {nombre: 'Explorador Natural Mejorado', descripcion: 'Eliges un terreno favorito adicional. Además, las criaturas tienen desventaja en emboscadas.'},
-          {nombre: 'Ocultarse Sin Dejar Rastro', descripcion: 'Puedes esconderte cuando solo estés ligeramente oscurecido.'}
-        ],
-        11: [{nombre: 'Rasgo de Arquetipo', descripcion: 'Obtienes un rasgo de tu arquetipo de explorador.'}],
-        12: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        13: [{nombre: 'Hechizos de Nivel 4', descripcion: 'Puedes lanzar hechizos de nivel 4.'}],
-        14: [
-          {nombre: 'Enemigo Favorito Mejorado', descripcion: 'Eliges un enemigo favorito adicional. Tu bonificador de daño contra enemigos favoritos aumenta a +4.'}
-        ],
-        15: [{nombre: 'Rasgo de Arquetipo', descripcion: 'Obtienes un rasgo de tu arquetipo de explorador.'}],
-        16: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        17: [{nombre: 'Hechizos de Nivel 5', descripcion: 'Puedes lanzar hechizos de nivel 5.'}],
-        18: [
-          {nombre: 'Sentidos Salvajes', descripcion: 'Puedes ver 30 pies en la oscuridad. Si ya tienes visión en la oscuridad, el alcance se duplica.'}
-        ],
-        19: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        20: [
-          {nombre: 'Matador de Enemigos', descripcion: 'Una vez por turno, puedes añadir tu modificador de Sabiduría a una tirada de ataque o daño contra un enemigo favorito.'}
-        ]
-      }
-    },
-    {
-      nombre: 'Rogue',
-      dado_golpe: 'd8',
-      competencias: {
-        armaduras: ['Armadura ligera'],
-        armas: ['Armas simples', 'Ballesta de mano', 'Espada larga', 'Estoque', 'Espada corta'],
-        salvaciones: ['Destreza', 'Inteligencia'],
-        habilidades: ['Acrobatics', 'Athletics', 'Deception', 'Insight', 'Intimidation', 'Investigation', 'Perception', 'Performance', 'Persuasion', 'Sleight of Hand', 'Stealth'],
-        habilidades_elige: 4
-      },
-      equipo: ['Un estoque o una espada corta', 'Un arco corto y una aljaba con 20 flechas o una espada corta', 'Un equipo de mazmorra o un equipo de explorador', 'Armadura de cuero, dos dagas y herramientas de ladrón'],
-      rasgos_por_nivel: {
-        1: [
-          {nombre: 'Ataque Furtivo', descripcion: 'Una vez por turno, puedes infligir 1d6 de daño adicional a una criatura que golpees con un ataque con ventaja o si un aliado está a 5 pies. Debes usar un arma a distancia o un arma cuerpo a cuerpo con la propiedad de sutileza. El daño aumenta en 1d6 cada dos niveles.'},
-          {nombre: 'Jerga de Ladrones', descripcion: 'Conoces la jerga secreta de los ladrones.'},
-          {nombre: 'Percepción Experta', descripcion: 'Eliges una competencia de habilidad adicional y tu bonificador de competencia se duplica para cualquier prueba que la use.'}
-        ],
-        2: [
-          {nombre: 'Acción Astuta', descripcion: 'Puedes usar una acción bonus para Esprintar, Separarte o Esconderte.'}
-        ],
-        3: [
-          {nombre: 'Arquetipo de Pícaro', descripcion: 'Eliges un arquetipo de pícaro. Otorga rasgos en niveles 3, 9, 13 y 17.'},
-          {nombre: 'Ataque Furtivo (2d6)', descripcion: 'Tu daño de Ataque Furtivo aumenta a 2d6.'}
-        ],
-        4: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        5: [
-          {nombre: 'Ataque Furtivo (3d6)', descripcion: 'Tu daño de Ataque Furtivo aumenta a 3d6.'},
-          {nombre: 'Esquivar Instintivo', descripcion: 'Cuando un atacante que puedes ver te golpea, puedes usar tu reacción para reducir el daño a la mitad.'}
-        ],
-        6: [
-          {nombre: 'Percepción Experta', descripcion: 'Eliges otra competencia de habilidad y tu bonificador de competencia se duplica para ella.'}
-        ],
-        7: [
-          {nombre: 'Evasión', descripcion: 'Si estás sujeto a un efecto que permite una salvación de Destreza para la mitad del daño, no recibes daño si tienes éxito y la mitad si fallas.'},
-          {nombre: 'Ataque Furtivo (4d6)', descripcion: 'Tu daño de Ataque Furtivo aumenta a 4d6.'}
-        ],
-        8: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        9: [
-          {nombre: 'Rasgo de Arquetipo', descripcion: 'Obtienes un rasgo de tu arquetipo de pícaro.'},
-          {nombre: 'Ataque Furtivo (5d6)', descripcion: 'Tu daño de Ataque Furtivo aumenta a 5d6.'}
-        ],
-        10: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        11: [
-          {nombre: 'Talento Confiable', descripcion: 'Siempre que hagas una prueba de habilidad con la que tengas competencia, puedes tratar un resultado de 9 o menos en el d20 como un 10.'},
-          {nombre: 'Ataque Furtivo (6d6)', descripcion: 'Tu daño de Ataque Furtivo aumenta a 6d6.'}
-        ],
-        12: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        13: [
-          {nombre: 'Rasgo de Arquetipo', descripcion: 'Obtienes un rasgo de tu arquetipo de pícaro.'},
-          {nombre: 'Ataque Furtivo (7d6)', descripcion: 'Tu daño de Ataque Furtivo aumenta a 7d6.'}
-        ],
-        14: [
-          {nombre: 'Sentir Ciego', descripcion: 'Percibes la ubicación de cualquier criatura oculta o invisible a 10 pies.'}
-        ],
-        15: [
-          {nombre: 'Mente Esquiva', descripcion: 'Tienes ventaja en tiradas de salvación de Inteligencia, Sabiduría y Carisma.'},
-          {nombre: 'Ataque Furtivo (8d6)', descripcion: 'Tu daño de Ataque Furtivo aumenta a 8d6.'}
-        ],
-        16: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        17: [
-          {nombre: 'Rasgo de Arquetipo', descripcion: 'Obtienes un rasgo de tu arquetipo de pícaro.'},
-          {nombre: 'Ataque Furtivo (9d6)', descripcion: 'Tu daño de Ataque Furtivo aumenta a 9d6.'}
-        ],
-        18: [{nombre: 'Esquivar Instintivo Mejorado', descripcion: 'No necesitas ver al atacante para usar Esquivar Instintivo.'}],
-        19: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        20: [
-          {nombre: 'Golpe de Suerte', descripcion: 'Cuando fallas un ataque, puedes convertirlo en un éxito. Una vez por descanso corto.'},
-          {nombre: 'Ataque Furtivo (10d6)', descripcion: 'Tu daño de Ataque Furtivo aumenta a 10d6.'}
-        ]
-      }
-    },
-    {
-      nombre: 'Sorcerer',
-      dado_golpe: 'd6',
-      spellSlots: [
-        [2,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [4,2,0,0,0,0,0,0,0],
-        [4,3,0,0,0,0,0,0,0],
-        [4,3,2,0,0,0,0,0,0],
-        [4,3,3,0,0,0,0,0,0],
-        [4,3,3,1,0,0,0,0,0],
-        [4,3,3,2,0,0,0,0,0],
-        [4,3,3,3,1,0,0,0,0],
-        [4,3,3,3,2,0,0,0,0],
-        [4,3,3,3,2,1,0,0,0],
-        [4,3,3,3,2,1,0,0,0],
-        [4,3,3,3,2,1,1,0,0],
-        [4,3,3,3,2,1,1,0,0],
-        [4,3,3,3,2,1,1,1,0],
-        [4,3,3,3,2,1,1,1,0],
-        [4,3,3,3,2,1,1,1,1],
-        [4,3,3,3,3,1,1,1,1],
-        [4,3,3,3,3,2,1,1,1],
-        [4,3,3,3,3,2,2,1,1],
-      ],
-      competencias: {
-        armaduras: ['Ninguna'],
-        armas: ['Dagas', 'Dardos', 'Hondas', 'Bastones', 'Ballesta ligera'],
-        salvaciones: ['Constitución', 'Carisma'],
-        habilidades: ['Arcana', 'Deception', 'Insight', 'Intimidation', 'Persuasion', 'Religion'],
-        habilidades_elige: 2
-      },
-      equipo: ['Una ballesta ligera y 20 virotes o cualquier arma simple', 'Un equipo de mazmorra o un equipo de explorador', 'Dos dagas', 'Un foco arcano'],
-      rasgos_por_nivel: {
-        1: [
-          {nombre: 'Lanzamiento de Conjuros', descripcion: 'Puedes lanzar hechizos de hechicero. Conoces cuatro trucos y dos hechizos de nivel 1. El Carisma es tu habilidad de lanzamiento.'},
-          {nombre: 'Origen Mágico', descripcion: 'Eliges un origen mágico. Otorga rasgos en niveles 1, 6, 14 y 18.'}
-        ],
-        2: [
-          {nombre: 'Puntos de Hechicería', descripcion: 'Tienes un número de puntos de hechicería igual a tu nivel de hechicero. Se recuperan en un descanso largo. Puedes convertir espacios de hechizo en puntos y viceversa.'},
-          {nombre: 'Metamagia', descripcion: 'Aprendes dos opciones de Metamagia. Puedes gastar puntos de hechicería para modificar tus hechizos.'}
-        ],
-        3: [{nombre: 'Metamagia (3 opciones)', descripcion: 'Aprendes una opción adicional de Metamagia.'}],
-        4: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        5: [{nombre: 'Hechizos de Nivel 3', descripcion: 'Puedes lanzar hechizos de nivel 3.'}],
-        6: [{nombre: 'Rasgo de Origen', descripcion: 'Obtienes un rasgo de tu origen mágico.'}],
-        7: [{nombre: 'Hechizos de Nivel 4', descripcion: 'Puedes lanzar hechizos de nivel 4.'}],
-        8: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        9: [{nombre: 'Hechizos de Nivel 5', descripcion: 'Puedes lanzar hechizos de nivel 5.'}],
-        10: [
-          {nombre: 'Metamagia (4 opciones)', descripcion: 'Aprendes una opción adicional de Metamagia.'}
-        ],
-        11: [{nombre: 'Hechizos de Nivel 6', descripcion: 'Puedes lanzar hechizos de nivel 6.'}],
-        12: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        13: [{nombre: 'Hechizos de Nivel 7', descripcion: 'Puedes lanzar hechizos de nivel 7.'}],
-        14: [{nombre: 'Rasgo de Origen', descripcion: 'Obtienes un rasgo de tu origen mágico.'}],
-        15: [{nombre: 'Hechizos de Nivel 8', descripcion: 'Puedes lanzar hechizos de nivel 8.'}],
-        16: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        17: [
-          {nombre: 'Metamagia (5 opciones)', descripcion: 'Aprendes una opción adicional de Metamagia.'},
-          {nombre: 'Hechizos de Nivel 9', descripcion: 'Puedes lanzar hechizos de nivel 9.'}
-        ],
-        18: [{nombre: 'Rasgo de Origen', descripcion: 'Obtienes un rasgo de tu origen mágico.'}],
-        19: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        20: [
-          {nombre: 'Recuperación de Hechicería', descripcion: 'Cuando terminas un descanso corto, recuperas 4 puntos de hechicería.'}
-        ]
-      }
-    },
-    {
-      nombre: 'Warlock',
-      dado_golpe: 'd8',
-      spellSlots: [
-        [1,0,0,0,0,0,0,0,0],
-        [2,0,0,0,0,0,0,0,0],
-        [2,0,0,0,0,0,0,0,0],
-        [2,0,0,0,0,0,0,0,0],
-        [2,0,0,0,0,0,0,0,0],
-        [2,0,0,0,0,0,0,0,0],
-        [2,0,0,0,0,0,0,0,0],
-        [2,0,0,0,0,0,0,0,0],
-        [2,0,0,0,0,0,0,0,0],
-        [2,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [4,0,0,0,0,0,0,0,0],
-        [4,0,0,0,0,0,0,0,0],
-        [4,0,0,0,0,0,0,0,0],
-        [4,0,0,0,0,0,0,0,0],
-      ],
-      competencias: {
-        armaduras: ['Armadura ligera'],
-        armas: ['Armas simples'],
-        salvaciones: ['Sabiduría', 'Carisma'],
-        habilidades: ['Arcana', 'Deception', 'History', 'Intimidation', 'Investigation', 'Nature', 'Religion'],
-        habilidades_elige: 2
-      },
-      equipo: ['Una ballesta ligera y 20 virotes o cualquier arma simple', 'Un equipo de mazmorra o un equipo de explorador', 'Una daga', 'Un foco arcano'],
-      rasgos_por_nivel: {
-        1: [
-          {nombre: 'Lanzamiento de Conjuros', descripcion: 'Puedes lanzar hechizos de brujo. Conoces dos trucos y dos hechizos de nivel 1. El Carisma es tu habilidad de lanzamiento. Tus espacios de hechizo se recuperan en un descanso corto.'},
-          {nombre: 'Beneficio de Otrosmundano', descripcion: 'Eliges un beneficio de otrosmundano. Otorga rasgos en niveles 1, 6, 10, 14.'}
-        ],
-        2: [
-          {nombre: 'Invocaciones Místicas', descripcion: 'Aprendes dos invocaciones místicas a tu elección.'}
-        ],
-        3: [
-          {nombre: 'Beneficio de Otrosmundano', descripcion: 'Rasgo de beneficio.'},
-          {nombre: 'Espacio de Hechizo de Nivel 2', descripcion: 'Tus espacios de hechizo pasan a ser de nivel 2.'}
-        ],
-        4: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        5: [
-          {nombre: 'Espacio de Hechizo de Nivel 3', descripcion: 'Tus espacios de hechizo pasan a ser de nivel 3.'},
-          {nombre: 'Invocaciones Místicas', descripcion: 'Aprendes una invocación adicional.'}
-        ],
-        6: [{nombre: 'Rasgo de Beneficio', descripcion: 'Obtienes un rasgo de tu beneficio de otrosmundano.'}],
-        7: [
-          {nombre: 'Espacio de Hechizo de Nivel 4', descripcion: 'Tus espacios de hechizo pasan a ser de nivel 4.'},
-          {nombre: 'Invocaciones Místicas', descripcion: 'Aprendes una invocación adicional.'}
-        ],
-        8: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        9: [
-          {nombre: 'Espacio de Hechizo de Nivel 5', descripcion: 'Tus espacios de hechizo pasan a ser de nivel 5.'},
-          {nombre: 'Invocaciones Místicas', descripcion: 'Aprendes una invocación adicional.'}
-        ],
-        10: [{nombre: 'Rasgo de Beneficio', descripcion: 'Obtienes un rasgo de tu beneficio de otrosmundano.'}],
-        11: [
-          {nombre: 'Arcano Místico (Nivel 6)', descripcion: 'Puedes lanzar un hechizo de nivel 6 una vez por descanso largo.'}
-        ],
-        12: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        13: [
-          {nombre: 'Arcano Místico (Nivel 7)', descripcion: 'Puedes lanzar un hechizo de nivel 7 una vez por descanso largo.'}
-        ],
-        14: [{nombre: 'Rasgo de Beneficio', descripcion: 'Obtienes un rasgo de tu beneficio de otrosmundano.'}],
-        15: [
-          {nombre: 'Arcano Místico (Nivel 8)', descripcion: 'Puedes lanzar un hechizo de nivel 8 una vez por descanso largo.'},
-          {nombre: 'Invocaciones Místicas', descripcion: 'Aprendes una invocación adicional.'}
-        ],
-        16: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        17: [
-          {nombre: 'Arcano Místico (Nivel 9)', descripcion: 'Puedes lanzar un hechizo de nivel 9 una vez por descanso largo.'},
-          {nombre: 'Espacio de Hechizo', descripcion: 'Tienes 4 espacios de hechizo en lugar de 2.'}
-        ],
-        18: [
-          {nombre: 'Invocaciones Místicas', descripcion: 'Aprendes una invocación adicional.'}
-        ],
-        19: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        20: [
-          {nombre: 'Maestro de Invocaciones', descripcion: 'Puedes recuperar todos tus espacios de hechizo una vez por descanso largo sin necesidad de un descanso corto.'}
-        ]
-      }
-    },
-    {
-      nombre: 'Wizard',
-      dado_golpe: 'd6',
-      spellSlots: [
-        [2,0,0,0,0,0,0,0,0],
-        [3,0,0,0,0,0,0,0,0],
-        [4,2,0,0,0,0,0,0,0],
-        [4,3,0,0,0,0,0,0,0],
-        [4,3,2,0,0,0,0,0,0],
-        [4,3,3,0,0,0,0,0,0],
-        [4,3,3,1,0,0,0,0,0],
-        [4,3,3,2,0,0,0,0,0],
-        [4,3,3,3,1,0,0,0,0],
-        [4,3,3,3,2,0,0,0,0],
-        [4,3,3,3,2,1,0,0,0],
-        [4,3,3,3,2,1,0,0,0],
-        [4,3,3,3,2,1,1,0,0],
-        [4,3,3,3,2,1,1,0,0],
-        [4,3,3,3,2,1,1,1,0],
-        [4,3,3,3,2,1,1,1,0],
-        [4,3,3,3,2,1,1,1,1],
-        [4,3,3,3,3,1,1,1,1],
-        [4,3,3,3,3,2,1,1,1],
-        [4,3,3,3,3,2,2,1,1],
-      ],
-      competencias: {
-        armaduras: ['Ninguna'],
-        armas: ['Dagas', 'Dardos', 'Hondas', 'Bastones', 'Ballesta ligera'],
-        salvaciones: ['Inteligencia', 'Sabiduría'],
-        habilidades: ['Arcana', 'History', 'Insight', 'Investigation', 'Medicine', 'Religion'],
-        habilidades_elige: 2
-      },
-      equipo: ['Un bastón o una daga', 'Un equipo de erudito o un equipo de explorador', 'Un grimorio', 'Una bolsa de componentes o un foco arcano'],
-      rasgos_por_nivel: {
-        1: [
-          {nombre: 'Lanzamiento de Conjuros', descripcion: 'Puedes lanzar hechizos de mago. Conoces tres trucos y tienes seis hechizos de nivel 1 en tu grimorio. Pre paras un número de hechizos igual a tu nivel de mago + tu modificador de Inteligencia. La Inteligencia es tu habilidad de lanzamiento.'},
-          {nombre: 'Recuperación Arcana', descripcion: 'Una vez por día, después de un descanso corto, puedes recuperar espacios de hechizo con un nivel total igual a la mitad de tu nivel de mago (mínimo 1).'}
-        ],
-        2: [
-          {nombre: 'Tradición Arcana', descripcion: 'Eliges una tradición arcana. Otorga rasgos en niveles 2, 6, 10 y 14.'}
-        ],
-        3: [{nombre: 'Hechizos de Nivel 2', descripcion: 'Puedes aprender y lanzar hechizos de nivel 2.'}],
-        4: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        5: [{nombre: 'Hechizos de Nivel 3', descripcion: 'Puedes aprender y lanzar hechizos de nivel 3.'}],
-        6: [{nombre: 'Rasgo de Tradición', descripcion: 'Obtienes un rasgo de tu tradición arcana.'}],
-        7: [{nombre: 'Hechizos de Nivel 4', descripcion: 'Puedes aprender y lanzar hechizos de nivel 4.'}],
-        8: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        9: [{nombre: 'Hechizos de Nivel 5', descripcion: 'Puedes aprender y lanzar hechizos de nivel 5.'}],
-        10: [{nombre: 'Rasgo de Tradición', descripcion: 'Obtienes un rasgo de tu tradición arcana.'}],
-        11: [{nombre: 'Hechizos de Nivel 6', descripcion: 'Puedes aprender y lanzar hechizos de nivel 6.'}],
-        12: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        13: [{nombre: 'Hechizos de Nivel 7', descripcion: 'Puedes aprender y lanzar hechizos de nivel 7.'}],
-        14: [{nombre: 'Rasgo de Tradición', descripcion: 'Obtienes un rasgo de tu tradición arcana.'}],
-        15: [{nombre: 'Hechizos de Nivel 8', descripcion: 'Puedes aprender y lanzar hechizos de nivel 8.'}],
-        16: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        17: [{nombre: 'Hechizos de Nivel 9', descripcion: 'Puedes aprender y lanzar hechizos de nivel 9.'}],
-        18: [
-          {nombre: 'Hechizos de Dominio', descripcion: 'Aprendes un hechizo de nivel 1 y de nivel 2 de tu escuela de magia.'}
-        ],
-        19: [{nombre: 'Mejora de Puntuación de Característica', descripcion: 'Aumentas una puntuación de característica en 2, o dos en 1.'}],
-        20: [
-          {nombre: 'Hechizos de Dominio Mejorados', descripcion: 'Aprendes un hechizo de nivel 3 y de nivel 4 de tu escuela de magia.'}
-        ]
-      }
-    }
-  ],
-  trasfondos: [
-    {
-      nombre: 'Acolyte',
-      competencias_habilidades: ['Insight', 'Religion'],
-      equipo: ['Un símbolo sagrado', 'Un libro de oraciones', '5 velas', 'Un incensario', 'Vestiduras religiosas', 'Un equipo de sacerdote', 'Una bolsa con 15 gp'],
-      rasgo: {nombre: 'Refugio de los Fieles', descripcion: 'Puedes recibir curación y cuidado en un templo de tu fe. Tú y tus compañeros podéis alojaros en los templos de tu deidad.'}
-    },
-    {
-      nombre: 'Charlatan',
-      competencias_habilidades: ['Deception', 'Sleight of Hand'],
-      equipo: ['Un disfraz', 'Herramientas de falsificador', 'Un artículo de valor falso', 'Un equipo de estafador', 'Una bolsa con 15 gp'],
-      rasgo: {nombre: 'Estafa Favorita', descripcion: 'Tienes una estafa favorita que usas para engañar a la gente. Puedes crear documentos falsos, imitar caligrafía o hacer trampas en juegos.'}
-    },
-    {
-      nombre: 'Criminal',
-      competencias_habilidades: ['Deception', 'Stealth'],
-      equipo: ['Una ganzúa', 'Herramientas de ladrón', 'Un equipo de mazmorra', 'Una bolsa con 15 gp'],
-      rasgo: {nombre: 'Contacto Criminal', descripcion: 'Tienes un contacto de confianza en el inframundo criminal que puede proporcionarte información y favores a cambio de un pago.'}
-    },
-    {
-      nombre: 'Entertainer',
-      competencias_habilidades: ['Acrobatics', 'Performance'],
-      equipo: ['Un instrumento musical', 'Un disfraz', 'Un equipo de entretenido', 'Una bolsa con 15 gp'],
-      rasgo: {nombre: 'Público Cautivador', descripcion: 'Siempre puedes encontrar un lugar para actuar. Recibes alojamiento gratuito y comida modesta por tu actuación.'}
-    },
-    {
-      nombre: 'Folk Hero',
-      competencias_habilidades: ['Animal Handling', 'Survival'],
-      equipo: ['Herramientas de artesano', 'Una pala', 'Una olla de hierro', 'Un equipo de explorador', 'Una bolsa con 10 gp'],
-      rasgo: {nombre: 'Rusticidad', descripcion: 'Los aldeanos te reciben con hospitalidad y te ayudan contra los abusos de los nobles y otras figuras de autoridad.'}
-    },
-    {
-      nombre: 'Guild Artisan',
-      competencias_habilidades: ['Insight', 'Persuasion'],
-      equipo: ['Herramientas de artesano', 'Una carta de membrecía del gremio', 'Un equipo de artesano', 'Una bolsa con 15 gp'],
-      rasgo: {nombre: 'Membresía de Gremio', descripcion: 'Puedes acceder a los recursos del gremio: alojamiento, comida, contactos comerciales y protección legal.'}
-    },
-    {
-      nombre: 'Hermit',
-      competencias_habilidades: ['Medicine', 'Religion'],
-      equipo: ['Un cojín de meditación', 'Una manta de viaje', 'Un equipo de erudito', 'Una lámpara', 'Un aceite', 'Una bolsa con 5 gp'],
-      rasgo: {nombre: 'Descubrimiento', descripcion: 'Has hecho un descubrimiento privado durante tu reclusión. Podría ser un secreto religioso, filosófico o la ubicación de algo importante.'}
-    },
-    {
-      nombre: 'Noble',
-      competencias_habilidades: ['History', 'Persuasion'],
-      equipo: ['Un sello de famila', 'Un pergamino genealógico', 'Ropa de calidad', 'Un escudero o sirviente', 'Una bolsa con 25 gp'],
-      rasgo: {nombre: 'Posición Privilegiada', descripcion: 'Eres recibido en la alta sociedad y la gente tiende a respetar tu estatus. Puedes acceder a eventos de la nobleza.'}
-    },
-    {
-      nombre: 'Outlander',
-      competencias_habilidades: ['Athletics', 'Survival'],
-      equipo: ['Un bastón', 'Una trampa para caza', 'Un trofeo de caza', 'Un equipo de viajero', 'Una bolsa con 10 gp'],
-      rasgo: {nombre: 'Gran Viajero', descripcion: 'Tienes una memoria excelente para mapas y geografía. Siempre puedes recordar el terreno general y los recursos de la zona.'}
-    },
-    {
-      nombre: 'Sage',
-      competencias_habilidades: ['Arcana', 'History'],
-      equipo: ['Un frasco de tinta', 'Una pluma', 'Un cuchillo de papel', 'Un libro de historia', 'Un equipo de erudito', 'Una bolsa con 10 gp'],
-      rasgo: {nombre: 'Investigador', descripcion: 'Puedes acceder a bibliotecas, archivos y eruditos locales para obtener información sobre temas de tu especialidad.'}
-    },
-    {
-      nombre: 'Sailor',
-      competencias_habilidades: ['Athletics', 'Perception'],
-      equipo: ['Una cuerda de 50 pies', 'Un amuleto de la suerte', 'Un equipo de marinero', 'Una bolsa con 10 gp'],
-      rasgo: {nombre: 'Pasaje de Barco', descripcion: 'Puedes encontrar trabajo y pasaje en barcos. Siempre puedes convencer a capitanes para que te lleven a cambio de trabajo.'}
-    },
-    {
-      nombre: 'Soldier',
-      competencias_habilidades: ['Athletics', 'Intimidation'],
-      equipo: ['Una insignia de rango', 'Un trofeo de guerra', 'Un dado y una baraja', 'Un equipo de soldado', 'Una bolsa con 10 gp'],
-      rasgo: {nombre: 'Rango Militar', descripcion: 'Los soldados y guardias respetan tu autoridad. Puedes acceder a instalaciones militares y ejercer autoridad sobre reclutas.'}
-    },
-    {
-      nombre: 'Urchin',
-      competencias_habilidades: ['Sleight of Hand', 'Stealth'],
-      equipo: ['Una cuerda de 10 pies', 'Un ratón mascota', 'Un recuerdo de tus padres', 'Un equipo de mazmorra', 'Una bolsa con 10 gp'],
-      rasgo: {nombre: 'Pies Ligeros', descripcion: 'Puedes moverte por la ciudad el doble de rápido. Conoces los atajos y escondites de cualquier asentamiento urbano.'}
-    }
-  ],
-  habilidades: {
-    'Fuerza': ['Athletics'],
-    'Destreza': ['Acrobatics', 'Sleight of Hand', 'Stealth'],
-    'Constitución': [],
-    'Inteligencia': ['Arcana', 'History', 'Investigation', 'Nature', 'Religion'],
-    'Sabiduría': ['Animal Handling', 'Insight', 'Medicine', 'Perception', 'Survival'],
-    'Carisma': ['Deception', 'Intimidation', 'Performance', 'Persuasion']
-  },
-  hechizos: [
-    {nombre: 'Mano de Mago', nivel: 0, escuela: 'Taumaturgia', tiempo: '1 acción', alcance: '30 pies', componentes: 'V, S', duracion: '1 minuto', descripcion: 'Aparece una mano espectral que puede manipular objetos, abrir puertas o recoger objetos sueltos.', clases: ['Bard','Sorcerer','Warlock','Wizard']},
-    {nombre: 'Luz', nivel: 0, escuela: 'Evocación', tiempo: '1 acción', alcance: 'Toque', componentes: 'V, M', duracion: '1 hora', descripcion: 'Tocas un objeto para que emita luz brillante en un radio de 20 pies y luz tenue 20 pies más.', clases: ['Bard','Cleric','Sorcerer','Wizard']},
-    {nombre: 'Prestidigitación', nivel: 0, escuela: 'Taumaturgia', tiempo: '1 acción', alcance: '10 pies', componentes: 'V, S', duracion: '1 hora', descripcion: 'Truco menor que puede limpiar, calentar, enfriar, saborear o crear pequeños efectos inofensivos.', clases: ['Bard','Sorcerer','Warlock','Wizard']},
-    {nombre: 'Llama Sagrada', nivel: 0, escuela: 'Evocación', tiempo: '1 acción', alcance: '60 pies', componentes: 'V, S', duracion: 'Instantáneo', descripcion: 'Un rayo de luz divina golpea a una criatura. 1d8 de daño radiante. No aplica bonificador de característica al daño.', clases: ['Cleric']},
-    {nombre: 'Impacto Certero', nivel: 0, escuela: 'Adivinación', tiempo: '1 acción', alcance: '30 pies', componentes: 'V, S', duracion: '1 ronda', descripcion: 'Tocas a una criatura. La próxima vez que la golpees antes del final de tu próximo turno, causas 1d6 de daño adicional.', clases: ['Bard','Warlock','Wizard']},
-    {nombre: 'Hoja de Fuego', nivel: 0, escuela: 'Evocación', tiempo: '1 acción', alcance: 'Personal', componentes: 'V, M', duracion: '1 minuto', descripcion: 'Una hoja de fuego aparece en tu mano. Ataque cuerpo a cuerpo con 1d8 de daño de fuego. Al nivel 5+ el daño aumenta.', clases: ['Sorcerer','Warlock','Wizard']},
-    {nombre: 'Perro de Guardia', nivel: 0, escuela: 'Conjuración', tiempo: '1 acción', alcance: '30 pies', componentes: 'V, S', duracion: '8 horas', descripcion: 'Creas un perro espectral que vigila un área. Ladra si una criatura se acerca.', clases: ['Wizard']},
-    {nombre: 'Toque Helado', nivel: 0, escuela: 'Nigromancia', tiempo: '1 acción', alcance: '120 pies', componentes: 'V, S', duracion: 'Instantáneo', descripcion: 'Un rayo de energía helada daña a una criatura y evita que recupere puntos de golpe hasta tu próximo turno.', clases: ['Sorcerer','Warlock','Wizard']},
-    {nombre: 'Amigos', nivel: 0, escuela: 'Encantamiento', tiempo: '1 acción', alcance: 'Personal', componentes: 'S, M', duracion: '1 minuto', descripcion: 'Ganas ventaja en pruebas de Carisma contra una criatura. Al terminar, la criatura sabe que la has manipulado.', clases: ['Bard','Sorcerer','Warlock','Wizard']},
-    {nombre: 'Rociada de Veneno', nivel: 0, escuela: 'Conjuración', tiempo: '1 acción', alcance: '10 pies', componentes: 'V, S', duracion: 'Instantáneo', descripcion: 'Extiendes la mano y rocías veneno a una criatura que puedes ver. 1d12 de daño de veneno.', clases: ['Druid','Sorcerer','Warlock','Wizard']},
-    {nombre: 'Curar Heridas', nivel: 1, escuela: 'Evocación', tiempo: '1 acción', alcance: 'Toque', componentes: 'V, S', duracion: 'Instantáneo', descripcion: 'Una criatura recupera 1d8 + tu modificador de habilidad de lanzamiento de conjuros puntos de golpe.', clases: ['Bard','Cleric','Druid','Paladin','Ranger']},
-    {nombre: 'Bola de Fuego', nivel: 3, escuela: 'Evocación', tiempo: '1 acción', alcance: '150 pies', componentes: 'V, S, M', duracion: 'Instantáneo', descripcion: 'Un punto de luz estalla en una explosión de fuego. Radio de 20 pies. 8d6 de daño de fuego, salvación de Destreza para la mitad.', clases: ['Sorcerer','Wizard']},
-    {nombre: 'Misil Mágico', nivel: 1, escuela: 'Evocación', tiempo: '1 acción', alcance: '120 pies', componentes: 'V, S', duracion: 'Instantáneo', descripcion: 'Tres proyectiles mágicos golpean automáticamente a una o más criaturas. Cada uno causa 1d4 + 1 de daño de fuerza.', clases: ['Sorcerer','Wizard']},
-    {nombre: 'Escudo', nivel: 1, escuela: 'Ablación', tiempo: '1 reacción', alcance: 'Personal', componentes: 'V, S', duracion: '1 ronda', descripcion: 'Una barrera invisible te protege. Tu CA aumenta en +5 y no recibes daño del hechizo Misil Mágico.', clases: ['Sorcerer','Wizard']},
-    {nombre: 'Detección de Magia', nivel: 1, escuela: 'Adivinación', tiempo: '1 acción', alcance: 'Personal', componentes: 'V, S', duracion: 'Concentración, 10 minutos', descripcion: 'Sientes la presencia de magia a 30 pies. Puedes ver un aura mágica alrededor de objetos y criaturas visibles.', clases: ['Bard','Cleric','Druid','Paladin','Ranger','Sorcerer','Wizard']},
-    {nombre: 'Dormir', nivel: 1, escuela: 'Encantamiento', tiempo: '1 acción', alcance: '90 pies', componentes: 'V, S, M', duracion: 'Instantáneo', descripcion: '5d8 de puntos de golpe de criaturas caen dormidas. Las criaturas con menos de 5 PV se ven afectadas primero.', clases: ['Bard','Sorcerer','Wizard']},
-    {nombre: 'Telaraña', nivel: 2, escuela: 'Conjuración', tiempo: '1 acción', alcance: '60 pies', componentes: 'V, S, M', duracion: 'Concentración, 1 hora', descripcion: 'Creas una capa de telarañas pegajosas en un radio de 20 pies. Terreno difícil. Las criaturas atrapadas deben hacer una salvación de Destreza.', clases: ['Sorcerer','Wizard']},
-    {nombre: 'Invisibilidad', nivel: 2, escuela: 'Ilusión', tiempo: '1 acción', alcance: 'Toque', componentes: 'V, S, M', duracion: 'Concentración, 1 hora', descripcion: 'La criatura que tocas se vuelve invisible. El hechizo termina si la criatura ataca o lanza un hechizo.', clases: ['Bard','Sorcerer','Warlock','Wizard']},
-    {nombre: 'Relámpago', nivel: 3, escuela: 'Evocación', tiempo: '1 acción', alcance: '100 pies', componentes: 'V, S, M', duracion: 'Instantáneo', descripcion: 'Un rayo de 100 por 5 pies causa 8d6 de daño de relámpago. Salvación de Destreza para la mitad.', clases: ['Sorcerer','Wizard']},
-    {nombre: 'Polimorfar', nivel: 4, escuela: 'Transmutación', tiempo: '1 acción', alcance: '60 pies', componentes: 'V, S, M', duracion: 'Concentración, 1 hora', descripcion: 'Transformas a una criatura en una bestia con CR igual o menor al nivel de la criatura objetivo.', clases: ['Bard','Sorcerer','Wizard']},
-    {nombre: 'Muro de Fuego', nivel: 4, escuela: 'Evocación', tiempo: '1 acción', alcance: '120 pies', componentes: 'V, S, M', duracion: 'Concentración, 1 minuto', descripcion: 'Creas un muro de fuego de 60 por 20 pies. Causa 5d8 de daño de fuego a las criaturas que lo atraviesan.', clases: ['Druid','Sorcerer','Warlock','Wizard']},
-    {nombre: 'Curar Heridas en Masa', nivel: 5, escuela: 'Evocación', tiempo: '1 acción', alcance: '60 pies', componentes: 'V, S', duracion: 'Instantáneo', descripcion: 'Restauras 3d8 + tu modificador de habilidad de lanzamiento puntos de golpe a hasta seis criaturas en un radio de 30 pies.', clases: ['Bard','Cleric','Druid']},
-    {nombre: 'Levantar Muertos', nivel: 5, escuela: 'Nigromancia', tiempo: '1 hora', alcance: 'Toque', componentes: 'V, S, M', duracion: 'Instantáneo', descripcion: 'Devuelves a la vida a una criatura que ha muerto en los últimos 10 días. La criatura vuelve con 1 punto de golpe.', clases: ['Cleric','Paladin']},
-    {nombre: 'Desintegrar', nivel: 6, escuela: 'Transmutación', tiempo: '1 acción', alcance: '60 pies', componentes: 'V, S, M', duracion: 'Instantáneo', descripcion: 'Un fino rayo verde reduce a una criatura o a un objeto a cenizas. 10d6 + 40 de daño de fuerza.', clases: ['Sorcerer','Wizard']},
-    {nombre: 'Globo de Invulnerabilidad', nivel: 6, escuela: 'Ablación', tiempo: '1 acción', alcance: 'Personal', componentes: 'V, S, M', duracion: 'Concentración, 1 minuto', descripcion: 'Una burbuja mágica te rodea. Los hechizos de nivel 5 o menor no pueden afectarte.', clases: ['Sorcerer','Wizard']},
-    {nombre: 'Teleportar', nivel: 7, escuela: 'Conjuración', tiempo: '1 acción', alcance: '10 pies', componentes: 'V', duracion: 'Instantáneo', descripcion: 'Tú y hasta 8 criaturas voluntarias sois transportados a un destino conocido. Puede fallar dependiendo de la familiaridad.', clases: ['Bard','Sorcerer','Wizard']},
-    {nombre: 'Palabra de Poder: Aturdir', nivel: 8, escuela: 'Encantamiento', tiempo: '1 acción', alcance: '60 pies', componentes: 'V', duracion: 'Instantáneo', descripcion: 'Una criatura con 150 puntos de golpe o menos queda aturdida sin salvación.', clases: ['Bard','Sorcerer','Warlock','Wizard']},
-    {nombre: 'Deseo', nivel: 9, escuela: 'Conjuración', tiempo: '1 acción', alcance: 'Ilimitado', componentes: 'V', duracion: 'Instantáneo', descripcion: 'El hechizo más poderoso. Puedes alterar la realidad para lograr cualquier efecto que describas. El DM puede limitar el efecto.', clases: ['Sorcerer','Wizard']},
-    {nombre: 'Tormenta de Meteoros', nivel: 9, escuela: 'Evocación', tiempo: '1 acción', alcance: '1 milla', componentes: 'V, S', duracion: 'Instantáneo', descripcion: 'Cuatro meteoros impactan en puntos que elijas. Cada uno causa 20d6 de daño de fuego y 20d6 de daño contundente en un radio de 40 pies.', clases: ['Sorcerer','Wizard']},
-    {nombre: 'Resurrección Verdadera', nivel: 9, escuela: 'Nigromancia', tiempo: '1 hora', alcance: 'Toque', componentes: 'V, S, M', duracion: 'Instantáneo', descripcion: 'Devuelves la vida a una criatura muerta en los últimos 200 años. Incluso puede regenerar partes del cuerpo perdidas.', clases: ['Cleric','Druid']},
-    {nombre: 'Parálisis', nivel: 1, escuela: 'Encantamiento', tiempo: '1 acción', alcance: '60 pies', componentes: 'V, S', duracion: 'Concentración, 1 minuto', descripcion: 'Una criatura que falla una salvación de Sabiduría queda paralizada. Repite la salvación al final de cada turno.', clases: ['Bard','Cleric','Druid','Sorcerer','Warlock','Wizard']},
-    {nombre: 'Bendecir', nivel: 1, escuela: 'Encantamiento', tiempo: '1 acción', alcance: '30 pies', componentes: 'V, S, M', duracion: 'Concentración, 1 minuto', descripcion: 'Hasta tres criaturas añaden 1d4 a las tiradas de ataque y salvaciones.', clases: ['Cleric','Paladin']},
-    {nombre: 'Palabra de Curación', nivel: 1, escuela: 'Evocación', tiempo: '1 acción bonus', alcance: '60 pies', componentes: 'V', duracion: 'Instantáneo', descripcion: 'Una criatura recupera 1d4 + tu modificador de habilidad de lanzamiento puntos de golpe.', clases: ['Bard','Cleric','Druid']},
-    {nombre: 'Armadura de Mago', nivel: 1, escuela: 'Ablación', tiempo: '1 acción', alcance: 'Toque', componentes: 'V, S, M', duracion: '8 horas', descripcion: 'Tocas a una criatura dispuesta. Su CA base pasa a ser 13 + su modificador de Destreza.', clases: ['Sorcerer','Wizard']},
-    {nombre: 'Aliento de Fuego', nivel: 2, escuela: 'Evocación', tiempo: '1 acción', alcance: 'Personal', componentes: 'V, S, M', duracion: 'Concentración, 1 minuto', descripcion: 'Exhalas fuego en un cono de 15 pies. 3d6 de daño de fuego, salvación de Destreza para la mitad.', clases: ['Druid','Sorcerer','Wizard']},
-    {nombre: 'Volar', nivel: 3, escuela: 'Transmutación', tiempo: '1 acción', alcance: 'Toque', componentes: 'V, S, M', duracion: 'Concentración, 10 minutos', descripcion: 'Una criatura obtiene una velocidad de vuelo de 60 pies.', clases: ['Sorcerer','Warlock','Wizard']},
-    {nombre: 'Mano de Bigby', nivel: 5, escuela: 'Evocación', tiempo: '1 acción', alcance: '120 pies', componentes: 'V, S, M', duracion: 'Concentración, 1 minuto', descripcion: 'Una mano de fuerza invisible de 10 pies puede empujar, agarrar, golpear o proteger. Golpe: 4d8 de daño de fuerza.', clases: ['Wizard']}
-  ],
-  equipo: {
-    armas_simples: [
-      {nombre: 'Clava', daño: '1d4', tipo: 'Contundente', propiedades: 'Ligera'},
-      {nombre: 'Daga', daño: '1d4', tipo: 'Perforante', propiedades: 'Sutil, ligera, arrojadiza (20/60)'},
-      {nombre: 'Hacha de Mano', daño: '1d6', tipo: 'Cortante', propiedades: 'Ligera, arrojadiza (20/60)'},
-      {nombre: 'Jabalina', daño: '1d6', tipo: 'Perforante', propiedades: 'Arrojadiza (30/120)'},
-      {nombre: 'Maza', daño: '1d6', tipo: 'Contundente', propiedades: '-'},
-      {nombre: 'Bastón', daño: '1d6', tipo: 'Contundente', propiedades: 'Versátil (1d8)'},
-      {nombre: 'Hoz', daño: '1d4', tipo: 'Cortante', propiedades: 'Ligera'},
-      {nombre: 'Honda', daño: '1d4', tipo: 'Contundente', propiedades: 'Munición (30/120)'},
-      {nombre: 'Lanza', daño: '1d6', tipo: 'Perforante', propiedades: 'Versátil (1d8), arrojadiza (20/60)'},
-      {nombre: 'Ballesta Ligera', daño: '1d8', tipo: 'Perforante', propiedades: 'Munición (80/320), recarga, a dos manos'},
-      {nombre: 'Dardo', daño: '1d4', tipo: 'Perforante', propiedades: 'Sutil, arrojadiza (20/60)'}
-    ],
-    armas_marciales: [
-      {nombre: 'Gran Hacha', daño: '1d12', tipo: 'Cortante', propiedades: 'Pesada, de dos manos'},
-      {nombre: 'Cimitarra', daño: '1d6', tipo: 'Cortante', propiedades: 'Ligera, sutil'},
-      {nombre: 'Estoque', daño: '1d8', tipo: 'Perforante', propiedades: 'Sutil'},
-      {nombre: 'Espada Larga', daño: '1d8', tipo: 'Cortante', propiedades: 'Versátil (1d10)'},
-      {nombre: 'Hacha de Batalla', daño: '1d8', tipo: 'Cortante', propiedades: 'Versátil (1d10)'},
-      {nombre: 'Martillo de Guerra', daño: '1d8', tipo: 'Contundente', propiedades: 'Versátil (1d10)'},
-      {nombre: 'Espada Corta', daño: '1d6', tipo: 'Cortante', propiedades: 'Ligera, sutil'},
-      {nombre: 'Ballesta de Mano', daño: '1d6', tipo: 'Perforante', propiedades: 'Munición (30/120), ligera, recarga'},
-      {nombre: 'Ballesta Pesada', daño: '1d10', tipo: 'Perforante', propiedades: 'Munición (100/400), pesada, recarga, a dos manos'},
-      {nombre: 'Arco Largo', daño: '1d8', tipo: 'Perforante', propiedades: 'Munición (150/600), pesada, a dos manos'},
-      {nombre: 'Arco Corto', daño: '1d6', tipo: 'Perforante', propiedades: 'Munición (80/320), a dos manos'},
-      {nombre: 'Gran Espada', daño: '2d6', tipo: 'Cortante', propiedades: 'Pesada, a dos manos'},
-      {nombre: 'Gran Hacha de Guerra', daño: '1d12', tipo: 'Cortante', propiedades: 'Pesada, a dos manos'},
-      {nombre: 'Maza Pesada', daño: '1d8', tipo: 'Contundente', propiedades: 'A dos manos'},
-      {nombre: 'Alabarda', daño: '1d10', tipo: 'Cortante', propiedades: 'Pesada, alcance, a dos manos'},
-      {nombre: 'Martillo de Guerra a Dos Manos', daño: '2d6', tipo: 'Contundente', propiedades: 'Pesada, a dos manos'}
-    ],
-    armaduras: [
-      {nombre: 'Acolchada', ca: 11, tipo: 'Ligera', fuerza: 0, sigilo: 'Desventaja', precio: '5 gp'},
-      {nombre: 'Cuero', ca: 11, tipo: 'Ligera', fuerza: 0, sigilo: '-', precio: '10 gp'},
-      {nombre: 'Cuero Tachonado', ca: 12, tipo: 'Ligera', fuerza: 0, sigilo: '-', precio: '45 gp'},
-      {nombre: 'Pieles', ca: 12, tipo: 'Media', fuerza: 0, sigilo: '-', precio: '15 gp'},
-      {nombre: 'Camisote de Mallas', ca: 13, tipo: 'Media', fuerza: 0, sigilo: '-', precio: '50 gp'},
-      {nombre: 'Escamas', ca: 14, tipo: 'Media', fuerza: 0, sigilo: 'Desventaja', precio: '400 gp'},
-      {nombre: 'Placas y Mallas', ca: 15, tipo: 'Media', fuerza: 0, sigilo: 'Desventaja', precio: '600 gp'},
-      {nombre: 'Media Placa', ca: 15, tipo: 'Media', fuerza: 0, sigilo: 'Desventaja', precio: '750 gp'},
-      {nombre: 'Anillas', ca: 14, tipo: 'Pesada', fuerza: 0, sigilo: 'Desventaja', precio: '30 gp'},
-      {nombre: 'Cota de Mallas', ca: 16, tipo: 'Pesada', fuerza: 13, sigilo: 'Desventaja', precio: '75 gp'},
-      {nombre: 'Armadura de Placas', ca: 18, tipo: 'Pesada', fuerza: 15, sigilo: 'Desventaja', precio: '1500 gp'},
-      {nombre: 'Escudo', ca: 2, tipo: 'Escudo', fuerza: 0, sigilo: '-', precio: '10 gp'}
-    ],
-    equipo_aventurero: [
-      {nombre: 'Mochila', precio: '2 gp'},
-      {nombre: 'Cuerda de cáñamo (50 pies)', precio: '1 gp'},
-      {nombre: 'Antorchas (10)', precio: '1 sp'},
-      {nombre: 'Yesca y pedernal', precio: '5 sp'},
-      {nombre: 'Raciones (1 día)', precio: '5 sp'},
-      {nombre: 'Odre de agua', precio: '2 sp'},
-      {nombre: 'Cuerda de seda (50 pies)', precio: '10 gp'},
-      {nombre: 'Pértiga (10 pies)', precio: '2 sp'},
-      {nombre: 'Martillo y pitones (10)', precio: '1 gp'},
-      {nombre: 'Grapa', precio: '5 sp'},
-      {nombre: 'Linterna', precio: '5 gp'},
-      {nombre: 'Aceite (1 frasco)', precio: '1 sp'},
-      {nombre: 'Tiza (1 pieza)', precio: '1 cp'},
-      {nombre: 'Bolsa de dormir', precio: '1 gp'},
-      {nombre: 'Manta de viaje', precio: '2 gp'},
-      {nombre: 'Kit de disfraz', precio: '25 gp'},
-      {nombre: 'Kit de falsificación', precio: '15 gp'},
-      {nombre: 'Kit de envenenador', precio: '50 gp'},
-      {nombre: 'Kit de herboristería', precio: '5 gp'},
-      {nombre: 'Piedra de afilar', precio: '2 cp'},
-      {nombre: 'Saco', precio: '1 cp'},
-      {nombre: 'Cobertor', precio: '1 gp'},
-      {nombre: 'Ropa fina', precio: '15 gp'},
-      {nombre: 'Ropa de viaje', precio: '2 gp'},
-      {nombre: 'Candado', precio: '10 gp'},
-      {nombre: 'Ganzúas', precio: '25 gp'}
-    ]
-  },
-  alineamientos: ['Legal Bueno', 'Neutral Bueno', 'Caótico Bueno', 'Legal Neutral', 'Neutral', 'Caótico Neutral', 'Legal Malvado', 'Neutral Malvado', 'Caótico Malvado'],
-  tiradas_dados_golpe: {
-    'Barbarian': 'd12',
-    'Bard': 'd8',
-    'Cleric': 'd8',
-    'Druid': 'd8',
-    'Fighter': 'd10',
-    'Monk': 'd8',
-    'Paladin': 'd10',
-    'Ranger': 'd10',
-    'Rogue': 'd8',
-    'Sorcerer': 'd6',
-    'Warlock': 'd8',
-    'Wizard': 'd6'
-  },
-  bestiario: [
-    {nombre:'Murciélago Gigante', tamaño:'Mediano', tipo:'Bestia', ca:13, pg:'11 (2d8+2)', velocidad:'10 pies, volar 60 pies', des:16, fuer:10, con:11, int:2, sab:12, car:6, habilidades:{}, sentidos:'Visión ciega 60 pies', idiomas:'—', cr:'1/8', acciones:[{nombre:'Mordisco', desc:'+4 a golpear, 1d6+2 perforante'}], rasgos:[{nombre:'Ecolocalización', desc:'El murciélago no puede usar su vista ciega mientras esté ensordecido.'},{nombre:'Oído Agudo', desc:'Ventaja en pruebas de Sabiduría (Percepción) que usen oído.'}]},
-    {nombre:'Cocodrilo', tamaño:'Grande', tipo:'Bestia', ca:12, pg:'19 (3d10+3)', velocidad:'20 pies, nadar 30 pies', des:10, fuer:15, con:13, int:2, sab:10, car:5, habilidades:{Sigilo:'+4'}, sentidos:'—', idiomas:'—', cr:'1/2', acciones:[{nombre:'Mordisco', desc:'+4 a golpear, 2d6+2 perforante. El objetivo queda agarrado (CD 12).'}], rasgos:[{nombre:'Contención', desc:'El cocodrilo puede derribar a una criatura que tenga agarrada como acción bonus.'}]},
-    {nombre:'Pantera', tamaño:'Mediano', tipo:'Bestia', ca:12, pg:'13 (3d8)', velocidad:'50 pies, trepar 40 pies', des:15, fuer:14, con:10, int:3, sab:14, car:7, habilidades:{Percepción:'+4',Sigilo:'+6'}, sentidos:'Visión oscura 60 pies', idiomas:'—', cr:'1/4', acciones:[{nombre:'Garra', desc:'+4 a golpear, 1d4+2 cortante'},{nombre:'Mordisco', desc:'+4 a golpear, 1d6+2 perforante'}], rasgos:[{nombre:'Salto Poderoso', desc:'La pantera puede saltar hasta 20 pies sin carrera.'},{nombre:'Olfato Agudo', desc:'Ventaja en Percepción usando olfato.'}]},
-    {nombre:'Escorpión Gigante', tamaño:'Grande', tipo:'Bestia', ca:15, pg:'52 (7d10+14)', velocidad:'40 pies', des:13, fuer:15, con:14, int:1, sab:9, car:3, habilidades:{}, sentidos:'Visión ciega 60 pies', idiomas:'—', cr:'3', acciones:[{nombre:'Pinza', desc:'+4 a golpear, 1d8+2 contundente y el objetivo queda agarrado.'},{nombre:'Aguijón', desc:'+4 a golpear, 1d10+2 perforante + 4d10 veneno (CD 12 CON para mitad).'}], rasgos:[]},
-    {nombre:'Gargantúa', tamaño:'Enorme', tipo:'Gigante', ca:17, pg:'138 (12d12+60)', velocidad:'40 pies', des:9, fuer:22, con:20, int:8, sab:10, car:8, habilidades:{}, sentidos:'—', idiomas:'Común, Gigante', cr:'5', acciones:[{nombre:'Puñetazo', desc:'+9 a golpear, 3d8+6 contundente'},{nombre:'Roca', desc:'+9 a golpear, 3d10+6 contundente'}], rasgos:[]},
-    {nombre:'Minotauro', tamaño:'Grande', tipo:'Monstruosidad', ca:14, pg:'76 (9d10+27)', velocidad:'40 pies', des:11, fuer:18, con:16, int:6, sab:16, car:9, habilidades:{Percepción:'+7'}, sentidos:'Visión oscura 60 pies', idiomas:'Común, Abismal', cr:'3', acciones:[{nombre:'Gran Hacha', desc:'+6 a golpear, 2d12+4 cortante'},{nombre:'Cornada', desc:'+6 a golpear, 2d8+4 perforante'}], rasgos:[{nombre:'Carga Cornada', desc:'Si se mueve 10+ pies en línea recta hacia el objetivo y lo golpea con cornada, causa 2d8+4 adicional y el objetivo debe hacer TS de FUE CD 14 o ser empujado.'},{nombre:'Memoria del Laberinto', desc:'El minotauro nunca se pierde.'}]},
-    {nombre:'Golem de Carne', tamaño:'Grande', tipo:'Constructor', ca:9, pg:'93 (11d10+33)', velocidad:'30 pies', des:9, fuer:19, con:17, int:6, sab:10, car:5, habilidades:{}, sentidos:'Visión oscura 60 pies', idiomas:'—', cr:'5', acciones:[{nombre:'Puñetazo', desc:'+7 a golpear, 2d8+4 contundente'}], rasgos:[{nombre:'Inmunidad Mágica', desc:'El golem es inmune a hechizos de nivel 5 o inferior. Puede ser ralentizado por daño de fuego y curado por daño de relámpago.'},{nombre:'Inmunidades', desc:'Veneno, psíquico, agotamiento, hechizado, paralizado.'}]},
-    {nombre:'Vampiro Escudero', tamaño:'Mediano', tipo:'No-muerto', ca:15, pg:'63 (14d8)', velocidad:'30 pies', des:14, fuer:14, con:10, int:10, sab:14, car:14, habilidades:{Percepción:'+6',Sigilo:'+6'}, sentidos:'Visión oscura 60 pies', idiomas:'Común', cr:'3', acciones:[{nombre:'Puñetazo', desc:'+4 a golpear, 1d6+2 contundente + 2d6 necrótico'},{nombre:'Mordisco', desc:'+4 a golpear, 1d4+2 perforante + 2d6 necrótico. Reduce máximo de PG.'}], rasgos:[{nombre:'Regeneración', desc:'Recupera 5 PG al inicio de su turno si tiene al menos 1 PG.'},{nombre:'Resistencia', desc:'Resistencia a daño necrótico y contundente, perforante y cortante de ataques no mágicos.'},{nombre:'Debilidades', desc:'Agua corriente, luz solar, estaca en el corazón.'}]},
-    {nombre:'Ninfa del Bosque', tamaño:'Mediano', tipo:'Feérico', ca:12, pg:'27 (6d8)', velocidad:'30 pies', des:13, fuer:10, con:11, int:14, sab:15, car:18, habilidades:{Sigilo:'+5',Persuasión:'+6'}, sentidos:'Visión oscura 60 pies', idiomas:'Común, Silvano, Élfico', cr:'1', acciones:[{nombre:'Puñetazo', desc:'+2 a golpear, 1d4 contundente'}], rasgos:[{nombre:'Belleza Deslumbrante', desc:'Cualquier humanoide que vea a la ninfa debe hacer TS de SAB CD 13 o quedar hechizado 1 minuto.'},{nombre:'Paso Etéreo', desc:'La ninfa puede atravesar objetos y terreno difícil sin penalización.'}]},
-    {nombre:'Wyvern', tamaño:'Grande', tipo:'Dragón', ca:13, pg:'110 (13d10+39)', velocidad:'20 pies, volar 80 pies', des:10, fuer:19, con:16, int:5, sab:12, car:6, habilidades:{Percepción:'+4'}, sentidos:'Visión oscura 60 pies', idiomas:'—', cr:'6', acciones:[{nombre:'Mordisco', desc:'+7 a golpear, 2d6+4 perforante'},{nombre:'Aguijón', desc:'+7 a golpear, 2d6+4 perforante + 7d6 veneno (CD 15 CON para mitad).'}], rasgos:[]},
-    {nombre:'Troll', tamaño:'Grande', tipo:'Gigante', ca:15, pg:'84 (8d10+40)', velocidad:'30 pies', des:13, fuer:18, con:20, int:7, sab:9, car:7, habilidades:{Percepción:'+2'}, sentidos:'Visión oscura 60 pies', idiomas:'Común, Gigante', cr:'5', acciones:[{nombre:'Golpe', desc:'+7 a golpear, 2d6+4 contundente'},{nombre:'Mordisco', desc:'+7 a golpear, 1d6+4 perforante'}], rasgos:[{nombre:'Regeneración', desc:'El troll recupera 10 PG al inicio de su turno. Muere realmente solo si recibe daño de fuego o ácido.'},{nombre:'Olfato Agudo', desc:'Ventaja en Percepción usando olfato.'}]},
-    {nombre:'Yeti', tamaño:'Grande', tipo:'Monstruosidad', ca:12, pg:'51 (6d10+18)', velocidad:'40 pies, trepar 40 pies', des:13, fuer:17, con:16, int:8, sab:12, car:9, habilidades:{Percepción:'+3',Sigilo:'+3'}, sentidos:'Visión oscura 60 pies', idiomas:'Común, Gigante', cr:'3', acciones:[{nombre:'Garra', desc:'+5 a golpear, 1d6+3 cortante + 1d6 frío'},{nombre:'Mirada Aterradora', desc:'TS de SAB CD 12 o queda asustado.'}], rasgos:[{nombre:'Inmunidad al Frío', desc:'Inmune al daño por frío.'},{nombre:'Visión en la Nieve', desc:'No tiene penalización por ventisca o niebla.'}]},
-    {nombre:'Araña Gigante', tamaño:'Grande', tipo:'Bestia', ca:14, pg:'26 (4d10+4)', velocidad:'30 pies, trepar 30 pies', des:16, fuer:14, con:12, int:2, sab:11, car:4, habilidades:{Sigilo:'+7'}, sentidos:'Visión ciega 10 pies, visión oscura 60 pies', idiomas:'—', cr:'1', acciones:[{nombre:'Mordisco', desc:'+5 a golpear, 1d8+3 perforante + 2d6 veneno (CD 11 CON para mitad).'}], rasgos:[{nombre:'Telaraña', desc:'La araña puede lanzar telarañas. TS de FUE CD 11 o queda agarrado.'},{nombre:'Trepar Telarañas', desc:'Ignora restricciones de movimiento de telarañas.'},{nombre:'Escaladora', desc:'Puede trepar superficies difíciles sin prueba.'}]},
-    {nombre:'Lobo Sombrio', tamaño:'Grande', tipo:'Monstruosidad', ca:14, pg:'27 (5d8+5)', velocidad:'50 pies', des:15, fuer:16, con:13, int:6, sab:12, car:10, habilidades:{Percepción:'+3',Sigilo:'+4'}, sentidos:'Visión oscura 60 pies', idiomas:'—', cr:'1/4', acciones:[{nombre:'Mordisco', desc:'+5 a golpear, 2d4+3 perforante. TS de FUE CD 12 o derribado.'}], rasgos:[{nombre:'Olfato Agudo', desc:'Ventaja en Percepción usando olfato.'},{nombre:'Tácticas de Manada', desc:'Ventaja en ataques si un aliado está a 5 pies.'},{nombre:'Paso Sombrío', desc:'En luz tenue u oscuridad, puede esconderse como acción bonus.'}]},
-    {nombre:'Bandido Jefe', tamaño:'Mediano', tipo:'Humanoide', ca:15, pg:'65 (10d8+20)', velocidad:'30 pies', des:16, fuer:14, con:14, int:12, sab:10, car:14, habilidades:{Acrobacias:'+5',Percepción:'+2',Persuasión:'+4'}, sentidos:'—', idiomas:'Común', cr:'2', acciones:[{nombre:'Estoque', desc:'+5 a golpear, 1d8+3 perforante'},{nombre:'Ballesta de Mano', desc:'+5 a golpear, 1d6+3 perforante'}], rasgos:[{nombre:'Ataque Furtivo', desc:'Causa 3d6 de daño extra si tiene ventaja.'},{nombre:'Acción Astuta', desc:'Puede esprintar, separarse o esconderse como acción bonus.'}]}
-  ],
-  escenas: {
-    entrada_mazmorra: {
-      nombre: 'Entrada a la Cripta',
-      desc: 'Ante ti se alza una antigua cripta de piedra cubierta de musgo. La puerta de hierro está entreabierta, y un hedor a humedad y muerte escapa de su interior. El viento susurra entre las grietas de la mampostería.',
-      tipo: 'explore',
-      opciones: [
-        { texto: 'Entrar directamente', resultado: 'pasillo_principal', desc: 'Empujas la puerta oxidada y te adentras en la oscuridad. El sonido de tus pasos retumba en la piedra.' },
-        { texto: 'Buscar una entrada secreta', resultado: 'pasillo_principal', desc: 'Palpas las paredes en busca de algún mecanismo oculto.', checks: { habilidad: 'Percepción', cd: 12, fallo: 'No encuentras nada y pierdes varios minutos. Entras por la puerta principal.' } },
-        { texto: 'Acampar fuera y descansar', resultado: 'entrada_mazmorra', desc: 'Montas un pequeño campamento junto a la entrada. Descansas un par de horas, recuperando fuerzas.', checks: { fallo: 'Apenas logras conciliar el sueño. Descansas mal.' } }
-      ]
-    },
-    pasillo_principal: {
-      nombre: 'El Pasillo de las Estatuas',
-      desc: 'Un largo pasillo flanqueado por imponentes estatuas de guerreros cubiertas de polvo y telarañas. Sus ojos de ónice parecen seguirte. Al fondo se divisan dos puertas: una de madera tallada y otra de piedra lisa.',
-      tipo: 'explore',
-      opciones: [
-        { texto: 'Seguir derecho por el pasillo', resultado: 'sala_guardia', desc: 'Cruzas el pasillo con paso firme, sintiendo las miradas pétreas sobre ti.' },
-        { texto: 'Investigar las estatuas', resultado: 'cripta_arcana', desc: 'Examinas de cerca las estatuas y notas runas grabadas en sus bases.', checks: { habilidad: 'Arcano', cd: 14, fallo: 'Las runas no te dicen nada. Sigues adelante.' } },
-        { texto: 'Volver a la entrada de la mazmorra', resultado: 'entrada_mazmorra', desc: 'Decides retroceder a la entrada.' }
-      ]
-    },
-    sala_guardia: {
-      nombre: 'Sala de la Guardia Caída',
-      desc: 'Esta sala antaño fue una guardia. Los restos de mobiliario de madera yacen podridos en el suelo. Dos esqueletos vestidos con restos de armaduras se incorporan al sentir tu presencia, sus cuencas vacías brillan con luz violeta.',
-      tipo: 'combat',
-      opciones: [
-        { texto: '¡Luchar contra los esqueletos!', resultado: 'cripta_arcana', desc: 'Desenvainas tu arma y te lanzas al combate.' },
-        { texto: 'Intentar negociar', resultado: 'cripta_arcana', desc: 'Intentas hablar con los esqueletos, pero solo responden con un escalofriante crujir de huesos. Se preparan para atacar.' },
-        { texto: 'Huir de vuelta al pasillo', resultado: 'pasillo_principal', desc: 'Sales corriendo de vuelta al pasillo de las estatuas.' }
-      ],
-      encuentro: { monstruos: [{ nombre: 'Esqueleto', cantidad: 2 }], probabilidad: 1 }
-    },
-    cripta_arcana: {
-      nombre: 'La Cripta Arcana',
-      desc: 'Una cámara circular cuyas paredes están cubiertas de runas brillantes que pulsan con luz azulada. En el centro hay un pedestal con un cofre de madera oscura. El aire chisporrotea con energía mágica.',
-      tipo: 'loot',
-      opciones: [
-        { texto: 'Leer las runas de las paredes', resultado: 'puente_colgante', desc: 'Estudias los símbolos arcanos y logras descifrar un conocimiento olvidado.', checks: { habilidad: 'Arcano', cd: 12, fallo: 'Las runas te resultan indescifrables. El cofre parece más interesante.' } },
-        { texto: 'Abrir el cofre del pedestal', resultado: 'puente_colgante', desc: 'Te acercas al cofre con cuidado. Al abrirlo, una aguja envenenada sale de la cerradura.', checks: { habilidad: 'Percepción', cd: 14, fallo: 'La aguja te alcanza. Sientes un dolor punzante.' } },
-        { texto: 'Ignorar todo y seguir', resultado: 'puente_colgante', desc: 'Decides no tentar a la suerte y continuas por la puerta del fondo.' }
-      ],
-      tesoro: { oro: '50 mo', objetos: ['Pergamino Mágico', 'Gema Opaca'] }
-    },
-    puente_colgante: {
-      nombre: 'El Puente Colgante',
-      desc: 'Un abismo profundo se extiende ante ti. Un puente de cuerda y madera podrida cruza el foso, meciéndose sobre las sombras. Del otro lado se ve una puerta dorada. Gotas de agua caen desde las alturas.',
-      tipo: 'explore',
-      opciones: [
-        { texto: 'Cruzar el puente con cuidado', resultado: 'tesoro_reino', desc: 'Pisas con cautela las tablas podridas. El puente cruje pero aguanta.', checks: { habilidad: 'Destreza', cd: 13, fallo: 'Una tabla se parte bajo tu peso. Caes y te golpeas contra el borde, pero logras aferrarte y subir.' } },
-        { texto: 'Intentar saltar el abismo', resultado: 'tesoro_reino', desc: 'Tomas impulso y saltas con todas tus fuerzas.', checks: { habilidad: 'Fuerza', cd: 15, fallo: 'No alcanzas el otro lado. Caes al vacío, golpeándote contra las rocas.' } },
-        { texto: 'Rodear por un pasaje lateral', resultado: 'salida', desc: 'Encuentras un angosto pasaje que rodea el abismo, pero te lleva en dirección contraria.' }
-      ]
-    },
-    tesoro_reino: {
-      nombre: 'La Cámara del Tesoro',
-      desc: 'Una sala resplandeciente llena de monedas de oro, joyas y objetos de valor apilados en montones. Un esqueleto con armadura oxidada y un zombi harapiento custodian el tesoro, moviéndose lentamente hacia ti.',
-      tipo: 'boss',
-      opciones: [
-        { texto: 'Luchar por el tesoro', resultado: 'salida', desc: 'Te abres paso entre los no-muertos para reclamar tu recompensa.' },
-        { texto: 'Tomar lo que puedas y huir', resultado: 'salida', desc: 'Agarras un puñado de monedas y corres hacia la salida.' }
-      ],
-      encuentro: { monstruos: [{ nombre: 'Esqueleto', cantidad: 1 }, { nombre: 'Zombi', cantidad: 1 }], probabilidad: 1 },
-      tesoro: { oro: '100 mo', objetos: ['Gema', 'Anillo de Plata', 'Collar de Perlas'] }
-    },
-    salida: {
-      nombre: '¡Libertad!',
-      desc: 'La luz del sol te da en el rostro mientras emerges de la cripta. Has sobrevivido a las profundidades y llevas contigo el botín y la gloria. La mazmorra ha sido vencida... por ahora.',
-      tipo: 'rest',
-      opciones: [
-        { texto: 'Celebrar la victoria', resultado: 'salida', desc: 'Alzas el puño al cielo. ¡Has triunfado!' }
-      ]
-    }
-  },
-  narrador: {
-    ambiente_mazmorra: [
-      'La oscuridad es casi absoluta. Solo el eco de tus pasos rompe el silencio sepulcral.',
-      'El aire es pesado y húmedo, cargado con el olor a piedra mojada y moho ancestral.',
-      'Gotas de agua caen desde el techo invisible, marcando un ritmo constante en las sombras.',
-      'Una corriente de aire frío recorre el pasillo, trayendo consigo un susurro que parece una voz lejana.',
-      'Las paredes están cubiertas de extraños símbolos y grietas que se asemejan a venas petrificadas.',
-      'El crujido de tus pisadas sobre losas sueltas resuena en la galería. Nunca estás solo aquí.',
-      'Telarañas cuelgan del techo como cortinas olvidadas. Algo se mueve en la periferia de tu visión.',
-      'El hedor a muerte y descomposición se intensifica a medida que avanzas. Hay algo maligno aquí.'
-    ],
-    ambiente_bosque: [
-      'La luz del sol se filtra entre las copas de los árboles, creando un mosaico dorado sobre el suelo.',
-      'El canto de los pájaros se mezcla con el crujir de las hojas secas bajo tus pies.',
-      'Un ciervo levanta la cabeza y te observa desde la espesura antes de desaparecer entre los árboles.',
-      'El viento mece las ramas y un murmullo vegetal te envuelve como un abrazo de la naturaleza.',
-      'El sendero se pierde entre la maleza. La maleza parece susurrar secretos antiguos.',
-      'Huele a tierra mojada y a flores silvestres. Una ardilla te observa desde una rama cercana.',
-      'Un arroyo cristalino cruza tu camino, cantando su melodía entre las piedras.',
-      'La neblina matinal se enreda en los troncos, dando al bosque un aire místico y antiguo.'
-    ],
-    ambiente_montana: [
-      'El viento helado azota tu rostro mientras escalas la ladera rocosa. El paisaje es sobrecogedor.',
-      'A lo lejos, un águila planea sobre los picos nevados, dueña absoluta del cielo.',
-      'El sendero serpentea entre rocas afiladas. Cada paso debe ser firme o el abismo te reclamará.',
-      'El trueno retumba entre las montañas. La tormenta se acerca rápidamente.',
-      'Encuentras una cueva natural que se adentra en la montaña. De su interior emana un calor extraño.',
-      'El suelo tiembla ligeramente. Tal vez sea un terremoto... o algo más grande moviéndose bajo la tierra.',
-      'La nieve cruje bajo tus botas. El silencio aquí es tan vasto como las montañas mismas.',
-      'Una cascada helada cuelga del acantilado como una cortina de cristal. La luz la hace brillar.'
-    ],
-    combate_inicio: [
-      '—¡En guardia! —gritas mientras desenvainas tu arma. El combate ha comenzado.',
-      'El enemigo carga contra ti con ferocidad. No hay tiempo para pensar, solo para actuar.',
-      'El choque de acero contra acero rompe el silencio. ¡Que comience la batalla!',
-      'Un grueso de batalla surge de las sombras. Te preparas para lo peor.',
-      'El aire se tensa. Los dos os miráis fijamente, sabiendo que solo uno saldrá de pie.',
-      'Con un rugido ensordecedor, la criatura se abalanza. ¡El momento de la verdad ha llegado!'
-    ],
-    combate_golpe_acertado: [
-      'Tu arma encuentra su objetivo con un golpe seco y satisfactorio.',
-      'El acero penetra la defensa enemiga. Un grito de dolor confirma tu acierto.',
-      'Golpeas con precisión. El enemigo tambalea hacia atrás, herido.',
-      'Tu ataque impacta de lleno, levantando una nube de polvo y chispas.',
-      'Sientes la vibración del impacto recorrer tu brazo. Buen golpe.',
-      'La hoja se hunde en la carne. El enemigo retrocede, visiblemente afectado.',
-      'Un golpe limpio y directo. La criatura gruñe de dolor y rabia.',
-      'Golpeas con tal fuerza que el enemigo pierde el equilibrio por un instante.'
-    ],
-    combate_golpe_fallido: [
-      'Tu arma corta el aire, pero el enemigo esquiva hábilmente.',
-      'Fallaste por poco. La criatura se burla de tu torpeza.',
-      'El golpe rebota contra la armadura sin causar daño.',
-      'Tu ataque es demasiado lento. El enemigo lo ve venir y lo esquiva con facilidad.',
-      'El suelo cede bajo tu pie y el golpe se desvía lamentablemente.',
-      'La criatura se mueve con una agilidad inesperada, evitando tu ataque.'
-    ],
-    combate_golpe_critico: [
-      '¡Golpe maestro! Tu ataque encuentra un punto vulnerable con precisión letal.',
-      '¡Impacto devastador! El enemigo retrocede aturdido por la fuerza del golpe.',
-      '¡Certero! Tu golpe alcanza su marca con una perfección brutal.',
-      '¡Golpe perfecto! La criatura apenas puede mantenerse en pie.',
-      '¡Golpe demoledor! El enemigo siente la furia de tu ataque en todo su ser.',
-      '¡Precisión absoluta! El arma se hunde profundamente, causando un daño terrible.'
-    ],
-    combate_muerte: [
-      'Con un último estertor, el enemigo cae al suelo y no vuelve a moverse.',
-      'El cuerpo de tu oponente se desploma, la vida se apaga en sus ojos.',
-      'Un último y débil gemido escapa de sus labios antes de quedar inmóvil.',
-      'La criatura se desmorona, sus restos quedan esparcidos en el suelo.',
-      'El enemigo cae de rodillas y luego de bruces. El combate ha terminado para él.',
-      'Suelta su arma y se desploma. Un enemigo menos en este mundo.'
-    ],
-    combate_victoria: [
-      'El último enemigo cae. La batalla ha terminado. Por ahora, hay paz.',
-      'Guardas tu arma mientras observas el campo de batalla. Has vencido.',
-      'Respiras hondo. El peligro ha pasado. Has salido victorioso.',
-      'La adrenalina disminuye lentamente. Miras a tu alrededor: has sobrevivido.',
-      'Limpias el sudor de tu frente. La victoria es tuya.',
-      'Un sentimiento de triunfo te embarga. Nada se interpone en tu camino ahora.'
-    ],
-    exploracion_exito: [
-      'Tu instinto no falló. Encuentras exactamente lo que buscabas.',
-      'La suerte está de tu lado. El camino se revela ante ti.',
-      'Tu agudeza mental da frutos. Descubres un detalle que otros habrían pasado por alto.',
-      'El conocimiento que posees resulta invaluable en esta situación.',
-      'Tu paciencia se ve recompensada. El secreto se revela ante tus ojos.',
-      'Tus dedos hábiles logran lo que parecía imposible. El mecanismo cede.'
-    ],
-    exploracion_fracaso: [
-      'No fue suficiente. El mecanismo sigue cerrado, el secreto permanece oculto.',
-      'Mal calculaste. Ahora tendrás que buscar otra alternativa.',
-      'El destino parece estar en tu contra. No hay nada útil aquí.',
-      'Tu falta de conocimiento te juega una mala pasada. Deberías haber estudiado más.',
-      'El tiempo se agota y no logras tu objetivo. Tendrás que intentarlo de otra forma.',
-      'Fallas estrepitosamente. La situación se vuelve más complicada.'
-    ],
-    descanso_corto: [
-      'Te sientas a recuperar el aliento. El silencio te envuelve como un manto.',
-      'Aprovechas el momento para vendar tus heridas y beber un poco de agua.',
-      'Encuentras un rincón apartado y te permites un breve respiro.',
-      'Cierras los ojos un momento. Las fuerzas vuelven lentamente a tu cuerpo.',
-      'El descanso te sienta bien. Tus músculos dejan de doler y tu mente se aclara.'
-    ],
-    tesoro_encontrado: [
-      'Ante tus ojos aparece un brillo dorado. ¡Tesoro!',
-      'Tus manos tiemblan de emoción mientras examinas el hallazgo.',
-      'El contenido del cofre supera tus expectativas. ¡Qué maravilla!',
-      'Entre el polvo y las telarañas, algo valioso brilla con luz propia.',
-      'No puedes creer lo que ves. Este tesoro cambiará tu vida.',
-      'El peso del oro en tu bolsa es reconfortante. La aventura vale la pena.'
-    ],
-    evento_aleatorio: [
-      'Un puñado de murciélagos sale volando de una grieta en el techo.',
-      'Escuchas un ruido metálico a lo lejos. ¿Otro aventurero? ¿O algo peor?',
-      'Una pequeña criatura se cruza en tu camino y desaparece entre las sombras.',
-      'El suelo tiembla ligeramente bajo tus pies. Podría ser un terremoto lejano.',
-      'Encuentras los restos de un campamento abandonado. La hoguera aún humea.',
-      'Un extraño símbolo está grabado en la pared. Parece un marcador de algún tipo.',
-      'Oyes risas apagadas provenientes de algún lugar más allá de la pared. No puedes identificar la dirección.',
-      'Tu antorcha parpadea. Una corriente de aire helado recorre el pasaje.'
-    ]
-  },
-  tesoro: {
-    menor: [
-      { nombre: 'Bolsa de Monedas de Plata', desc: 'Una pequeña bolsa de cuero con 25 monedas de plata.', valor: '25 pp' },
-      { nombre: 'Anillo de Cobre', desc: 'Un anillo simple de cobre con una piedra verde engastada.', valor: '5 po' },
-      { nombre: 'Collar de Dientes de Lobo', desc: 'Un collar hecho con dientes de lobo ensartados en un cordón de cuero.', valor: '10 po' },
-      { nombre: 'Gemilla Opaca', desc: 'Una pequeña gema sin tallar de color azul apagado.', valor: '50 po' },
-      { nombre: 'Pluma de Grifo', desc: 'Una pluma grande y dorada de grifo. Los coleccionistas pagan bien por ella.', valor: '30 po' },
-      { nombre: 'Botella de Vino Añejo', desc: 'Una botella polvorienta de vino de hace décadas.', valor: '25 po' },
-      { nombre: 'Estatua de Jade', desc: 'Una pequeña estatua de un sapo tallada en jade.', valor: '40 po' },
-      { nombre: 'Mapa del Viejo Mundo', desc: 'Un pergamino amarillento con un mapa de tierras lejanas.', valor: '20 po' }
-    ],
-    mayor: [
-      { nombre: 'Cetro de Marfil', desc: 'Un cetro tallado en marfil con incrustaciones de oro.', valor: '250 po' },
-      { nombre: 'Corona de Latón con Rubíes', desc: 'Una corona ornamentada con tres rubíes pequeños.', valor: '350 po' },
-      { nombre: 'Espada Decorativa', desc: 'Una espada larga ceremonial con empuñadura enjoyada.', valor: '200 po' },
-      { nombre: 'Cáliz de Plata', desc: 'Un cáliz de plata purísima con grabados de escenas de caza.', valor: '150 po' },
-      { nombre: 'Pergamino de Poder Arcano', desc: 'Un antiguo pergamino que contiene un hechizo de nivel 3.', valor: '300 po' },
-      { nombre: 'Armadura Golemita', desc: 'Piezas de una armadura de placas decoradas con runas.', valor: '500 po' }
-    ],
-    armas_magicas: [
-      { nombre: 'Espada Corta del Cazador', desc: 'Una espada corta que brilla tenuemente cuando hay no-muertos cerca.', bonificacion: '+1' },
-      { nombre: 'Arco Largo del Viento', desc: 'Un arco largo de madera pálida. Las flechas disparadas viajan más rápido.', bonificacion: '+1' },
-      { nombre: 'Martillo del Trueno', desc: 'Un martillo de guerra que emite un sonido atronador al impactar.', bonificacion: '+1' },
-      { nombre: 'Daga del Veneno Eterno', desc: 'Una daga negra cuya hoja siempre está cubierta de un veneno letal.', bonificacion: '+1' },
-      { nombre: 'Bastón del Archimago', desc: 'Un bastón nudoso que potencia los hechizos de quien lo empuña.', bonificacion: '+2' }
-    ],
-    pociones: [
-      { nombre: 'Poción de Curación', desc: 'Vial de líquido rojo burbujeante. Restaura puntos de golpe.', efecto: 'Recuperas 2d4+2 PG' },
-      { nombre: 'Poción de Curación Superior', desc: 'Vial de líquido rojo brillante. Cura heridas graves.', efecto: 'Recuperas 4d4+4 PG' },
-      { nombre: 'Poción de Fuerza de Gigante', desc: 'Líquido turbio y espeso. Otorga fuerza sobrehumana.', efecto: 'Fuerza 21 durante 1 hora' },
-      { nombre: 'Poción de Invisibilidad', desc: 'Líquido claro como el agua, pero con burbujas plateadas.', efecto: 'Invisibilidad durante 1 hora' },
-      { nombre: 'Poción de Velocidad', desc: 'Líquido amarillo chispeante. Acelera el cuerpo y la mente.', efecto: 'Acción adicional extra durante 1 minuto' },
-      { nombre: 'Poción de Respiración Acuática', desc: 'Líquido azul neblinoso. Huele a mar.', efecto: 'Respirar bajo el agua durante 1 hora' },
-      { nombre: 'Poción de Escalada de Araña', desc: 'Líquido verde viscoso que tiembla en el vial.', efecto: 'Trepar superficies sin esfuerzo durante 1 hora' }
-    ]
-  },
-  encuentros: {
-    facil: [
-      { monstruos: [{ nombre: 'Goblin', cantidad: 2 }], desc: 'Dos goblins discuten ruidosamente sobre un botín miserable. No te han visto aún.' },
-      { monstruos: [{ nombre: 'Bandido', cantidad: 3 }], desc: 'Un grupo de bandidos flacuchos te sale al paso exigiendo tu bolsa.' },
-      { monstruos: [{ nombre: 'Lobo Sombrio', cantidad: 1 }], desc: 'Un lobo sombrío emerge de entre las sombras, mostrando los colmillos.' }
-    ],
-    medio: [
-      { monstruos: [{ nombre: 'Orco', cantidad: 2 }], desc: 'Dos orcos armados con grandes hachas custodian el camino. Gruñen al verte.' },
-      { monstruos: [{ nombre: 'Esqueleto', cantidad: 3 }], desc: 'Tres esqueletos se levantan de entre los escombros, armados con espadas oxidadas.' },
-      { monstruos: [{ nombre: 'Ladrón', cantidad: 1 }, { nombre: 'Bandido', cantidad: 2 }], desc: 'Un ladrón con dos secuaces bandidos te tiende una emboscada.' }
-    ],
-    dificil: [
-      { monstruos: [{ nombre: 'Minotauro', cantidad: 1 }], desc: 'Un minotauro furioso patea el suelo y carga contra ti con sus cuernos.' },
-      { monstruos: [{ nombre: 'Troll', cantidad: 1 }], desc: 'Un troll emerge de las sombras, su carne ya comenzando a regenerarse.' },
-      { monstruos: [{ nombre: 'Golem de Carne', cantidad: 1 }], desc: 'Un golem de carne hecho con restos de docenas de criaturas bloquea tu paso.' }
-    ]
+      if(r.rasgos_extra) r.rasgos = r.rasgos_extra;
+    });
   }
+  if(D.clases){
+    D.classes = D.clases;
+    D.classes.forEach(c => {
+      c.name = c.nombre;
+      c.hitDie = parseInt((c.dado_golpe||'').replace('d','')) || 8;
+      if(c.competencias){
+        c.armor = c.competencias.armaduras ? c.competencias.armaduras.join(', ') : '';
+        c.weapons = c.competencias.armas ? c.competencias.armas.join(', ') : '';
+        c.savingThrows = c.competencias.salvaciones || [];
+        c.skills = c.competencias.habilidades || [];
+      }
+    });
+  }
+  if(D.trasfondos){
+    D.backgrounds = D.trasfondos;
+    D.backgrounds.forEach(b => { b.name = b.nombre; });
+  }
+  if(D.hechizos){
+    D.spells = D.hechizos;
+    D.spells.forEach(s => {
+      s.name = s.nombre; s.school = s.escuela;
+      s.castingTime = s.tiempo; s.range = s.alcance;
+      s.duration = s.duracion; s.description = s.descripcion;
+      s.level = s.nivel; s.classes = s.clases;
+    });
+  }
+  if(D.subrazas){
+    D.subraces = D.subrazas;
+    D.subraces.forEach(sr => { sr.bonuses = sr.bonos; });
+  }
+})(D);
+
+// ---- State ----
+const state = {
+  rolledScores: [],
+  assigned: {},       // ability -> score
+  selectedStat: null,
+  character: null,
+  history: [],
 };
-// English aliases for HTML interface
-(function(e){
-  e.races=e.razas; e.subraces=e.subrazas; e.classes=e.clases; e.backgrounds=e.trasfondos;
-  e.spells=e.hechizos; e.skillsByAbility=e.habilidades;
-  e.armor=e.equipo&&e.equipo.armaduras?e.equipo.armaduras:[];
-  
-  // Add computed aliases for class properties
-  var clsList = e.clases || [];
-  clsList.forEach(function(c){
-    if(c.dado_golpe && !c.hitDie) c.hitDie = parseInt(c.dado_golpe.replace('d',''));
-    if(c.competencias && c.competencias.salvaciones && !c.savingThrows) c.savingThrows = c.competencias.salvaciones;
+
+// ---- DOM refs ----
+const $ = id => document.getElementById(id);
+const charForm = $('char-form');
+const charOutput = $('char-output');
+const raceSel = $('char-race');
+const subraceSel = $('char-subrace');
+const subraceGroup = $('subrace-group');
+const classSel = $('char-class');
+const bgSel = $('char-bg');
+const statGrid = $('stat-grid');
+const assignGrid = $('assign-grid');
+const assignSection = $('assign-section');
+const generateBtn = $('generate-btn');
+
+// ---- Init selects ---- 
+function initSelects(){
+  // Races
+  const races = D.races || [];
+  races.forEach(r => {
+    const o = document.createElement('option');
+    o.value = r.name;
+    o.textContent = r.name;
+    raceSel.appendChild(o);
   });
-})(DND);
+  // Classes
+  const classes = D.classes || [];
+  classes.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.name;
+    o.textContent = c.name;
+    classSel.appendChild(o);
+  });
+  // Backgrounds
+  const bgs = D.backgrounds || [];
+  bgs.forEach(b => {
+    const o = document.createElement('option');
+    o.value = b.name;
+    o.textContent = b.name;
+    bgSel.appendChild(o);
+  });
+  // Spell filters
+  const spells = D.spells || [];
+  const classesSet = new Set();
+  spells.forEach(s => (s.classes||[]).forEach(cl => classesSet.add(cl)));
+  const sortedClasses = [...classesSet].sort();
+  const classFilter = $('spell-class-filter');
+  sortedClasses.forEach(cl => {
+    const o = document.createElement('option');
+    o.value = cl;
+    o.textContent = cl;
+    classFilter.appendChild(o);
+  });
+  const levelFilter = $('spell-level-filter');
+  for(let i=1;i<=9;i++){
+    const o = document.createElement('option');
+    o.value = i;
+    o.textContent = 'Nivel '+i;
+    levelFilter.appendChild(o);
+  }
+  const schoolsSet = new Set();
+  spells.forEach(s => {if(s.school) schoolsSet.add(s.school)});
+  const schoolFilter = $('spell-school-filter');
+  [...schoolsSet].sort().forEach(sc => {
+    const o = document.createElement('option');
+    o.value = sc;
+    o.textContent = sc;
+    schoolFilter.appendChild(o);
+  });
+  // Dice grid
+  const diceGrid = $('dice-grid');
+  [4,6,8,10,12,20,100].forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'dice-btn';
+    btn.innerHTML = 'd' + d + '<span class="label">' + (d===100?'&#37;':'') + '</span>';
+    btn.dataset.dice = d;
+    btn.addEventListener('click', ()=>rollDice(1,d));
+    diceGrid.appendChild(btn);
+  });
+}
+
+// ---- Subraces ----
+raceSel.addEventListener('change', function(){
+  const race = D.races ? D.races.find(r => r.name === this.value) : null;
+  subraceGroup.style.display = 'none';
+  subraceSel.innerHTML = '<option value="">—</option>';
+  if(race && race.subraces && race.subraces.length){
+    race.subraces.forEach(sr => {
+      const o = document.createElement('option');
+      o.value = sr;
+      o.textContent = sr;
+      subraceSel.appendChild(o);
+    });
+    subraceGroup.style.display = 'block';
+  }
+});
+
+// ---- Class info display ----
+let lastClassInfo = null;
+classSel.addEventListener('change', function(){
+  const cls = D.classes ? D.classes.find(c => c.name === this.value) : null;
+  // remove old info
+  if(lastClassInfo) { lastClassInfo.remove(); lastClassInfo = null; }
+  if(!cls) return;
+  const div = document.createElement('div');
+  div.className = 'sheet';
+  div.style.marginBottom = '8px';
+  div.style.fontSize = '12px';
+  let html = '<strong style="color:var(--accent)">' + cls.name + '</strong><br>';
+  if(cls.hitDie) html += 'Dado de Golpe: <span class="badge">d' + cls.hitDie + '</span><br>';
+  if(cls.armor) html += 'Armaduras: ' + cls.armor + '<br>';
+  if(cls.weapons) html += 'Armas: ' + cls.weapons + '<br>';
+  if(cls.savingThrows) html += 'Tiradas Salvación: ' + cls.savingThrows.join(', ') + '<br>';
+  if(cls.skills) html += 'Habilidades: ' + cls.skills.join(', ') + '<br>';
+  div.innerHTML = html;
+  classSel.parentNode.parentNode.insertAdjacentElement('afterend', div); // after the form-row containing class
+  lastClassInfo = div;
+});
+
+// ---- Stat generation ----
+$('roll-stats-btn').addEventListener('click', function(){
+  const method = $('stat-method').value;
+  let scores;
+  if(method === 'standard'){
+    scores = [15,14,13,12,10,8];
+  } else {
+    scores = [];
+    for(let i=0;i<6;i++){
+      const rolls = [];
+      for(let j=0;j<4;j++) rolls.push(Math.floor(Math.random()*6)+1);
+      rolls.sort((a,b)=>a-b);
+      rolls.shift();
+      scores.push(rolls.reduce((s,v)=>s+v,0));
+    }
+  }
+  state.rolledScores = scores;
+  state.selectedStat = null;
+  state.assigned = {};
+  renderStatGrid(scores);
+  assignSection.style.display = 'block';
+  renderAssignGrid();
+  generateBtn.textContent = 'Generar Personaje';
+});
+
+function renderStatGrid(scores){
+  const abils = ['FUE','DES','CON','INT','SAB','CAR'];
+  statGrid.innerHTML = '';
+  scores.forEach((sc,i) => {
+    const card = document.createElement('div');
+    card.className = 'stat-card';
+    const mod = Math.floor((sc-10)/2);
+    const modStr = (mod>=0?'+':'')+mod;
+    card.innerHTML = '<div class="stat-label">' + abils[i] + '</div><div class="stat-value">' + sc + '</div><div class="stat-mod">(' + modStr + ')</div>';
+    card.dataset.idx = i;
+    card.addEventListener('click', function(e){
+      e.stopPropagation();
+      state.selectedStat = i;
+      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected');
+      renderAssignGrid();
+    });
+    statGrid.appendChild(card);
+  });
+}
+
+function renderAssignGrid(){
+  const abils = ['Fuerza','Destreza','Constitución','Inteligencia','Sabiduría','Carisma'];
+  const abilsShort = ['FUE','DES','CON','INT','SAB','CAR'];
+  assignGrid.innerHTML = '';
+  var assignedScores = Object.values(state.assigned);
+  var usedIndices = {};
+  state.rolledScores.forEach(function(sc, idx){
+    var pos = assignedScores.indexOf(sc);
+    if(pos !== -1){
+      usedIndices[idx] = true;
+      assignedScores[pos] = null;
+    }
+  });
+  
+  const table = document.createElement('table');
+  table.className = 'rules-table';
+  table.style.marginBottom = '0';
+  let html = '<thead><tr><th>Habilidad</th><th>Puntaje</th><th>Mod</th><th></th></tr></thead><tbody>';
+  abils.forEach((a,i) => {
+    const assigned = state.assigned[abilsShort[i]];
+    const mod = assigned !== undefined ? Math.floor((assigned-10)/2) : 0;
+    const modStr = assigned !== undefined ? ((mod>=0?'+':'')+mod) : '—';
+    const valStr = assigned !== undefined ? assigned : '—';
+    const canAssign = assigned === undefined && state.selectedStat !== null && state.rolledScores[state.selectedStat] !== undefined && !usedIndices[state.selectedStat];
+    const isSelectedScore = (assigned === undefined && i === state.selectedStat);
+    html += '<tr>';
+    html += '<td>' + a + '</td>';
+    html += '<td>' + valStr + '</td>';
+    html += '<td>' + modStr + '</td>';
+    html += '<td>';
+    if(canAssign && !isSelectedScore){
+      html += '<button class="btn btn-sm" data-abil="'+abilsShort[i]+'" data-idx="'+state.selectedStat+'">Asignar</button>';
+    } else if(assigned !== undefined){
+      html += '<button class="btn btn-sm btn-danger" data-clear="'+abilsShort[i]+'">X</button>';
+    }
+    html += '</td></tr>';
+  });
+  html += '</tbody></table>';
+  assignGrid.innerHTML = html;
+  
+  assignGrid.querySelectorAll('[data-abil]').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const abil = this.dataset.abil;
+      const idx = parseInt(this.dataset.idx);
+      const score = state.rolledScores[idx];
+      if(state.assigned[abil] !== undefined) return;
+      state.assigned[abil] = score;
+      state.selectedStat = null;
+      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('selected'));
+      renderAssignGrid();
+    });
+  });
+  assignGrid.querySelectorAll('[data-clear]').forEach(btn => {
+    btn.addEventListener('click', function(){
+      delete state.assigned[this.dataset.clear];
+      renderAssignGrid();
+    });
+  });
+}
+
+// ---- Generate character ----
+generateBtn.addEventListener('click', function(){
+  const name = $('char-name').value.trim() || 'Sin nombre';
+  const level = parseInt($('char-level').value) || 1;
+  const raceName = raceSel.value;
+  const subraceName = subraceSel.value;
+  const className = classSel.value;
+  const bgName = bgSel.value;
+  
+  if(!raceName || !className){
+    alert('Selecciona al menos raza y clase.');
+    return;
+  }
+  const assigned = state.assigned;
+  const abilsShort = ['FUE','DES','CON','INT','SAB','CAR'];
+  const missing = abilsShort.filter(a => assigned[a] === undefined);
+  if(missing.length){
+    alert('Asigna todos los puntajes de habilidad antes de generar.');
+    return;
+  }
+  
+  const race = D.races ? D.races.find(r => r.name === raceName) : null;
+  const cls = D.classes ? D.classes.find(c => c.name === className) : null;
+  const bg = D.backgrounds ? D.backgrounds.find(b => b.name === bgName) : null;
+  
+  // Build sheet
+  let scores = {};
+  abilsShort.forEach((a,i) => {
+    let base = assigned[a];
+    // Apply racial bonuses
+    if(race){
+      if(race.bonuses && race.bonuses[a]) base += race.bonuses[a];
+      if(race.bonusChoice && subraceName){
+        // In a full version we'd parse; for simplicity we'll apply subrace bonus manually or from DND data
+      }
+    }
+    // Subrace
+    if(subraceName && D.subraces){
+      const sr = D.subraces.find(s => s.nombre === subraceName);
+      if(sr && sr.bonuses && sr.bonuses[a]) base += sr.bonuses[a];
+    }
+    scores[a] = base;
+  });
+  
+  const mods = {};
+  Object.keys(scores).forEach(k => {
+    mods[k] = Math.floor((scores[k]-10)/2);
+  });
+  
+  const hp = cls ? (cls.hitDie || 8) + mods['CON'] : 8 + mods['CON'];
+  
+  // Calculate AC with equipped armor
+  let ca = 10 + mods['DES'];
+  let caDetail = '';
+  const armorList = (D.equipo && D.equipo.armaduras) || [];
+  if(state.equippedItems && state.equippedItems.armor){
+    const armor = armorList.find(a => a.nombre === state.equippedItems.armor);
+    if(armor){
+      if(armor.tipo === 'Ligera'){
+        ca = armor.ca + mods['DES'];
+        caDetail = armor.nombre + ' (CA base ' + armor.ca + ' + DES)';
+      } else if(armor.tipo === 'Media'){
+        const desMax = Math.min(mods['DES'], 2);
+        ca = armor.ca + desMax;
+        caDetail = armor.nombre + ' (CA base ' + armor.ca + ' + DES máx 2)';
+      } else if(armor.tipo === 'Pesada'){
+        ca = armor.ca;
+        caDetail = armor.nombre + ' (CA fija ' + armor.ca + ')';
+      }
+    }
+  }
+  // Shield bonus
+  if(state.equippedItems && state.equippedItems.shield){
+    ca += 2;
+    if(!caDetail) caDetail = 'Escudo (+2)';
+    else caDetail += ' + Escudo (+2)';
+  }
+  
+  const speed = (race && race.velocidad) ? race.velocidad + (subraceName==='Wood Elf'?5:0) : 30;
+  const languages = (race && race.idiomas) ? race.idiomas.join(', ') : '—';
+  
+  let html = '<div class="sheet">';
+  html += '<h2>' + name + ' <span style="font-size:11px;color:var(--text-dim)">Nv.' + level + '</span></h2>';
+  html += '<div style="margin-bottom:8px;font-size:12px">';
+  html += '<span class="badge">' + raceName + '</span>';
+  if(subraceName) html += ' <span class="badge badge-danger">' + subraceName + '</span>';
+  html += ' <span class="badge">' + className + '</span>';
+  if(bg) html += ' <span class="badge">' + bgName + '</span>';
+  html += '</div>';
+  
+  // CA, Speed, Languages
+  html += '<div style="font-size:12px;display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px">';
+  html += '<div><span style="color:var(--text-dim)">CA:</span> <span style="font-weight:bold;color:var(--accent)">' + ca + '</span>' + (caDetail?' <span style="font-size:10px;color:var(--text-dim)">('+caDetail+')</span>':'') + '</div>';
+  html += '<div><span style="color:var(--text-dim)">Velocidad:</span> <span style="font-weight:bold">' + speed + ' pies</span></div>';
+  html += '<div><span style="color:var(--text-dim)">Idiomas:</span> <span style="font-weight:bold">' + languages + '</span></div>';
+  html += '</div>';
+  
+  // Stats
+  html += '<table class="rules-table" style="margin-bottom:8px"><thead><tr>';
+  abilsShort.forEach(a => { html += '<th>' + a + '</th>'; });
+  html += '</tr></thead><tbody><tr>';
+  abilsShort.forEach(a => { html += '<td style="text-align:center;font-weight:bold;font-size:15px;color:var(--accent)">' + scores[a] + '</td>'; });
+  html += '</tr><tr>';
+  abilsShort.forEach(a => {
+    const m = mods[a];
+    const ms = (m>=0?'+':'')+m;
+    html += '<td style="text-align:center;font-size:12px">(' + ms + ')</td>';
+  });
+  html += '</tr></tbody></table>';
+  
+  // HP, AC, etc
+  html += '<div style="font-size:12px;display:flex;gap:16px;flex-wrap:wrap">';
+  html += '<div><span style="color:var(--text-dim)">PG:</span> <span style="color:var(--hp-red);font-weight:bold">' + hp + '</span></div>';
+  html += '<div><span style="color:var(--text-dim)">Iniciativa:</span> <span style="font-weight:bold">' + (mods['DES']>=0?'+':'')+mods['DES'] + '</span></div>';
+  html += '<div><span style="color:var(--text-dim)">Percepción pasiva:</span> <span style="font-weight:bold">' + (10+mods['SAB']) + '</span></div>';
+  if(cls && cls.savingThrows){
+    html += '<div><span style="color:var(--text-dim)">Salvación:</span> ';
+    html += (cls.savingThrows||[]).map(st => '<span class="badge">' + st + '</span>').join(' ');
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '</div>';
+  
+  // Skills
+  (function(){
+    const abilityKeys = {'Fuerza':'FUE','Destreza':'DES','Constitución':'CON','Inteligencia':'INT','Sabiduría':'SAB','Carisma':'CAR'};
+    const skillData = D.skillsByAbility || {};
+    let skillHtml = '<div class="sheet"><h2>Habilidades</h2>';
+    Object.entries(skillData).forEach(([abil, skills]) => {
+      if(!skills || !skills.length) return;
+      skills.forEach(skill => {
+        const abilShort = abilityKeys[abil] || 'FUE';
+        const mod = typeof mods[abilShort] === 'number' ? mods[abilShort] : 0;
+        const modStr = (mod>=0?'+':'')+mod;
+        const isProf = cls && cls.competencias && cls.competencias.habilidades && cls.competencias.habilidades.includes(skill);
+        const profDot = isProf ? '●' : '○';
+        skillHtml += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>' + profDot + ' ' + skill + '</span><span style="color:var(--accent)">' + modStr + '</span></div>';
+      });
+    });
+    skillHtml += '</div>';
+    html += skillHtml;
+  })();
+  
+  // Spell Slots
+  if(cls && cls.spellSlots){
+    const slots = cls.spellSlots[level-1] || [];
+    if(slots.some(s => s > 0)){
+      let slotHtml = '<div class="sheet"><h2>Espacios de Hechizo</h2><div style="display:flex;flex-wrap:wrap;gap:4px">';
+      const levelNames = ['Nv.1','Nv.2','Nv.3','Nv.4','Nv.5','Nv.6','Nv.7','Nv.8','Nv.9'];
+      slots.forEach((s,i) => {
+        if(s > 0) slotHtml += '<span class="badge" style="background:var(--accent);color:#fff">' + levelNames[i] + ': x' + s + '</span>';
+      });
+      slotHtml += '</div></div>';
+      html += slotHtml;
+    }
+  }
+  
+  // Equipped items
+  if(state.equippedItems && (state.equippedItems.armor || state.equippedItems.weapon)){
+    let eqHtml = '<div class="sheet"><h2>Equipado</h2><div style="font-size:12px">';
+    if(state.equippedItems.weapon) eqHtml += '<div>🔪 ' + state.equippedItems.weapon + '</div>';
+    if(state.equippedItems.armor) eqHtml += '<div>🛡️ ' + state.equippedItems.armor + '</div>';
+    eqHtml += '</div></div>';
+    html += eqHtml;
+  }
+  
+  // Racial traits
+  if(race && race.rasgos && race.rasgos.length){
+    html += '<div class="sheet"><h2>Rasgos Raciales</h2>';
+    race.rasgos.forEach(t => {
+      html += '<div style="margin-bottom:6px"><strong style="color:var(--accent);font-size:12px">' + t.nombre + '</strong><p style="font-size:11px;color:var(--text-dim);margin-top:2px">' + (t.descripcion||'') + '</p></div>';
+    });
+    html += '</div>';
+  }
+  // Subrace traits
+  if(subraceName && D.subraces){
+    const srData = D.subraces.find(s => s.nombre === subraceName);
+    if(srData && srData.rasgos && srData.rasgos.length){
+      html += '<div class="sheet"><h2>Rasgos de ' + subraceName + '</h2>';
+      srData.rasgos.forEach(t => {
+        html += '<div style="margin-bottom:6px"><strong style="color:var(--accent);font-size:12px">' + t.nombre + '</strong><p style="font-size:11px;color:var(--text-dim);margin-top:2px">' + (t.descripcion||'') + '</p></div>';
+      });
+      html += '</div>';
+    }
+  }
+  
+  // Save character
+  state.character = {name,level,race:raceName,subrace:subraceName,class:className,bg:bgName,scores,mods,hp,equipment:state.equippedItems};
+  try { localStorage.setItem('dnd_last_char', JSON.stringify(state.character)); } catch(e){}
+  
+  charOutput.innerHTML = html;
+  charOutput.classList.remove('hidden');
+  charForm.querySelector('#generate-btn').textContent = 'Regenerar Personaje';
+});
+
+// ---- Dice ----
+function rollDice(count, sides){
+  const rolls = [];
+  for(let i=0;i<count;i++) rolls.push(Math.floor(Math.random()*sides)+1);
+  const total = rolls.reduce((s,v)=>s+v,0);
+  const numEl = $('dice-number');
+  const detailEl = $('dice-detail');
+  
+  if(numEl.classList.contains('roll-anim')){
+    numEl.classList.remove('roll-anim');
+    void numEl.offsetWidth;
+  }
+  numEl.textContent = total;
+  numEl.classList.add('roll-anim');
+  
+  if(count > 1){
+    detailEl.textContent = count + 'd' + sides + ' = [' + rolls.join(', ') + '] = ' + total;
+  } else {
+    detailEl.textContent = 'd' + sides + ' = ' + total;
+  }
+  
+  // History
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  state.history.unshift({
+    label: count + 'd' + sides,
+    total: total,
+    detail: '[' + rolls.join(', ') + ']',
+    time: timeStr
+  });
+  if(state.history.length > 10) state.history.pop();
+  renderHistory();
+}
+
+$('roll-custom-btn').addEventListener('click', function(){
+  const input = $('custom-roll').value.trim().toLowerCase();
+  if(!input) return;
+  // Parse simple pattern: NdX+Y or NdX-Y
+  const m = input.match(/^(\d+)?d(\d+)([+-]\d+)?$/);
+  if(!m){ alert('Formato: 2d20+4'); return; }
+  const count = parseInt(m[1]) || 1;
+  const sides = parseInt(m[2]);
+  const mod = parseInt(m[3]) || 0;
+  if(count < 1 || sides < 2 || isNaN(count) || isNaN(sides)){ alert('Tirada inválida.'); return; }
+  const rolls = [];
+  for(let i=0;i<count;i++) rolls.push(Math.floor(Math.random()*sides)+1);
+  const total = rolls.reduce((s,v)=>s+v,0) + mod;
+  const numEl = $('dice-number');
+  if(numEl.classList.contains('roll-anim')){
+    numEl.classList.remove('roll-anim');
+    void numEl.offsetWidth;
+  }
+  numEl.textContent = total;
+  numEl.classList.add('roll-anim');
+  let detail = count + 'd' + sides;
+  if(mod) detail += (mod>0?'+':'') + mod;
+  detail += ' = [' + rolls.join(', ') + ']';
+  if(mod) detail += ' + (' + (mod>=0?'+':'') + mod + ')';
+  detail += ' = ' + total;
+  $('dice-detail').textContent = detail;
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  state.history.unshift({
+    label: count + 'd' + sides + (mod?(mod>0?'+':'')+mod:''),
+    total: total,
+    detail: '[' + rolls.join(', ') + ']' + (mod?' '+(mod>=0?'+':'')+mod:''),
+    time: timeStr
+  });
+  if(state.history.length > 10) state.history.pop();
+  renderHistory();
+});
+
+function renderHistory(){
+  const el = $('roll-history');
+  if(!state.history.length){
+    el.innerHTML = '<div class="empty-state">Sin tiradas aún</div>';
+    return;
+  }
+  el.innerHTML = state.history.map(h => 
+    '<div class="history-item"><span><span class="roll">' + h.label + '</span> <span class="total">' + h.total + '</span> <span style="color:var(--text-dim)">' + h.detail + '</span></span><span class="time">' + h.time + '</span></div>'
+  ).join('');
+}
+
+// ---- Spells ----
+function renderSpells(){
+  const spells = D.spells || [];
+  const classFilter = $('spell-class-filter').value;
+  const levelFilter = $('spell-level-filter').value;
+  const schoolFilter = $('spell-school-filter').value;
+  const search = $('spell-search').value.trim().toLowerCase();
+  
+  let filtered = spells.filter(s => {
+    if(classFilter && (!s.classes || !s.classes.includes(classFilter))) return false;
+    if(levelFilter && s.level !== parseInt(levelFilter)) return false;
+    if(schoolFilter && s.school !== schoolFilter) return false;
+    if(search && !s.name.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  
+  const el = $('spell-list');
+  if(!filtered.length){
+    el.innerHTML = '<div class="empty-state">No se encontraron hechizos</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(s => {
+    const levelWord = s.level === 0 ? 'Truco' : (s.level === 1 ? 'Nivel 1' : 'Nivel '+s.level);
+    const schoolColor = s.school === 'Ilusión' ? '#b07cc9' : s.school === 'Nigromancia' ? '#6b8e6b' : s.school === 'Evocación' ? '#c97a3a' : s.school === 'Encantamiento' ? '#c97a9a' : s.school === 'Adivinación' ? '#7a9ac9' : s.school === 'Ablación' ? '#7ac9b0' : s.school === 'Transmutación' ? '#c9b07a' : s.school === 'Conjuración' ? '#7ac97a' : 'var(--text-dim)';
+    return '<div class="spell-card"><div class="spell-name">' + s.name + '</div><div class="spell-meta"><span>🔮 ' + levelWord + ' ' + s.school + '</span><span>⏱ ' + (s.castingTime||'—') + '</span><span>📏 ' + (s.range||'—') + '</span><span>⏳ ' + (s.duration||'—') + '</span></div><div class="spell-desc">' + (s.description||'') + '</div></div>';
+  }).join('');
+}
+
+$('spell-class-filter').addEventListener('change', renderSpells);
+$('spell-level-filter').addEventListener('change', renderSpells);
+$('spell-school-filter').addEventListener('change', renderSpells);
+$('spell-search').addEventListener('input', renderSpells);
+
+// ---- Equipment (defined below) ----
+
+// ---- Rules ----
+function renderRules(){
+  // Skills by ability
+  const skillData = D.skillsByAbility || {
+    'Fuerza': ['Atletismo'],
+    'Destreza': ['Acrobacias','Juego de Manos','Sigilo'],
+    'Constitución': [],
+    'Inteligencia': ['Arcano','Historia','Investigación','Naturaleza','Religión'],
+    'Sabiduría': ['Trato con Animales','Perspicacia','Medicina','Percepción','Supervivencia'],
+    'Carisma': ['Engaño','Intimidación','Interpretación','Persuasión']
+  };
+  const skillTable = $('skill-table').querySelector('tbody');
+  skillTable.innerHTML = Object.entries(skillData).map(([abil, skills]) => 
+    '<tr><td style="font-weight:bold;color:var(--accent)">' + abil + '</td><td>' + (skills.length ? skills.join(', ') : '—') + '</td></tr>'
+  ).join('');
+  
+  // Modifiers
+  const modTable = $('mod-table').querySelector('tbody');
+  let modRows = '';
+  for(let i=1;i<=30;i++){
+    const mod = Math.floor((i-10)/2);
+    modRows += '<tr><td>' + i + '</td><td>' + (mod>=0?'+':'') + mod + '</td></tr>';
+  }
+  modTable.innerHTML = modRows;
+  
+  // AC table
+  const acItems = (D.equipo && D.equipo.armaduras) || [];
+  const acTable = $('ac-table').querySelector('tbody');
+  acTable.innerHTML = acItems.map(a => {
+    const acStr = a.tipo === 'Escudo' ? '+' + a.ca : a.ca + ' ' + (a.tipo==='Ligera'?'+DES': a.tipo==='Media'?'+DES (máx 2)':'');
+    return '<tr><td>' + a.nombre + '</td><td>' + acStr + '</td></tr>';
+  }).join('');
+  
+  // Conditions
+  const conditions = D.conditions || [
+    {name:'Cegado', desc:'No puede ver. Las tiradas de ataque contra la criatura tienen ventaja, y la criatura tiene desventaja en sus tiradas de ataque.'},
+    {name:'Encantado', desc:'No puede atacar al encantador ni atacarlo con sus características o efectos. El encantador tiene ventaja en habilidades sociales.'},
+    {name:'Ensordecido', desc:'No puede oír. Falla automáticamente cualquier prueba de habilidad que requiera oír.'},
+    {name:'Asustado', desc:'Tiene desventaja en pruebas de habilidad y tiradas de ataque mientras la fuente del miedo esté en línea de visión.'},
+    {name:'Agarrado', desc:'Su velocidad es 0. No puede beneficiarse de bonos de velocidad.'},
+    {name:'Incapacitado', desc:'No puede realizar acciones ni reacciones.'},
+    {name:'Invisible', desc:'No puede ser visto sin ayuda mágica. Tiene ventaja en ataques. Los ataques contra él tienen desventaja.'},
+    {name:'Paralizado', desc:'No puede moverse ni actuar. Los ataques cuerpo a cuerpo son críticos automáticos si están a 5 pies.'},
+    {name:'Petrificado', desc:'Transformado en piedra. No puede moverse ni actuar. Resistencia al daño. Inmune al veneno y enfermedad.'},
+    {name:'Envenenado', desc:'Tiene desventaja en todas las tiradas de ataque y pruebas de habilidad.'},
+    {name:'Derribado', desc:'Los ataques cuerpo a cuerpo tienen ventaja. Los ataques a distancia tienen desventaja. Debe gastar movimiento para levantarse.'},
+    {name:'Apresado', desc:'Su velocidad es 0. No puede teletransportarse ni viajar a otros planos.'},
+    {name:'Aturdido', desc:'No puede moverse ni actuar. Falla automáticamente las TS de FUE y DES. Ventaja en ataques contra él.'},
+    {name:'Inconsciente', desc:'No puede moverse ni actuar. Deja caer lo que sostiene. Falla automáticamente TS de FUE y DES. Ventaja en ataques contra él. Acierto automático si está a 5 pies.'},
+    {name:'Agotamiento', desc:'Nivel 1: desventaja en pruebas de habilidad. Nivel 2: velocidad reducida a la mitad. Nivel 3: desventaja en TS y ataques. Nivel 4: PG máximos reducidos a la mitad. Nivel 5: velocidad 0. Nivel 6: muerte.'},
+  ];
+  const condEl = $('condition-list');
+  condEl.innerHTML = conditions.map(c => '<div class="condition-item"><strong>' + c.name + '</strong><p>' + c.desc + '</p></div>').join('');
+}
+renderRules();
+
+// (Tab handler moved below)
+
+  // ---- Character Save/Load ----
+  function updateLoadList(){
+    const sel = $('load-char-select');
+    const current = sel.value;
+    sel.innerHTML = '<option value="">— Cargar personaje —</option>';
+    try {
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('dnd_char_'));
+      keys.sort().forEach(k => {
+        const o = document.createElement('option');
+        o.value = k;
+        o.textContent = k.replace('dnd_char_','');
+        sel.appendChild(o);
+      });
+    } catch(e){}
+    if(current && [...sel.options].some(o => o.value === current)) sel.value = current;
+  }
+  
+  $('save-char-btn').addEventListener('click', function(){
+    const name = $('char-name').value.trim() || 'Sin nombre';
+    if(!state.character){ alert('Primero genera un personaje.'); return; }
+    const key = 'dnd_char_' + name;
+    try {
+      localStorage.setItem(key, JSON.stringify(state.character));
+      updateLoadList();
+      alert('Personaje "' + name + '" guardado.');
+    } catch(e){ alert('Error al guardar.'); }
+  });
+  
+  $('load-char-select').addEventListener('change', function(){
+    if(!this.value) return;
+    try {
+      const data = JSON.parse(localStorage.getItem(this.value));
+      if(!data) return;
+      // Restore form
+      $('char-name').value = data.name || '';
+      raceSel.value = data.race || '';
+      raceSel.dispatchEvent(new Event('change'));
+      if(data.subrace) { subraceSel.value = data.subrace; }
+      classSel.value = data.class || '';
+      classSel.dispatchEvent(new Event('change'));
+      bgSel.value = data.bg || '';
+      // Restore scores in state
+      if(data.scores){
+        state.assigned = {};
+        const abilsShort = ['FUE','DES','CON','INT','SAB','CAR'];
+        abilsShort.forEach(a => {
+          if(data.scores[a] !== undefined) state.assigned[a] = data.scores[a];
+        });
+        state.rolledScores = abilsShort.map(a => data.scores[a] || 10);
+        renderStatGrid(state.rolledScores);
+        assignSection.style.display = 'block';
+        renderAssignGrid();
+      }
+      // Trigger generate
+      generateBtn.click();
+    } catch(e){ alert('Error al cargar personaje.'); }
+  });
+  
+  $('delete-char-btn').addEventListener('click', function(){
+    const name = $('load-char-select').value;
+    if(!name){ alert('Selecciona un personaje para eliminar.'); return; }
+    if(!confirm('Eliminar "' + name.replace('dnd_char_','') + '"?')) return;
+    try {
+      localStorage.removeItem(name);
+      updateLoadList();
+      alert('Eliminado.');
+    } catch(e){}
+  });
+  
+  // ---- Bestiary ----
+  function renderMonsters(){
+    const monsters = D.bestiario || [];
+    const crFilter = $('monster-cr-filter').value;
+    const search = $('monster-search').value.trim().toLowerCase();
+    
+    let filtered = monsters.filter(m => {
+      if(crFilter && m.cr !== crFilter) return false;
+      if(search && !m.nombre.toLowerCase().includes(search)) return false;
+      return true;
+    });
+    
+    const el = $('monster-list');
+    if(!filtered.length){
+      el.innerHTML = '<div class="empty-state">No se encontraron monstruos</div>';
+      return;
+    }
+    
+    el.innerHTML = filtered.map(m => {
+      const abils = ['FUE','DES','CON','INT','SAB','CAR'];
+      const statVals = [m.fuer||10, m.des||10, m.con||10, m.int||10, m.sab||10, m.car||10];
+      const statRow = abils.map((a,i) => {
+        const mod = Math.floor((statVals[i]-10)/2);
+        return a + ' ' + statVals[i] + ' (' + (mod>=0?'+':'') + mod + ')';
+      }).join(' | ');
+      
+      const skillsHtml = m.habilidades && Object.keys(m.habilidades).length ? 
+        Object.entries(m.habilidades).map(([s,v]) => '<span class="spell-tag">' + s + ' ' + v + '</span>').join('') : '';
+      
+      const actionsHtml = (m.acciones||[]).map(a => 
+        '<div style="font-size:11px;margin:2px 0"><strong style="color:var(--accent)">' + a.nombre + '.</strong> ' + a.desc + '</div>'
+      ).join('');
+      
+      const traitsHtml = (m.rasgos||[]).map(t => 
+        '<div style="font-size:11px;margin:2px 0"><strong>' + t.nombre + '.</strong> ' + t.desc + '</div>'
+      ).join('');
+      
+      return '<div class="spell-card"><div class="spell-name">' + m.nombre + ' <span style="font-size:11px;color:var(--text-dim);font-weight:normal">CR ' + m.cr + ' · ' + (m.tamaño||'') + ' ' + (m.tipo||'') + '</span></div>' +
+        '<div class="spell-meta"><span>CA ' + m.ca + '</span><span>PG ' + m.pg + '</span><span>Vel ' + (m.velocidad||'—') + '</span></div>' +
+        '<div style="font-size:10px;color:var(--text-dim);margin:4px 0">' + statRow + '</div>' +
+        (skillsHtml ? '<div style="margin:2px 0">' + skillsHtml + '</div>' : '') +
+        (traitsHtml ? '<div style="margin:4px 0;border-top:1px solid var(--bg3);padding-top:4px">' + traitsHtml + '</div>' : '') +
+        (actionsHtml ? '<div style="margin:4px 0;border-top:1px solid var(--bg3);padding-top:4px"><strong style="font-size:11px;color:var(--accent)">Acciones</strong>' + actionsHtml + '</div>' : '') +
+        '</div>';
+    }).join('');
+  }
+  
+  // Init monster CR filter
+  (function(){
+    const crs = new Set();
+    (D.bestiario||[]).forEach(m => crs.add(m.cr));
+    const crFilter = $('monster-cr-filter');
+    [...crs].sort().forEach(cr => {
+      const o = document.createElement('option');
+      o.value = cr;
+      o.textContent = 'CR ' + cr;
+      crFilter.appendChild(o);
+    });
+  })();
+  
+  $('monster-cr-filter').addEventListener('change', renderMonsters);
+  $('monster-search').addEventListener('input', renderMonsters);
+  
+  // ---- Advantage/Disadvantage ----
+  $('roll-adv-btn').addEventListener('click', function(){
+    const r1 = Math.floor(Math.random()*20)+1;
+    const r2 = Math.floor(Math.random()*20)+1;
+    const best = Math.max(r1, r2);
+    const numEl = $('dice-number');
+    if(numEl.classList.contains('roll-anim')){ numEl.classList.remove('roll-anim'); void numEl.offsetWidth; }
+    numEl.textContent = best;
+    numEl.classList.add('roll-anim');
+    $('dice-detail').textContent = 'Ventaja: [' + r1 + ', ' + r2 + '] = ' + best;
+    const now = new Date();
+    const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    state.history.unshift({label:'Ventaja', total:best, detail:'[' + r1 + ', ' + r2 + ']', time:timeStr});
+    if(state.history.length > 10) state.history.pop();
+    renderHistory();
+  });
+  
+  $('roll-disadv-btn').addEventListener('click', function(){
+    const r1 = Math.floor(Math.random()*20)+1;
+    const r2 = Math.floor(Math.random()*20)+1;
+    const worst = Math.min(r1, r2);
+    const numEl = $('dice-number');
+    if(numEl.classList.contains('roll-anim')){ numEl.classList.remove('roll-anim'); void numEl.offsetWidth; }
+    numEl.textContent = worst;
+    numEl.classList.add('roll-anim');
+    $('dice-detail').textContent = 'Desventaja: [' + r1 + ', ' + r2 + '] = ' + worst;
+    const now = new Date();
+    const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    state.history.unshift({label:'Desventaja', total:worst, detail:'[' + r1 + ', ' + r2 + ']', time:timeStr});
+    if(state.history.length > 10) state.history.pop();
+    renderHistory();
+  });
+  
+  // ---- Add equip buttons to equipment tab ----
+  var renderEquipment = function(){
+    const equip = D.equipo || {};
+    const cat = $('equip-category').value;
+    const search = $('equip-search').value.trim().toLowerCase();
+    let items = [];
+    if(!cat || cat === 'armas_simples') (equip.armas_simples||[]).forEach(i => items.push({...i, _cat:'Arma Simple'}));
+    if(!cat || cat === 'armas_marciales') (equip.armas_marciales||[]).forEach(i => items.push({...i, _cat:'Arma Marcial'}));
+    if(!cat || cat === 'armaduras') (equip.armaduras||[]).forEach(i => items.push({...i, _cat:'Armadura'}));
+    if(!cat || cat === 'equipo_aventurero') (equip.equipo_aventurero||[]).forEach(i => items.push({...i, _cat:'Equipo'}));
+    
+    if(search) items = items.filter(i => (i.nombre||'').toLowerCase().includes(search));
+    
+    const el = $('equip-list');
+    if(!items.length){
+      el.innerHTML = '<div class="empty-state">Sin equipo</div>';
+      return;
+    }
+    el.innerHTML = items.map(i => {
+      let detail = '';
+      if(i.daño) detail += '<span class="spell-tag">' + i.daño + ' ' + (i.tipo||'') + '</span>';
+      if(i.ca) detail += '<span class="spell-tag">CA ' + i.ca + '</span>';
+      if(i.propiedades) detail += '<span class="spell-tag">' + i.propiedades + '</span>';
+      if(i.precio) detail += '<span class="spell-tag" style="color:var(--accent)">' + i.precio + '</span>';
+      const canEquip = (i._cat === 'Arma Simple' || i._cat === 'Arma Marcial' || i._cat === 'Armadura');
+      const isEquipped = state.equippedItems && (state.equippedItems.weapon === i.nombre || state.equippedItems.armor === i.nombre || state.equippedItems.shield === i.nombre);
+      const equipBtn = canEquip ? '<button class="btn btn-sm equip-btn" style="margin-left:8px" data-name="' + i.nombre + '" data-cat="' + i._cat + '">' + (isEquipped ? '✓' : 'Equipar') + '</button>' : '';
+      return '<div class="spell-card"><div class="spell-name">' + (i.nombre||'') + equipBtn + '</div><div class="spell-meta"><span>' + i._cat + '</span>' + detail + '</div></div>';
+    }).join('');
+    
+    // Add equip event listeners
+    el.querySelectorAll('.equip-btn').forEach(btn => {
+      btn.addEventListener('click', function(){
+        const name = this.dataset.name;
+        const cat = this.dataset.cat;
+        if(!state.character){ alert('Primero genera un personaje.'); return; }
+        if(!state.equippedItems) state.equippedItems = {armor: null, weapon: null, shield: null};
+        if(cat === 'Armadura'){
+          if(name.indexOf('Escudo') !== -1){
+            state.equippedItems.shield = (state.equippedItems.shield === name) ? null : name;
+          } else {
+            if(state.equippedItems.armor) alert('Armadura cambiada: ' + state.equippedItems.armor + ' → ' + name);
+            state.equippedItems.armor = (state.equippedItems.armor === name) ? null : name;
+          }
+        } else {
+          state.equippedItems.weapon = (state.equippedItems.weapon === name) ? null : name;
+        }
+        renderEquipment();
+        // Regenerate character display
+        if(state.character) generateBtn.click();
+      });
+    });
+  };
+  
+  // Re-bind equipment filter listeners to new renderEquipment
+  $('equip-category').addEventListener('change', renderEquipment);
+  $('equip-search').addEventListener('input', renderEquipment);
+  
+  // ---- Update tabs handler for Bestiary ----
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      $('tab-'+this.dataset.tab).classList.add('active');
+      if(this.dataset.tab === 'hechizos') renderSpells();
+      if(this.dataset.tab === 'equipo') renderEquipment();
+      if(this.dataset.tab === 'bestiario') renderMonsters();
+    });
+  });
+  
+  // ---- Init ----
+  initSelects();
+  // Init stat assign
+  $('stat-method').value = '4d6';
+  $('roll-stats-btn').click();
+  // Init history
+  renderHistory();
+  // Init save/load list
+  updateLoadList();
+  // Init equipped state
+state.equippedItems = {armor: null, weapon: null, shield: null};
+
+// ===== GAME ENGINE =====
+(function(){
+  // ---- Game State ----
+  const game = {
+    state: 'menu',
+    scene: null,
+    player: null,
+    combat: null,
+    narrator: [],
+    gold: 0,
+    inventory: [],
+    xp: 0,
+    turnIndex: 0,
+    lastCheck: null
+  };
+
+  // ---- Utility Functions ----
+  function rand(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+  function randArr(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function randArrWeighted(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function d20(){ return rand(1,20); }
+  function parseDice(str){
+    if(!str) return 0;
+    const m = str.match(/(\d+)d(\d+)/);
+    if(!m) return 0;
+    let total = 0;
+    for(let i=0;i<parseInt(m[1]);i++) total += rand(1,parseInt(m[2]));
+    return total;
+  }
+  function getMod(score){ return Math.floor((score-10)/2); }
+  function modStr(mod){ return (mod>=0?'+':'')+mod; }
+
+  // ---- Narrator ----
+  function narrate(text, type){
+    game.narrator.push({text:text, type:type||'explore'});
+    renderNarrator();
+  }
+  function narrateRandom(pool, type){
+    narrate(randArr(D.narrador[pool]||['El destino te guía...']), type);
+  }
+
+  // ---- Player Setup ----
+  function setupPlayer(char){
+    game.player = {
+      name: char.name,
+      level: char.level,
+      race: char.race,
+      subrace: char.subrace,
+      class: char.class,
+      scores: char.scores,
+      mods: char.mods,
+      maxHp: char.hp,
+      hp: char.hp,
+      ac: 10 + (char.mods['DES']||0),
+      proficiency: Math.ceil(char.level/4)+1,
+      initiative: char.mods['DES']||0,
+      weapon: state.equippedItems && state.equippedItems.weapon ? state.equippedItems.weapon : null,
+      armor: state.equippedItems && state.equippedItems.armor ? state.equippedItems.armor : null,
+      shield: state.equippedItems && state.equippedItems.shield ? state.equippedItems.shield : null,
+      actions: [],
+      reactions: []
+    };
+    // Calculate AC with armor
+    const armorList = (D.equipo && D.equipo.armaduras) || [];
+    if(game.player.armor){
+      const armor = armorList.find(a => a.nombre === game.player.armor);
+      if(armor){
+        if(armor.tipo === 'Ligera'){ game.player.ac = armor.ca + (game.player.mods['DES']||0); }
+        else if(armor.tipo === 'Media'){ game.player.ac = armor.ca + Math.min(game.player.mods['DES']||0, 2); }
+        else if(armor.tipo === 'Pesada'){ game.player.ac = armor.ca; }
+      }
+    }
+    if(game.player.shield) game.player.ac += 2;
+    game.gold = 0;
+    game.inventory = [];
+    game.xp = 0;
+  }
+
+  // ---- Weapon Helper ----
+  function getWeaponData(name){
+    if(!name) return null;
+    const allWeapons = [].concat(
+      (D.equipo && D.equipo.armas_simples)||[],
+      (D.equipo && D.equipo.armas_marciales)||[]
+    );
+    return allWeapons.find(w => w.nombre === name) || null;
+  }
+  function getWeaponDamage(weapon){
+    if(!weapon) return '1d4';
+    const wpn = getWeaponData(weapon);
+    if(!wpn || !wpn.daño) return '1d4';
+    return wpn.daño;
+  }
+  function getWeaponType(weapon){
+    const wpn = getWeaponData(weapon);
+    return wpn ? (wpn.tipo||'') : '';
+  }
+  function getAttackBonus(){
+    const wpn = getWeaponData(game.player.weapon);
+    if(!wpn) return game.player.mods['DES']||0;
+    const isFinesse = wpn.propiedades && wpn.propiedades.indexOf('Finesse') !== -1;
+    const isRange = wpn.tipo === 'Perforante' && (wpn.propiedades||'').indexOf('Cerca') !== -1;
+    if(isFinesse) return Math.max(game.player.mods['FUE']||0, game.player.mods['DES']||0) + game.player.proficiency;
+    if(isRange) return (game.player.mods['DES']||0) + game.player.proficiency;
+    return (game.player.mods['FUE']||0) + game.player.proficiency;
+  }
+
+  // ---- Monster Helper ----
+  function getMonsterData(name){
+    return (D.bestiario||[]).find(m => m.nombre === name) || null;
+  }
+  function parseMonsterHP(pgStr){
+    if(!pgStr) return 10;
+    const m = pgStr.match(/(\d+)/);
+    return m ? parseInt(m[1]) : 10;
+  }
+  function getMonsterAttackBonus(monster){
+    // Parse from acciones
+    const acciones = monster.acciones || [];
+    if(acciones.length === 0) return 0;
+    // Look for +N in action descriptions
+    for(let i=0;i<acciones.length;i++){
+      const m = acciones[i].desc.match(/\+(\d+)\s*a\s*golpear/);
+      if(m) return parseInt(m[1]);
+    }
+    return 0;
+  }
+  function getMonsterDamage(monster){
+    const acciones = monster.acciones || [];
+    for(let i=0;i<acciones.length;i++){
+      const m = acciones[i].desc.match(/(\d+d\d+)/);
+      if(m) return m[1];
+    }
+    return '1d6';
+  }
+
+  // ---- Game UI ----
+  function renderNarrator(){
+    const el = $('narrator-text');
+    if(!el) return;
+    el.innerHTML = game.narrator.map(n => 
+      '<div class="narrator-entry ' + (n.type||'explore') + '">' +
+      '<span class="type-tag">' + (n.type||'info') + '</span>' +
+      n.text +
+      '</div>'
+    ).join('');
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function updateStatusBar(){
+    $('status-hp').textContent = game.player.hp + '/' + game.player.maxHp;
+    $('status-level').textContent = game.player.level;
+    $('status-xp').textContent = game.xp;
+    $('status-gold').textContent = game.gold;
+  }
+
+  function setLocation(name){
+    $('game-location').textContent = name;
+  }
+
+  // ---- Game Flow ----
+  function startGame(){
+    const char = state.character;
+    if(!char){
+      alert('Primero genera un personaje en la pestaña Personaje.');
+      return;
+    }
+    setupPlayer(char);
+    game.state = 'explore';
+    game.scene = 'entrada_mazmorda';
+    game.narrator = [];
+    game.gold = 0;
+    game.inventory = [];
+    game.xp = 0;
+    game.combat = null;
+    game.turnIndex = 0;
+    $('game-menu').classList.add('hidden');
+    $('game-view').classList.remove('hidden');
+    narrate('Te adentras en la cripta. El aire es frío y húmedo. Las sombras cobran vida en la penumbra.', 'explore');
+    narrateRandom('ambiente_mazmorra', 'explore');
+    enterScene('entrada_mazmorda');
+  }
+
+  function enterScene(sceneId){
+    const scene = D.escenas[sceneId];
+    if(!scene){ narrate('No hay nada más que explorar aquí.', 'explore'); return; }
+    game.scene = sceneId;
+    setLocation(scene.nombre);
+    narrate(scene.desc, 'explore');
+    // Random encounter check
+    if(scene.encuentro && Math.random() < scene.encuentro.probabilidad){
+      startCombat(scene.encuentro.monstruos);
+      return;
+    }
+    renderActions(scene);
+  }
+
+  function renderActions(scene){
+    const el = $('action-buttons');
+    el.innerHTML = '';
+    if(game.state === 'combat' && game.combat){
+      renderCombatActions();
+      return;
+    }
+    // Exploration actions
+    const container = document.createElement('div');
+    container.className = 'action-grid';
+    scene.opciones.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'action-btn';
+      btn.innerHTML = '<span class="action-icon">▶</span><span class="action-label">' + opt.texto + '</span>';
+      btn.onclick = function(){ handleChoice(opt, scene); };
+      container.appendChild(btn);
+    });
+    el.appendChild(container);
+  }
+
+  function handleChoice(opt, scene){
+    // Check skill check
+    if(opt.checks && opt.checks.habilidad && opt.checks.cd){
+      const skillMap = {'Fuerza':'FUE','Destreza':'DES','Constitución':'CON','Inteligencia':'INT','Sabiduría':'SAB','Carisma':'CAR'};
+      const abilKey = skillMap[opt.checks.habilidad] || 'DES';
+      const roll = d20();
+      const mod = game.player.mods[abilKey] || 0;
+      const total = roll + mod;
+      const success = total >= opt.checks.cd;
+      if(success){
+        narrate('(' + opt.checks.habilidad + ' ' + (roll+mod) + ' vs CD ' + opt.checks.cd + ') ' + opt.desc, 'explore');
+        narrateRandom('exploracion_exito', 'explore');
+      } else {
+        narrate('(' + opt.checks.habilidad + ' ' + (roll+mod) + ' vs CD ' + opt.checks.cd + ') Fallaste. ' + (opt.checks.fallo || 'No logras nada.'), 'explore');
+        narrateRandom('exploracion_fracaso', 'explore');
+      }
+    } else {
+      narrate(opt.desc, 'explore');
+    }
+    // Apply treasure
+    if(opt.resultado === scene.nombre.replace(/ /g,'_').toLowerCase()){
+      // Same scene, just narrate
+    }
+    // Move to next scene
+    if(D.escenas[opt.resultado]){
+      // Random event chance
+      if(Math.random() < 0.15){
+        narrateRandom('evento_aleatorio', 'explore');
+      }
+      enterScene(opt.resultado);
+    } else if(opt.resultado === scene.sceneId || !D.escenas[opt.resultado]){
+      // Stay in same scene
+      renderActions(scene);
+    }
+  }
+
+  // ---- Combat System ----
+  function startCombat(monsterDefs){
+    game.state = 'combat';
+    game.combat = {
+      enemies: [],
+      initiative: [],
+      round: 1
+    };
+    // Create enemy instances
+    monsterDefs.forEach(def => {
+      for(let i=0;i<def.cantidad;i++){
+        const mData = getMonsterData(def.nombre);
+        if(mData){
+          game.combat.enemies.push({
+            name: def.nombre,
+            data: mData,
+            hp: parseMonsterHP(mData.pg),
+            maxHp: parseMonsterHP(mData.pg),
+            ac: mData.ca,
+            attackBonus: getMonsterAttackBonus(mData),
+            damage: getMonsterDamage(mData),
+            isDead: false
+          });
+        }
+      }
+    });
+    // Roll initiative
+    const initOrder = [];
+    initOrder.push({name: game.player.name, type:'player', init: d20()+game.player.initiative, isDead:false});
+    game.combat.enemies.forEach((e,i) => {
+      initOrder.push({name: e.name, type:'enemy', index:i, init: d20()+getMod(e.data.des||10), isDead:false});
+    });
+    initOrder.sort((a,b) => b.init - a.init);
+    game.combat.initiative = initOrder;
+    game.turnIndex = 0;
+    // Show combat UI
+    $('combat-tracker').classList.remove('hidden');
+    $('enemies-panel').classList.remove('hidden');
+    narrateRandom('combate_inicio', 'combat');
+    renderCombatTracker();
+    renderEnemies();
+    renderActions(null);
+    updateStatusBar();
+  }
+
+  function renderCombatTracker(){
+    const el = $('initiative-list');
+    el.innerHTML = game.combat.initiative.map((entry, i) => {
+      const isCurrent = i === game.turnIndex;
+      const cls = entry.type === 'player' ? 'player' : '';
+      const currentCls = isCurrent ? ' current' : '';
+      let hpHtml = '';
+      if(entry.type === 'enemy' && !entry.isDead){
+        const enemy = game.combat.enemies[entry.index];
+        hpHtml = '<span class="initiative-hp">[' + enemy.hp + '/' + enemy.maxHp + ']</span>';
+      }
+      return '<div class="initiative-entry' + cls + currentCls + '">' +
+        '<span class="initiative-name">' + entry.name + '</span>' +
+        hpHtml +
+        '<span class="initiative-badge">' + entry.init + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  function renderEnemies(){
+    const el = $('enemies-list');
+    el.innerHTML = game.combat.enemies.map(e => {
+      const pct = (e.hp / e.maxHp) * 100;
+      const deadCls = e.isDead ? ' dead' : '';
+      return '<div class="enemy-card' + deadCls + '">' +
+        '<div class="enemy-name">' + e.name + '</div>' +
+        '<div class="enemy-stats">CA ' + e.ac + ' · PG ' + e.maxHp + '</div>' +
+        '<div class="enemy-hp-bar"><div class="enemy-hp-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="enemy-hp-text">' + e.hp + '/' + e.maxHp + '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function renderCombatActions(){
+    const el = $('action-buttons');
+    const container = document.createElement('div');
+    container.className = 'action-grid';
+    // Attack
+    const attackBtn = document.createElement('button');
+    attackBtn.className = 'action-btn primary';
+    attackBtn.innerHTML = '<span class="action-icon">⚔️</span><span class="action-label">Atacar</span>';
+    attackBtn.onclick = playerAttack;
+    container.appendChild(attackBtn);
+    // Defend
+    const defendBtn = document.createElement('button');
+    defendBtn.className = 'action-btn';
+    defendBtn.innerHTML = '<span class="action-icon">🛡️</span><span class="action-label">Defender</span>';
+    defendBtn.onclick = playerDefend;
+    container.appendChild(defendBtn);
+    // Use Item
+    const itemBtn = document.createElement('button');
+    itemBtn.className = 'action-btn';
+    itemBtn.innerHTML = '<span class="action-icon">🧪</span><span class="action-label">Objeto</span>';
+    itemBtn.onclick = playerUseItem;
+    itemBtn.disabled = game.inventory.filter(i => i.type === 'potion').length === 0;
+    container.appendChild(itemBtn);
+    // Flee
+    const fleeBtn = document.createElement('button');
+    fleeBtn.className = 'action-btn danger';
+    fleeBtn.innerHTML = '<span class="action-icon">🏃</span><span class="action-label">Huir</span>';
+    fleeBtn.onclick = playerFlee;
+    container.appendChild(fleeBtn);
+    el.innerHTML = '';
+    el.appendChild(container);
+  }
+
+  function playerAttack(){
+    if(!game.combat) return;
+    const roll = d20();
+    const bonus = getAttackBonus();
+    const total = roll + bonus;
+    const isCrit = roll === 20;
+    // Target first alive enemy
+    const target = game.combat.enemies.find(e => !e.isDead);
+    if(!target){ narrate('No hay enemigos para atacar.', 'combat'); return; }
+    if(isCrit){
+      narrateRandom('combate_golpe_critico', 'combat');
+    } else if(total >= target.ac){
+      narrateRandom('combate_golpe_acertado', 'combat');
+    } else {
+      narrateRandom('combate_golpe_fallido', 'combat');
+      endPlayerTurn();
+      return;
+    }
+    // Calculate damage
+    let damage = parseDice(getWeaponDamage(game.player.weapon));
+    if(isCrit) damage *= 2;
+    target.hp -= damage;
+    narrate(' (' + total + ' vs CA ' + target.ac + ') Causaste ' + damage + ' puntos de daño.', 'combat');
+    if(target.hp <= 0){
+      target.isDead = true;
+      narrateRandom('combate_muerte', 'combat');
+      game.xp += parseInt(target.data.cr.replace('/','')) * 10 || 10;
+      checkCombatEnd();
+      return;
+    }
+    renderEnemies();
+    renderCombatTracker();
+    endPlayerTurn();
+  }
+
+  function playerDefend(){
+    narrate('Te pones en posición defensiva. Tu armadura reluce bajo la luz tenue.', 'combat');
+    game.player.actions.push({type:'defend', duration:1});
+    endPlayerTurn();
+  }
+
+  function playerUseItem(){
+    const potions = game.inventory.filter(i => i.type === 'potion');
+    if(potions.length === 0){ narrate('No tienes pociones.', 'combat'); return; }
+    const potion = potions[0];
+    game.inventory = game.inventory.filter(i => i !== potion);
+    const heal = parseDice('2d4+2');
+    game.player.hp = Math.min(game.player.maxHp, game.player.hp + heal);
+    narrate('Bebes la ' + potion.name + '. Recuperas ' + heal + ' puntos de golpe.', 'rest');
+    updateStatusBar();
+    endPlayerTurn();
+  }
+
+  function playerFlee(){
+    const roll = d20();
+    if(roll >= 10){
+      narrate('Logras huir del combate. La criatura no te detiene.', 'explore');
+      endCombat(false);
+    } else {
+      narrate('Intentas huir pero la criatura te alcanza. El combate continúa.', 'combat');
+      endPlayerTurn();
+    }
+  }
+
+  function endPlayerTurn(){
+    // Enemy turn
+    enemyTurn();
+  }
+
+  function enemyTurn(){
+    const aliveEnemies = game.combat.enemies.filter(e => !e.isDead);
+    if(aliveEnemies.length === 0){ checkCombatEnd(); return; }
+    aliveEnemies.forEach(enemy => {
+      if(game.player.hp <= 0){ checkCombatEnd(); return; }
+      const roll = d20();
+      const total = roll + enemy.attackBonus;
+      if(total >= game.player.ac){
+        const damage = parseDice(enemy.damage);
+        game.player.hp -= damage;
+        narrate('El ' + enemy.name + ' te ataca. (' + total + ' vs CA ' + game.player.ac + ') Recibes ' + damage + ' puntos de daño.', 'combat');
+      } else {
+        narrate('El ' + enemy.name + ' falla su ataque.', 'combat');
+      }
+    });
+    renderCombatTracker();
+    updateStatusBar();
+    // Check if player died
+    if(game.player.hp <= 0){
+      narrate('Has caído en combate. Tus ojos se cierran sobre el mundo...', 'combat');
+      gameOver();
+      return;
+    }
+    // Advance turn
+    game.turnIndex = (game.turnIndex + 1) % game.combat.initiative.length;
+    // Skip dead enemies in initiative
+    while(game.combat.initiative[game.turnIndex] && game.combat.initiative[game.turnIndex].type === 'enemy' && game.combat.enemies[game.combat.initiative[game.turnIndex].index].isDead){
+      game.turnIndex = (game.turnIndex + 1) % game.combat.initiative.length;
+    }
+    renderCombatTracker();
+  }
+
+  function checkCombatEnd(){
+    const alive = game.combat.enemies.filter(e => !e.isDead);
+    if(alive.length === 0){
+      narrateRandom('combate_victoria', 'combat');
+      // Grant XP
+      const xpGain = 20;
+      game.xp += xpGain;
+      narrate('Ganas ' + xpGain + ' puntos de experiencia.', 'explore');
+      // Check for treasure
+      const scene = D.escenas[game.scene];
+      if(scene && scene.tesoro){
+        const gold = parseInt(scene.tesoro.oro) || 0;
+        game.gold += gold;
+        narrate('Encuentras ' + scene.tesoro.oro + ' en el suelo.', 'loot');
+        narrateRandom('tesoro_encontrado', 'loot');
+        if(scene.tesoro.objetos){
+          scene.tesoro.objetos.forEach(obj => {
+            game.inventory.push({name: obj, type: 'treasure'});
+            narrate('Añades "' + obj + '" a tu inventario.', 'loot');
+          });
+        }
+      }
+      endCombat(true);
+    }
+  }
+
+  function endCombat(victory){
+    game.state = 'explore';
+    game.combat = null;
+    $('combat-tracker').classList.add('hidden');
+    $('enemies-panel').classList.add('hidden');
+    updateStatusBar();
+    // Return to scene
+    const scene = D.escenas[game.scene];
+    if(scene){
+      renderActions(scene);
+    }
+  }
+
+  function gameOver(){
+    game.state = 'game_over';
+    game.combat = null;
+    $('combat-tracker').classList.add('hidden');
+    $('enemies-panel').classList.add('hidden');
+    narrate('La aventura ha terminado. Tu leyenda quedará en el olvido.', 'rest');
+    const el = $('action-buttons');
+    el.innerHTML = '<div class="action-grid"><button class="action-btn danger" id="btn-restart" style="grid-column:1/-1"><span class="action-icon">🔄</span><span class="action-label">Reintentar</span></button></div>';
+    $('btn-restart').onclick = function(){ goMenu(); };
+  }
+
+  function goMenu(){
+    game.state = 'menu';
+    game.scene = null;
+    game.combat = null;
+    game.narrator = [];
+    $('game-menu').classList.remove('hidden');
+    $('game-view').classList.add('hidden');
+    $('combat-tracker').classList.add('hidden');
+    $('enemies-panel').classList.add('hidden');
+    renderNarrator();
+  }
+
+  // ---- Event Listeners ----
+  $('btn-new-game').addEventListener('click', startGame);
+  $('btn-back-to-toolkit').addEventListener('click', goMenu);
+  $('btn-load-game').addEventListener('click', function(){
+    try {
+      const data = localStorage.getItem('dnd_last_char');
+      if(data){
+        state.character = JSON.parse(data);
+        startGame();
+      } else { alert('No hay personaje guardado.'); }
+    } catch(e){ alert('Error al cargar.'); }
+  });
+
+  // Update tab handler for game
+  const origTabHandler = document.querySelectorAll('.tab-btn');
+  origTabHandler.forEach(btn => {
+    btn.addEventListener('click', function(){
+      if(this.dataset.tab === 'jugar'){
+        $('game-menu').classList.remove('hidden');
+        $('game-view').classList.add('hidden');
+        $('combat-tracker').classList.add('hidden');
+        $('enemies-panel').classList.add('hidden');
+        game.state = 'menu';
+      }
+    });
+  });
+})();
+
+})();
+</script>
+</body>
+</html>
