@@ -1683,28 +1683,51 @@ renderRules();
   function getMod(score){ return Math.floor((score-10)/2); }
   function modStr(mod){ return (mod>=0?'+':'')+mod; }
 
+  // ---- TTS: find best natural voice ----
+  function findBestVoice(){
+    if(game.selectedVoice){
+      var match = window.speechSynthesis.getVoices().find(function(v){ return v.name === game.selectedVoice; });
+      if(match) return match;
+    }
+    var allVoices = window.speechSynthesis.getVoices();
+    if(!allVoices.length) return null;
+    // Spanish voices, prioritize Google/Microsoft neural
+    var es = allVoices.filter(function(v){ return v.lang && v.lang.indexOf('es') === 0; });
+    var best = es.find(function(v){ return /google|microsoft/i.test(v.name); })
+            || es.find(function(v){ return /neural|natural|premium/i.test(v.name); })
+            || es.find(function(v){ return /español|spanish|mexico|latino/i.test(v.name); })
+            || es[0];
+    // If no Spanish, try any neural/premium
+    if(!best) best = allVoices.find(function(v){ return /google|microsoft|neural/i.test(v.name); });
+    return best || allVoices[0] || null;
+  }
+
+  var _ttsId = 0;
   // ---- Narrator ----
   function speakText(text){
     if(!game.ttsEnabled) return;
-    if('speechSynthesis' in window){
-      window.speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance(text);
+    if(!('speechSynthesis' in window)) return;
+    if(!window.speechSynthesis.getVoices().length){
+      setTimeout(function(){ speakText(text); }, 300);
+      return;
+    }
+    window.speechSynthesis.cancel();
+    var myId = ++_ttsId;
+    var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    var idx = 0;
+    function speakNext(){
+      if(idx >= sentences.length || myId !== _ttsId) return;
+      var u = new SpeechSynthesisUtterance(sentences[idx].trim());
       u.lang = 'es-ES';
-      u.rate = 0.88;
-      u.pitch = 1.05;
+      u.rate = 0.8;
+      u.pitch = 1.15;
       u.volume = 1.0;
-      if(game.selectedVoice){
-        var allVoices = window.speechSynthesis.getVoices();
-        var match = allVoices.find(function(v){ return v.name === game.selectedVoice; });
-        if(match) u.voice = match;
-      }
-      if(!u.voice){
-        var allVoices = window.speechSynthesis.getVoices();
-        var esVoices = allVoices.filter(function(v){ return v.lang && v.lang.indexOf('es') === 0; });
-        u.voice = esVoices.find(function(v){ return v.name.indexOf('Google') >= 0; }) || esVoices[0] || null;
-      }
+      var voice = findBestVoice();
+      if(voice) u.voice = voice;
+      u.onend = function(){ idx++; setTimeout(function(){ speakNext(); }, 100); };
       window.speechSynthesis.speak(u);
     }
+    speakNext();
   }
 
   function populateVoiceList(){
@@ -1715,6 +1738,11 @@ renderRules();
     if(!allVoices.length){
       window.speechSynthesis.onvoiceschanged = function(){ populateVoiceList(); };
       return;
+    }
+    // Auto-select best voice if none selected
+    if(!game.selectedVoice){
+      var best = findBestVoice();
+      if(best) game.selectedVoice = best.name;
     }
     var cur = game.selectedVoice || '';
     sel.innerHTML = '<option value="">🎙️ Predeterminada</option>';
@@ -1905,12 +1933,13 @@ renderRules();
     game.dungeonDepth = 0;
     game.scenePools = null;
     game.ttsEnabled = true;
+    populateVoiceList();
     var ttsBtn = $('btn-tts');
     if(ttsBtn) ttsBtn.textContent = '🔊 Voz';
     $('game-menu').classList.add('hidden');
     $('game-view').classList.remove('hidden');
     narrate('Te encuentras en las afueras de una aldea. El viento trae el olor a hierba y hogueras. Una antigua cripta se alza en la colina cercana.', 'explore');
-    narrateRandom('ambiente_mazmorra', 'explore');
+    narrateRandom('ambiente_bosque', 'explore');
     enterScene('entrada_aldea');
   }
 
