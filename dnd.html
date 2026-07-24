@@ -2143,6 +2143,15 @@ renderRules();
       var xpReward = Math.floor(Math.random() * 30) + 10;
       game.xp += xpReward;
       narrate('Obtienes ' + goldReward + ' mo y ' + xpReward + ' XP del botín.', 'loot');
+      if(Math.random() < 0.3){
+        var tables = ['menor','pociones','menor','armas_magicas'];
+        var pick = D.tesoro[tables[Math.floor(Math.random() * tables.length)]];
+        if(pick && pick.length > 0){
+          var item = pick[Math.floor(Math.random() * pick.length)];
+          game.inventory.push(item.nombre);
+          narrate('¡Encuentras un objeto: ' + item.nombre + '! (' + (item.desc||'') + ')', 'loot');
+        }
+      }
       checkLevelUp();
     }
     updateStatusBar();
