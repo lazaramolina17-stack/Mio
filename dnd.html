@@ -345,14 +345,55 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   text-transform:uppercase;
   letter-spacing:1px;
 }
-.voice-select{
-  background:var(--bg);color:var(--text);border:1px solid var(--border);
-  font-family:inherit;font-size:10px;padding:2px 4px;
-  border-radius:3px;max-width:120px;margin:0 4px;
-  cursor:pointer;
+/* ---- Voice Panel ---- */
+.narrator-panel{position:relative}
+.voice-header-controls{display:flex;gap:4px;align-items:center;margin-left:auto}
+.btn-voice-toggle{
+  background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  font-size:16px;width:32px;height:28px;border-radius:4px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;flex-shrink:0;line-height:1;
 }
-.voice-select optgroup{color:var(--text-dim);background:var(--bg2)}
-.voice-select option{color:var(--text);background:var(--bg)}
+.btn-voice-toggle:hover{border-color:var(--accent);background:var(--bg2)}
+.btn-voice-toggle.active{border-color:var(--accent);background:rgba(200,164,78,0.15)}
+.voice-panel{
+  position:absolute;top:100%;left:0;right:0;z-index:50;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:0 0 6px 6px;max-height:260px;overflow-y:auto;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+.voice-panel::-webkit-scrollbar{width:4px}
+.voice-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.voice-panel .vp-header{
+  padding:8px 10px 6px;font-size:10px;color:var(--text-dim);
+  text-transform:uppercase;letter-spacing:1px;
+  border-bottom:1px solid var(--border);display:flex;justify-content:space-between;
+  position:sticky;top:0;background:var(--bg2);z-index:1;
+}
+.voice-panel .vp-count{color:var(--accent);font-weight:bold}
+.vp-item{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 10px;cursor:pointer;transition:background .12s;
+  border-bottom:1px solid var(--bg3);
+}
+.vp-item:last-child{border-bottom:none}
+.vp-item:hover{background:var(--bg3)}
+.vp-item.selected{background:rgba(200,164,78,0.12);border-left:3px solid var(--accent);padding-left:7px}
+.vp-item .vp-check{width:16px;text-align:center;flex-shrink:0;font-size:12px;color:var(--accent);opacity:0}
+.vp-item.selected .vp-check{opacity:1}
+.vp-item .vp-info{flex:1;min-width:0}
+.vp-item .vp-name{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vp-item .vp-lang{font-size:10px;color:var(--text-dim)}
+.vp-item .vp-badge{font-size:11px;flex-shrink:0}
+.vp-item .vp-test-btn{
+  font-size:10px;padding:2px 8px;background:var(--bg);
+  border:1px solid var(--border);color:var(--text-dim);
+  border-radius:3px;cursor:pointer;font-family:inherit;
+  transition:all .12s;flex-shrink:0;
+}
+.vp-item .vp-test-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--bg2)}
+.vp-empty{padding:20px;text-align:center;color:var(--text-dim);font-size:12px}
 .narrator-text{
   flex:1;
   overflow-y:auto;
@@ -635,6 +676,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   border:1px solid var(--border);border-radius:3px;cursor:pointer;
 }
 #btn-test-voice:hover{color:var(--accent);border-color:var(--accent)}
+#btn-debug-voices{font-size:10px;padding:1px 6px;background:var(--bg2);color:var(--text-dim);border:1px solid var(--border);border-radius:3px;cursor:pointer}
+#btn-debug-voices:hover{color:var(--accent);border-color:var(--accent)}
 
 @media(max-width:400px){
   .status-bar{grid-template-columns:repeat(2,1fr);gap:6px;padding:8px}
@@ -762,13 +805,17 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
              <div class="narrator-header">
               <span class="narrator-title">📜 Narrador</span>
               <span id="game-location" class="location-badge"></span>
-              <select id="voice-select" class="voice-select" title="Seleccionar voz"></select>
-              <button id="btn-tts" class="btn btn-sm" style="font-size:11px;padding:2px 8px" title="Activar/Desactivar voz">🔊 Voz</button>
+              <div class="voice-header-controls">
+                <button id="btn-voice-panel" class="btn-voice-toggle" title="Seleccionar voz">🎙️</button>
+                <button id="btn-tts" class="btn btn-sm" style="font-size:11px;padding:2px 8px" title="Activar/Desactivar voz">🔊 Voz</button>
+              </div>
             </div>
+            <div id="voice-panel" class="voice-panel hidden"></div>
             <div class="voice-controls">
-              <label>🐢<input type="range" id="voice-rate" min="0.3" max="1.5" step="0.05" value="0.8"></label>
-              <label>🎵<input type="range" id="voice-pitch" min="0.5" max="2.0" step="0.05" value="1.15"></label>
-              <button id="btn-test-voice" title="Probar voz">🔊 Probar</button>
+              <label>🐢<input type="range" id="voice-rate" min="0.5" max="1.3" step="0.05" value="0.9"></label>
+              <label>🎵<input type="range" id="voice-pitch" min="0.5" max="1.5" step="0.05" value="1.0"></label>
+               <button id="btn-test-voice" title="Probar voz">🔊 Probar</button>
+               <button id="btn-debug-voices" class="btn btn-sm" style="font-size:10px;padding:1px 6px;opacity:0.6" title="Ver voces disponibles en consola">🔍 Voces</button>
             </div>
             <div id="narrator-text" class="narrator-text"></div>
           </div>
@@ -1782,23 +1829,65 @@ renderRules();
   function getMod(score){ return Math.floor((score-10)/2); }
   function modStr(mod){ return (mod>=0?'+':'')+mod; }
 
+  // ---- TTS: voice state & debug ----
+  var _voiceReady = false;
+  var _ttsQueue = [];
+
+  function logVoiceDebug(msg){
+    var available = window.speechSynthesis.getVoices().map(function(v){
+      return v.name + ' (' + v.lang + ')';
+    }).join(', ');
+    console.log('[TTS] ' + msg + ' | Voces: ' + (available || '(ninguna)'));
+  }
+
   // ---- TTS: find best natural voice ----
   function findBestVoice(){
-    if(game.selectedVoice){
-      var match = window.speechSynthesis.getVoices().find(function(v){ return v.name === game.selectedVoice; });
-      if(match) return match;
-    }
     var allVoices = window.speechSynthesis.getVoices();
     if(!allVoices.length) return null;
-    // Spanish voices, prioritize Google/Microsoft neural
+    // If user selected a specific voice, try to find it
+    if(game.selectedVoice){
+      var match = allVoices.find(function(v){ return v.name === game.selectedVoice; });
+      if(match) return match;
+      game.selectedVoice = '';
+    }
+    // Spanish voices (all variants: es-ES, es-MX, es-US, es-AR, etc.)
     var es = allVoices.filter(function(v){ return v.lang && v.lang.indexOf('es') === 0; });
-    var best = es.find(function(v){ return /google|microsoft/i.test(v.name); })
-            || es.find(function(v){ return /neural|natural|premium/i.test(v.name); })
-            || es.find(function(v){ return /español|spanish|mexico|latino/i.test(v.name); })
-            || es[0];
-    // If no Spanish, try any neural/premium
+    var best =
+      // 1st: Google/Microsoft voices (best quality)
+      es.find(function(v){ return /google|microsoft/i.test(v.name); }) ||
+      // 2nd: any neural/natural/premium
+      es.find(function(v){ return /neural|natural|premium|high.?quality/i.test(v.name); }) ||
+      // 3rd: voices with explicit Spanish label
+      es.find(function(v){ return /español|spanish|mexico|latino|castellano/i.test(v.name); }) ||
+      // 4th: first Spanish voice available
+      es[0];
+    // If no Spanish voice at all, try any Google/Microsoft/neural voice in any language
     if(!best) best = allVoices.find(function(v){ return /google|microsoft|neural/i.test(v.name); });
+    // Last resort: first available voice
     return best || allVoices[0] || null;
+  }
+
+  // ---- Wait for voices to be ready ----
+  function waitVoices(callback){
+    var voices = window.speechSynthesis.getVoices();
+    if(voices.length){
+      _voiceReady = true;
+      callback();
+      return;
+    }
+    var handler = function(){
+      voices = window.speechSynthesis.getVoices();
+      if(voices.length){
+        _voiceReady = true;
+        window.speechSynthesis.onvoiceschanged = null;
+        callback();
+        // Flush any queued speech
+        while(_ttsQueue.length) speakText(_ttsQueue.shift());
+      }
+    };
+    window.speechSynthesis.onvoiceschanged = handler;
+    // Retry after a timeout in case onvoiceschanged never fires
+    setTimeout(handler, 2000);
   }
 
   var _ttsId = 0;
@@ -1806,74 +1895,112 @@ renderRules();
   function speakText(text){
     if(!game.ttsEnabled) return;
     if(!('speechSynthesis' in window)) return;
-    if(!window.speechSynthesis.getVoices().length){
-      setTimeout(function(){ speakText(text); }, 300);
-      return;
+    if(!_voiceReady){
+      _ttsQueue.push(text);
+      if(window.speechSynthesis.getVoices().length){
+        _voiceReady = true;
+      } else {
+        waitVoices(function(){ /* already flushed via queue */ });
+        return;
+      }
     }
     window.speechSynthesis.cancel();
     var myId = ++_ttsId;
-    var rate = parseFloat($('voice-rate').value) || 0.8;
-    var pitch = parseFloat($('voice-pitch').value) || 1.15;
+    var rate = parseFloat($('voice-rate').value) || 0.9;
+    var pitch = parseFloat($('voice-pitch').value) || 1.0;
     var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    // Limit rate range to avoid distortion
+    rate = Math.max(0.5, Math.min(1.5, rate));
+    pitch = Math.max(0.5, Math.min(1.5, pitch));
     var idx = 0;
     function speakNext(){
       if(idx >= sentences.length || myId !== _ttsId) return;
       var u = new SpeechSynthesisUtterance(sentences[idx].trim());
-      u.lang = 'es-ES';
+      var voice = findBestVoice();
+      if(voice){
+        u.voice = voice;
+        u.lang = voice.lang; // CRITICAL: match utterance lang to voice lang
+        console.log('[TTS] Voz: ' + voice.name + ' (' + voice.lang + ')');
+      } else {
+        u.lang = 'es-MX';
+      }
       u.rate = rate;
       u.pitch = pitch;
       u.volume = 1.0;
-      var voice = findBestVoice();
-      if(voice) u.voice = voice;
       u.onend = function(){ idx++; setTimeout(function(){ speakNext(); }, 80); };
       window.speechSynthesis.speak(u);
     }
     speakNext();
   }
 
-  function populateVoiceList(){
-    var sel = $('voice-select');
+  function buildVoicePanel(){
+    var sel = $('voice-panel');
     if(!sel) return;
     if(!('speechSynthesis' in window)) return;
     var allVoices = window.speechSynthesis.getVoices();
     if(!allVoices.length){
-      window.speechSynthesis.onvoiceschanged = function(){ populateVoiceList(); };
+      sel.innerHTML = '<div class="vp-empty">Esperando voces...</div>';
+      waitVoices(function(){ buildVoicePanel(); });
       return;
     }
-    // Auto-select best voice if none selected
+    _voiceReady = true;
     if(!game.selectedVoice){
       var best = findBestVoice();
       if(best) game.selectedVoice = best.name;
     }
     var cur = game.selectedVoice || '';
-    sel.innerHTML = '<option value="">🎙️ Predeterminada</option>';
-    var es = allVoices.filter(function(v){ return v.lang && v.lang.indexOf('es') === 0; });
-    var other = allVoices.filter(function(v){ return !v.lang || v.lang.indexOf('es') !== 0; });
-    if(es.length){
-      var g = document.createElement('optgroup');
-      g.label = '🇪🇸 Español';
-      es.forEach(function(v){
-        var o = document.createElement('option');
-        o.value = v.name;
-        o.textContent = v.name.replace(/España/g,'ES').replace(/Español/g,'ES').replace(/Latinoamérica/g,'LA');
-        if(v.name === cur) o.selected = true;
-        g.appendChild(o);
-      });
-      sel.appendChild(g);
+
+    function cleanName(name){
+      return name.replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
     }
-    if(other.length){
-      var og = document.createElement('optgroup');
-      og.label = '🌐 Otras';
-      other.forEach(function(v){
-        var o = document.createElement('option');
-        o.value = v.name;
-        o.textContent = v.name;
-        if(v.name === cur) o.selected = true;
-        og.appendChild(o);
-      });
-      sel.appendChild(og);
+    function getQuality(name){
+      if(/google|microsoft/i.test(name)) return {icon:'⭐', label:'Premium'};
+      if(/neural|natural|premium|high.?quality|enhanced|wavenet/i.test(name)) return {icon:'🔊', label:'Neural'};
+      return {icon:'🎙️', label:'Sistema'};
     }
-    sel.onchange = function(){ game.selectedVoice = this.value || ''; };
+    function sortScore(v){
+      var s = 0;
+      if(v.lang && v.lang.indexOf('es')===0) s += 100;
+      if(v.name === cur) s += 200;
+      if(/google|microsoft/i.test(v.name)) s += 50;
+      if(/neural|natural|premium|high.?quality/i.test(v.name)) s += 25;
+      return -s;
+    }
+
+    var sorted = [].concat(allVoices).sort(function(a,b){ return sortScore(a) - sortScore(b); });
+    var html = '<div class="vp-header"><span>🎙️ Voces disponibles</span><span class="vp-count">' + allVoices.length + '</span></div>';
+    sorted.forEach(function(v){
+      var q = getQuality(v.name);
+      var selected = (v.name === cur) ? ' selected' : '';
+      var displayName = cleanName(v.name.replace(/\(.+?\)/g,'')).trim() || cleanName(v.name);
+      html += '<div class="vp-item' + selected + '" data-voice="' + v.name.replace(/"/g,'&quot;') + '">';
+      html += '<span class="vp-check">✓</span>';
+      html += '<span class="vp-badge" title="' + q.label + '">' + q.icon + '</span>';
+      html += '<div class="vp-info"><div class="vp-name">' + displayName + '</div><div class="vp-lang">' + (v.lang||'—') + '</div></div>';
+      html += '<button class="vp-test-btn" data-voice="' + v.name.replace(/"/g,'&quot;') + '">▶</button>';
+      html += '</div>';
+    });
+    sel.innerHTML = html;
+
+    sel.querySelectorAll('.vp-item').forEach(function(el){
+      el.addEventListener('click', function(e){
+        if(e.target.classList.contains('vp-test-btn')) return;
+        var voiceName = this.dataset.voice;
+        game.selectedVoice = voiceName;
+        sel.querySelectorAll('.vp-item').forEach(function(i){ i.classList.remove('selected'); });
+        this.classList.add('selected');
+      });
+    });
+    sel.querySelectorAll('.vp-test-btn').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var voiceName = this.dataset.voice;
+        var oldVoice = game.selectedVoice;
+        game.selectedVoice = voiceName;
+        speakText('Bienvenido, aventurero. Que los dioses te guíen en tu travesía.');
+        game.selectedVoice = oldVoice;
+      });
+    });
   }
   function narrate(text, type){
     game.narrator.push({text:text, type:type||'explore'});
@@ -2126,7 +2253,7 @@ renderRules();
     game.dungeonDepth = 0;
     game.scenePools = null;
     game.ttsEnabled = true;
-    populateVoiceList();
+    waitVoices(function(){ buildVoicePanel(); });
     var ttsBtn = $('btn-tts');
     if(ttsBtn) ttsBtn.textContent = '🔊 Voz';
     $('game-menu').classList.add('hidden');
@@ -2616,8 +2743,39 @@ renderRules();
     var testText = 'Bienvenido, aventurero. Que los dioses te guíen en tu travesía.';
     speakText(testText);
   });
+  $('btn-debug-voices').addEventListener('click', function(){
+    var voices = window.speechSynthesis.getVoices();
+    if(!voices.length){
+      alert('No hay voces disponibles todavía. Asegúrate de tener Google TTS instalado.');
+      return;
+    }
+    var msg = 'Voces disponibles (' + voices.length + '):\n\n';
+    voices.forEach(function(v){
+      msg += '• ' + v.name + '\n  lang=' + v.lang + ' local=' + v.localService + '\n';
+    });
+    logVoiceDebug('Consulta manual de voces');
+    alert(msg);
+  });
 
-  populateVoiceList();
+  // Voice panel toggle
+  $('btn-voice-panel').addEventListener('click', function(){
+    var panel = $('voice-panel');
+    var isHidden = panel.classList.contains('hidden');
+    panel.classList.toggle('hidden');
+    this.classList.toggle('active');
+    if(isHidden) buildVoicePanel();
+  });
+  document.addEventListener('click', function(e){
+    var panel = $('voice-panel');
+    var btn = $('btn-voice-panel');
+    if(!panel || !btn) return;
+    if(!panel.classList.contains('hidden') && !panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)){
+      panel.classList.add('hidden');
+      btn.classList.remove('active');
+    }
+  });
+
+  waitVoices(function(){ buildVoicePanel(); });
 
   // Update tab handler for game
   const origTabHandler = document.querySelectorAll('.tab-btn');
