@@ -1,0 +1,18 @@
+function errorHandler(err, req, res, next) {
+  console.error('[error]', err);
+
+  if (err.isJoi) {
+    return res.status(400).json({
+      error: 'ValidationError',
+      details: err.details.map(d => d.message),
+    });
+  }
+
+  if (err.status) {
+    return res.status(err.status).json({ error: err.message });
+  }
+
+  res.status(500).json({ error: 'Internal server error' });
+}
+
+module.exports = errorHandler;

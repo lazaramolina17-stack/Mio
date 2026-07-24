@@ -1,0 +1,55 @@
+.scene-visual{
+  width:100%;height:140px;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;border-bottom:2px solid var(--border);
+  transition:background .6s ease;
+}
+.scene-visual .visual-art{
+  font-size:48px;letter-spacing:10px;
+  text-shadow:0 0 24px rgba(0,0,0,0.7),0 2px 6px rgba(0,0,0,0.5);
+  z-index:2;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+  padding:10px;background:rgba(0,0,0,0.15);border-radius:12px;
+}
+.scene-visual .visual-label{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:8px 12px 6px;
+  background:linear-gradient(transparent,rgba(0,0,0,0.85));
+  color:var(--accent);font-size:13px;
+  text-transform:uppercase;letter-spacing:2px;text-align:center;
+  z-index:2;
+}
+.visual-village{background:linear-gradient(135deg,#2d5016,#4a7c2e,#5a8f3a)}
+.visual-warm{background:linear-gradient(135deg,#5a2d0c,#8b4513,#a0522d)}
+.visual-market{background:linear-gradient(135deg,#5a3e1e,#8b6914,#a07d2d)}
+.visual-forge{background:linear-gradient(135deg,#4a1a0a,#7a2d0c,#a03a15)}
+.visual-holy{background:linear-gradient(135deg,#1a2a4a,#2d4a7a,#3a6b9a)}
+.visual-dark{background:linear-gradient(135deg,#1a0e0e,#2d1a1a,#3d2525)}
+.visual-dungeon{background:linear-gradient(135deg,#0e1a0e,#1a2d1a,#253d25)}
+.visual-forest{background:linear-gradient(135deg,#1a2d0e,#2d4a1a,#3a6b25)}
+.visual-danger{background:linear-gradient(135deg,#2d0a0a,#4a1515,#6b1a1a)}
+.visual-default{background:linear-gradient(135deg,#1a1815,#252220,#3d3530)}
+#ambient-particles{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;overflow:hidden;z-index:1;
+}
+.particle{
+  position:absolute;width:6px;height:6px;border-radius:50%;
+  opacity:0;animation:particleFade linear infinite;
+}
+.particle.leaf{width:10px;height:6px;border-radius:2px;background:#5a8f3a;opacity:0.6}
+.particle.ember{width:4px;height:4px;background:#ff6622;box-shadow:0 0 6px #ff6622}
+.particle.spark{width:3px;height:3px;background:#ffcc00;box-shadow:0 0 8px #ffaa00}
+.particle.dust{width:8px;height:8px;background:#8a8075;opacity:0.2}
+.particle.mist{width:12px;height:12px;background:#aabbcc;opacity:0.08;border-radius:50%}
+.particle.firefly{width:5px;height:5px;background:#aaff66;box-shadow:0 0 10px #66ff33;opacity:0.7}
+.particle.orb{width:6px;height:6px;background:#88bbff;box-shadow:0 0 12px #4488ff;opacity:0.5}
+@keyframes particleFade{
+  0%{opacity:0;transform:translateY(0) translateX(0) scale(0.5)}
+  10%{opacity:var(--p-opacity,0.6)}
+  90%{opacity:var(--p-opacity,0.6)}
+  100%{opacity:0;transform:translateY(var(--p-fall,-120px)) translateX(var(--p-drift,30px)) scale(1)}
+}
+@media(max-width:400px){
+  .scene-visual{height:100px}
+  .scene-visual .visual-art{font-size:36px;padding:6px}
+}

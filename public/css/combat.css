@@ -1,0 +1,133 @@
+.combat-tracker{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px;
+  margin-bottom:10px;
+  flex-shrink:0;
+}
+.combat-header{color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:bold}
+.initiative-entry{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:6px 10px;
+  background:var(--bg);
+  border-radius:4px;
+  margin-bottom:4px;
+  font-size:12px;
+  border-left:3px solid var(--text-dim);
+}
+.initiative-entry.player{border-left-color:var(--accent);background:rgba(200,164,78,0.1)}
+.initiative-entry.current{box-shadow:0 0 0 2px var(--accent);transform:scale(1.01)}
+.initiative-name{font-weight:bold}
+.initiative-hp{color:var(--hp-red);font-family:monospace}
+.initiative-badge{
+  background:var(--bg3);
+  padding:1px 6px;
+  border-radius:3px;
+  font-size:9px;
+  color:var(--text-dim);
+}
+.enemies-panel{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px;
+  margin-bottom:10px;
+  flex-shrink:0;
+}
+.enemies-header{color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:bold}
+.enemy-card{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:8px;
+  margin-bottom:6px;
+}
+.enemy-card.dead{opacity:0.4;text-decoration:line-through}
+.enemy-name{font-weight:bold;color:var(--accent);font-size:13px}
+.enemy-stats{font-size:11px;color:var(--text-dim);margin:2px 0}
+.enemy-hp-bar{
+  height:6px;
+  background:var(--bg3);
+  border-radius:3px;
+  overflow:hidden;
+  margin-top:4px;
+}
+.enemy-hp-fill{
+  height:100%;
+  background:var(--hp-red);
+  transition:width .3s ease;
+}
+.enemy-hp-text{font-size:10px;color:var(--text-dim);text-align:right;margin-top:2px;font-family:monospace}
+.action-panel{flex-shrink:0}
+.action-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+.action-btn{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:12px;
+  border-radius:6px;
+  font-family:inherit;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition:all .15s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+}
+.action-btn:hover,.action-btn:focus{border-color:var(--accent);color:var(--accent);background:var(--bg2);transform:translateY(-1px)}
+.action-btn:disabled{opacity:0.4;cursor:not-allowed}
+.action-btn.primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.action-btn.primary:hover{background:#b8942e;border-color:#b8942e}
+.action-btn.danger{background:var(--hp-red);border-color:var(--hp-red);color:#fff}
+.action-btn.danger:hover{background:#7a1f15;border-color:#7a1f15}
+.action-icon{font-size:18px}
+.action-label{font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.shake{animation:shake .3s ease-in-out}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  10%,50%,90%{transform:translateX(-4px)}
+  30%,70%{transform:translateX(4px)}
+}
+.hit-flash{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:999;pointer-events:none;
+  animation:flash .3s ease-out forwards;
+}
+.hit-flash.damage{background:radial-gradient(circle,rgba(200,50,30,0.3),transparent 60%)}
+.hit-flash.crit{background:radial-gradient(circle,rgba(255,200,50,0.4),transparent 70%)}
+.hit-flash.heal{background:radial-gradient(circle,rgba(50,200,80,0.25),transparent 60%)}
+@keyframes flash{0%{opacity:1}100%{opacity:0}}
+@keyframes critFlash{
+  0%{opacity:1;transform:scale(1)}
+  50%{opacity:1;transform:scale(1.05)}
+  100%{opacity:0;transform:scale(1)}
+}
+.hit-flash.crit{animation:critFlash .5s ease-out forwards}
+.dmg-popup{
+  position:fixed;z-index:1000;pointer-events:none;
+  font-family:inherit;font-size:22px;font-weight:bold;
+  text-shadow:0 0 10px rgba(0,0,0,0.8),0 2px 4px rgba(0,0,0,0.5);
+  animation:dmgFloat 1s ease-out forwards;
+}
+.dmg-popup.damage{color:#ff4444}
+.dmg-popup.crit{color:#ffcc00;font-size:30px}
+.dmg-popup.heal{color:#44ff66}
+@keyframes dmgFloat{
+  0%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:0;transform:translateY(-60px) scale(1.2)}
+}
+#game-menu{text-align:center}
+#menu-buttons{margin-top:20px}
+@media(max-width:400px){
+  .action-grid{grid-template-columns:1fr}
+}

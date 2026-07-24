@@ -1,0 +1,96 @@
+.game-panel{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:12px;
+  margin-bottom:10px;
+}
+.narrator-panel{
+  flex:1;
+  min-height:200px;
+  max-height:280px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.narrator-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+  padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+.narrator-title{color:var(--accent);font-weight:bold;font-size:12px;text-transform:uppercase;letter-spacing:1px}
+.location-badge{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  padding:2px 8px;
+  border-radius:3px;
+  font-size:10px;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.narrator-text{
+  flex:1;
+  overflow-y:auto;
+  font-size:13px;
+  line-height:1.6;
+  color:var(--text);
+  padding:4px 2px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border) transparent;
+}
+.narrator-text::-webkit-scrollbar{width:4px}
+.narrator-text::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.narrator-entry{
+  margin-bottom:10px;
+  padding:6px 8px;
+  background:var(--bg);
+  border-radius:4px;
+  border-left:3px solid var(--accent);
+  animation:fadeIn .4s ease-out;
+}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.narrator-entry.combat{background:rgba(150,40,27,0.15);border-left-color:var(--hp-red)}
+.narrator-entry.explore{background:rgba(200,164,78,0.1);border-left-color:var(--accent)}
+.narrator-entry.loot{background:rgba(45,90,123,0.15);border-left-color:var(--mana-blue)}
+.narrator-entry.rest{background:rgba(0,120,60,0.15);border-left-color:#2e8b57}
+.narrator-entry .type-tag{
+  display:inline-block;
+  font-size:8px;
+  text-transform:uppercase;
+  padding:0 4px;
+  border-radius:2px;
+  margin-right:6px;
+  font-weight:bold;
+}
+.narrator-entry.combat .type-tag{background:var(--hp-red);color:#fff}
+.narrator-entry.explore .type-tag{background:var(--accent);color:var(--bg)}
+.narrator-entry.loot .type-tag{background:var(--mana-blue);color:#fff}
+.narrator-entry.rest .type-tag{background:#2e8b57;color:#fff}
+.typing-cursor::after{
+  content:'▍';animation:blink 0.7s steps(1) infinite;
+  color:var(--accent);margin-left:2px;
+}
+@keyframes blink{50%{opacity:0}}
+.status-bar{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px;
+  margin-bottom:10px;
+  flex-shrink:0;
+}
+.status-item{text-align:center}
+.status-label{display:block;font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.status-value{font-size:16px;font-weight:bold;color:var(--accent)}
+#status-hp{color:var(--hp-red)}
+#status-gold{color:#c8a44e}

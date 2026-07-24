@@ -11,14 +11,32 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "better-sqlite3": "^13.0.1",
+    "bull": "^4.16.5",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
+    "helmet": "^8.3.0",
     "http-server": "^14.1.1",
+    "joi": "^18.2.3",
     "jsdom": "^29.1.1",
+    "jsonwebtoken": "^9.0.3",
     "localtunnel": "^2.0.2",
     "pdfkit": "^0.19.1",
+    "pg": "^8.22.0",
     "pureimage": "^0.4.20",
-    "sharp": "^0.35.3"
-  }
+    "redis": "^6.1.0",
+    "sharp": "^0.35.3",
+    "uuid": "^14.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lazaramolina17-stack/Mio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lazaramolina17-stack/Mio/issues"
+  },
+  "homepage": "https://github.com/lazaramolina17-stack/Mio#readme"
 }

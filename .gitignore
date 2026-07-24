@@ -5,3 +5,8 @@ __pycache__/
 .DS_Store
 opencode.json
 opencode.jsonc
+pgdata/
+logs/
+*.bak
+*.log
+server_test.log
