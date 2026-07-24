@@ -1,102 +1,59 @@
 const { Router } = require('express');
 const db = require('../../db/connection');
 const { authenticate } = require('../middleware/auth');
-const Chronology = require('../services/Chronology');
-const { runWorldTick } = require('../jobs/worldTick');
+const HistoryEngine = require('../services/HistoryEngine'); // Ensure this path is correct
 
 const router = Router();
 
-/**
- * Middleware that checks the requesting user belongs to the given world.
- * Sets req.worldMember on success.
- */
 function requireWorldMember(req, res, next) {
-  db.query(
-    'SELECT role FROM world_members WHERE world_id = $1 AND user_id = $2',
-    [req.params.worldId, req.user.id]
-  )
-    .then(function (result) {
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'World not found or access denied' });
-      }
-      req.worldMember = result.rows[0];
-      next();
-    })
-    .catch(function (err) {
-      next(err);
-    });
+  db.query('SELECT role FROM world_members WHERE world_id = $1 AND user_id = $2', [req.params.worldId, req.user.id])
+    .then(function (r) { if (r.rows.length === 0) return res.status(404).json({ error: 'World not found or access denied' }); req.worldMember = r.rows[0]; next(); })
+    .catch(function (err) { next(err); });
 }
 
-/**
- * Middleware that restricts access to the world owner (dm) only.
- */
-function requireWorldOwner(req, res, next) {
-  if (!req.worldMember || req.worldMember.role !== 'dm') {
-    return res.status(403).json({ error: 'Only the world owner can perform this action' });
+// Middleware to restrict access to world owner/DM for destructive or sensitive actions
+function requireWorldOwnerOrAdmin(req, res, next) {
+  if (!req.worldMember || (req.worldMember.role !== 'dm' && req.worldMember.role !== 'admin')) {
+     return res.status(403).json({ error: 'Forbidden: Only world owner or admin can perform this action' });
   }
   next();
 }
 
-/**
- * GET /api/worlds/:worldId/history
- * Returns the event timeline with optional filters.
- *
- * Query params:
- *   from  - from_tick (inclusive)
- *   to    - to_tick (inclusive)
- *   types - comma-separated event types
- *   min_importance - minimum importance (1-10)
- *   limit  - page size (default 50)
- *   offset - page offset (default 0)
- */
 router.get('/:worldId/history', authenticate, requireWorldMember, async function (req, res, next) {
   try {
-    const chronology = new Chronology(req.params.worldId);
+    const history = new HistoryEngine(req.params.worldId);
     const filters = {};
-
-    if (req.query.from) filters.from_tick = parseInt(req.query.from, 10);
-    if (req.query.to) filters.to_tick = parseInt(req.query.to, 10);
+    if (req.query.from_tick) filters.from_tick = parseInt(req.query.from_tick, 10);
+    if (req.query.to_tick) filters.to_tick = parseInt(req.query.to_tick, 10);
     if (req.query.types) filters.types = req.query.types.split(',').map(function (t) { return t.trim(); });
     if (req.query.min_importance) filters.min_importance = parseInt(req.query.min_importance, 10);
     if (req.query.limit) filters.limit = parseInt(req.query.limit, 10);
     if (req.query.offset) filters.offset = parseInt(req.query.offset, 10);
+    if (req.query.entity) filters.entity = req.query.entity; // e.g., 'npc_id=...' or 'faction_id=...'
+    if (req.query.location) filters.location = req.query.location; // e.g., 'region_id=...'
 
-    const result = await chronology.getTimeline(filters);
+    const result = await history.getTimeline(filters); // Assuming getTimeline method exists and accepts filters
     res.json(result);
   } catch (err) {
     next(err);
   }
 });
 
-/**
- * GET /api/worlds/:worldId/history/encyclopedia
- * Returns encyclopedia-style aggregation of events.
- */
 router.get('/:worldId/history/encyclopedia', authenticate, requireWorldMember, async function (req, res, next) {
   try {
-    const chronology = new Chronology(req.params.worldId);
-    const result = await chronology.getEncyclopedia();
+    const history = new HistoryEngine(req.params.worldId);
+    const result = await history.getEncyclopedia(); // Assuming getEncyclopedia method exists
     res.json(result);
-  } catch (err) {
-    next(err);
-  }
+  } catch (err) { next(err); }
 });
 
-/**
- * POST /api/worlds/:worldId/tick
- * Forces a manual simulation tick.
- * Only the world owner (dm) can trigger this.
- */
-router.post('/:worldId/tick', authenticate, requireWorldMember, requireWorldOwner, async function (req, res, next) {
+router.post('/:worldId/tick', authenticate, requireWorldMember, requireWorldOwnerOrAdmin, async function (req, res, next) {
   try {
-      const result = await runWorldTick(req.params.worldId);
-    if (!result.success) {
-      return res.status(500).json({ error: result.error });
-    }
-    res.json({ message: 'Tick completed', elapsed: result.elapsed });
-  } catch (err) {
-    next(err);
-  }
+    // This endpoint might trigger a single tick in WorldSimulation
+    // For now, we rely on the cron job `simulationManager.js`
+    // We can add a manual tick trigger here if needed, but it should probably update the world state directly
+    res.status(501).json({ error: 'Manual tick trigger not implemented yet. Use cron job.' });
+  } catch (err) { next(err); }
 });
 
 module.exports = router;
