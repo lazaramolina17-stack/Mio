@@ -30,6 +30,7 @@ router.use('/worlds', ecosystem);
 router.use('/worlds', factions);
 router.use('/worlds', religion);
 router.use('/worlds', justice);
+router.use('/worlds', magic);
 
 router.get('/health', function (req, res) {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

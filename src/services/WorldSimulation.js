@@ -1,7 +1,7 @@
 const db = require('../../db/connection');
 const NPCRoutines = require('./NPCRoutines');
 const EconomyEngine = require('./EconomyEngine');
-const WeatherSystem = require('./WeatherSystem');
+const MagicSystem = require('./MagicSystem');
 const Ecosystem = require('./Ecosystem');
 let socketManager;
 try { socketManager = require('./SocketManager'); } catch (e) { }
