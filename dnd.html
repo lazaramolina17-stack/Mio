@@ -345,6 +345,14 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   text-transform:uppercase;
   letter-spacing:1px;
 }
+.voice-select{
+  background:var(--bg);color:var(--text);border:1px solid var(--border);
+  font-family:inherit;font-size:10px;padding:2px 4px;
+  border-radius:3px;max-width:120px;margin:0 4px;
+  cursor:pointer;
+}
+.voice-select optgroup{color:var(--text-dim);background:var(--bg2)}
+.voice-select option{color:var(--text);background:var(--bg)}
 .narrator-text{
   flex:1;
   overflow-y:auto;
@@ -506,11 +514,44 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 #game-menu{text-align:center}
 #menu-buttons{margin-top:20px}
 
+.scene-visual{
+  width:100%;height:140px;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;border-bottom:2px solid var(--border);
+  transition:background .6s ease;
+}
+.scene-visual .visual-art{
+  font-size:48px;letter-spacing:10px;
+  text-shadow:0 0 24px rgba(0,0,0,0.7),0 2px 6px rgba(0,0,0,0.5);
+  z-index:2;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+  padding:10px;background:rgba(0,0,0,0.15);border-radius:12px;
+}
+.scene-visual .visual-label{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:8px 12px 6px;
+  background:linear-gradient(transparent,rgba(0,0,0,0.85));
+  color:var(--accent);font-size:13px;
+  text-transform:uppercase;letter-spacing:2px;text-align:center;
+  z-index:2;
+}
+.visual-village{background:linear-gradient(135deg,#2d5016,#4a7c2e,#5a8f3a)}
+.visual-warm{background:linear-gradient(135deg,#5a2d0c,#8b4513,#a0522d)}
+.visual-market{background:linear-gradient(135deg,#5a3e1e,#8b6914,#a07d2d)}
+.visual-forge{background:linear-gradient(135deg,#4a1a0a,#7a2d0c,#a03a15)}
+.visual-holy{background:linear-gradient(135deg,#1a2a4a,#2d4a7a,#3a6b9a)}
+.visual-dark{background:linear-gradient(135deg,#1a0e0e,#2d1a1a,#3d2525)}
+.visual-dungeon{background:linear-gradient(135deg,#0e1a0e,#1a2d1a,#253d25)}
+.visual-forest{background:linear-gradient(135deg,#1a2d0e,#2d4a1a,#3a6b25)}
+.visual-danger{background:linear-gradient(135deg,#2d0a0a,#4a1515,#6b1a1a)}
+.visual-default{background:linear-gradient(135deg,#1a1815,#252220,#3d3530)}
+
 @media(max-width:400px){
   .status-bar{grid-template-columns:repeat(2,1fr);gap:6px;padding:8px}
   .action-grid{grid-template-columns:1fr}
   .narrator-text{font-size:12px}
   .initiative-entry{font-size:11px;padding:4px 8px}
+  .scene-visual{height:100px}
+  .scene-visual .visual-art{font-size:36px;padding:6px}
 }
 </style>
 </head>
@@ -619,11 +660,16 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         </div>
         <!-- Game View -->
         <div id="game-view" class="hidden">
+          <div id="scene-visual" class="scene-visual visual-default">
+            <div class="visual-art">✨</div>
+            <div class="visual-label">Aventura</div>
+          </div>
           <div id="narrator-panel" class="game-panel narrator-panel">
              <div class="narrator-header">
               <span class="narrator-title">📜 Narrador</span>
               <span id="game-location" class="location-badge"></span>
-              <button id="btn-tts" class="btn btn-sm" style="margin-left:auto;font-size:11px;padding:2px 8px" title="Activar/Desactivar voz">🔊 Voz</button>
+              <select id="voice-select" class="voice-select" title="Seleccionar voz"></select>
+              <button id="btn-tts" class="btn btn-sm" style="font-size:11px;padding:2px 8px" title="Activar/Desactivar voz">🔊 Voz</button>
             </div>
             <div id="narrator-text" class="narrator-text"></div>
           </div>
@@ -1579,7 +1625,46 @@ renderRules();
     inventory: [],
     xp: 0,
     turnIndex: 0,
-    lastCheck: null
+    lastCheck: null,
+    ttsEnabled: true,
+    selectedVoice: ''
+  };
+
+  // ---- Scene Visuals ----
+  var SCENE_VISUALS = {
+    entrada_aldea: { art: '🏘️  🌾  🛤️', theme: 'village', label: 'Entrada a la Aldea' },
+    plaza_central: { art: '🏛️  ⛲  🏘️', theme: 'village', label: 'Plaza de Vallebruma' },
+    taberna: { art: '🍺  🔥  🪵', theme: 'warm', label: 'El Dragón Dormido' },
+    mercado: { art: '⚖️  💰  🧺', theme: 'market', label: 'Mercado de Vallebruma' },
+    herrero: { art: '🔨  ⚔️  🔥', theme: 'forge', label: 'Martillo y Yunque' },
+    templo: { art: '⛪  ✨  🕯️', theme: 'holy', label: 'Templo de la Luz Eterna' },
+    camino_mazmorra: { art: '🌲  🌫️  🪦', theme: 'dark', label: 'Camino a la Cripta' },
+    entrada_mazmorra: { art: '🪦  🌑  🕸️', theme: 'dungeon', label: 'Entrada a la Cripta' },
+    pasillo_principal: { art: '🗿  🏛️  🕯️', theme: 'dungeon', label: 'El Pasillo de las Estatuas' },
+    sala_guardia: { art: '🛡️  ⚔️  💀', theme: 'danger', label: 'Sala de la Guardia Caída' },
+    cripta_arcana: { art: '🔮  📜  💎', theme: 'dark', label: 'La Cripta Arcana' },
+    puente_colgante: { art: '🌉  🌊  💨', theme: 'dark', label: 'El Puente Colgante' },
+    tesoro_reino: { art: '👑  💰  🏆', theme: 'forge', label: 'Cámara del Tesoro' },
+    salida: { art: '🌅  🚪  🌿', theme: 'forest', label: '¡Libertad!' },
+    atrio_olvidado: { art: '🌿  🏛️  🌸', theme: 'village', label: 'Atrio Olvidado' },
+    cripta_secreta: { art: '💀  🔒  🕯️', theme: 'dark', label: 'Cripta Oculta' },
+    galeria_runica: { art: '🔮  ✨  📿', theme: 'holy', label: 'Galería de las Runas' },
+    biblioteca_oscura: { art: '📚  🕯️  🕸️', theme: 'dark', label: 'Biblioteca Prohibida' },
+    laboratorio_alquimico: { art: '⚗️  🔥  🧪', theme: 'forge', label: 'Laboratorio del Alquimista' },
+    pozo_sagrado: { art: '⛲  💧  ✨', theme: 'holy', label: 'Pozo de la Sanación' },
+    catacumbas: { art: '🪦  🦴  💀', theme: 'dungeon', label: 'Catacumbas Susurrantes' },
+    sala_trono: { art: '👑  ⚔️  🏛️', theme: 'danger', label: 'Salón del Trono Olvidado' },
+    boveda_tesoro: { art: '💰  🗡️  🏆', theme: 'forge', label: 'Bóveda del Rey' },
+    catalizador: { art: '🔮  💠  ⚡', theme: 'holy', label: 'Cámara del Catalizador' },
+    paso_secreto: { art: '🚪  🔦  🕸️', theme: 'dungeon', label: 'Paso Secreto' },
+    santuario_estelar: { art: '🌟  🌌  ✨', theme: 'holy', label: 'Santuario Estelar' }
+  };
+  var TYPE_VISUALS = {
+    explore: { art: '🌲  🌍  🗺️', theme: 'forest', label: 'Exploración' },
+    rest: { art: '🛏️  🔥  🍺', theme: 'warm', label: 'Descanso' },
+    loot: { art: '💰  💎  ⚖️', theme: 'market', label: 'Botín' },
+    combat: { art: '⚔️  💥  🩸', theme: 'danger', label: 'Combate' },
+    boss: { art: '👹  ⚔️  🔥', theme: 'danger', label: 'Jefe' }
   };
 
   // ---- Utility Functions ----
@@ -1605,10 +1690,61 @@ renderRules();
       window.speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(text);
       u.lang = 'es-ES';
-      u.rate = 0.85;
-      u.pitch = 1.0;
+      u.rate = 0.88;
+      u.pitch = 1.05;
+      u.volume = 1.0;
+      if(game.selectedVoice){
+        var allVoices = window.speechSynthesis.getVoices();
+        var match = allVoices.find(function(v){ return v.name === game.selectedVoice; });
+        if(match) u.voice = match;
+      }
+      if(!u.voice){
+        var allVoices = window.speechSynthesis.getVoices();
+        var esVoices = allVoices.filter(function(v){ return v.lang && v.lang.indexOf('es') === 0; });
+        u.voice = esVoices.find(function(v){ return v.name.indexOf('Google') >= 0; }) || esVoices[0] || null;
+      }
       window.speechSynthesis.speak(u);
     }
+  }
+
+  function populateVoiceList(){
+    var sel = $('voice-select');
+    if(!sel) return;
+    if(!('speechSynthesis' in window)) return;
+    var allVoices = window.speechSynthesis.getVoices();
+    if(!allVoices.length){
+      window.speechSynthesis.onvoiceschanged = function(){ populateVoiceList(); };
+      return;
+    }
+    var cur = game.selectedVoice || '';
+    sel.innerHTML = '<option value="">🎙️ Predeterminada</option>';
+    var es = allVoices.filter(function(v){ return v.lang && v.lang.indexOf('es') === 0; });
+    var other = allVoices.filter(function(v){ return !v.lang || v.lang.indexOf('es') !== 0; });
+    if(es.length){
+      var g = document.createElement('optgroup');
+      g.label = '🇪🇸 Español';
+      es.forEach(function(v){
+        var o = document.createElement('option');
+        o.value = v.name;
+        o.textContent = v.name.replace(/España/g,'ES').replace(/Español/g,'ES').replace(/Latinoamérica/g,'LA');
+        if(v.name === cur) o.selected = true;
+        g.appendChild(o);
+      });
+      sel.appendChild(g);
+    }
+    if(other.length){
+      var og = document.createElement('optgroup');
+      og.label = '🌐 Otras';
+      other.forEach(function(v){
+        var o = document.createElement('option');
+        o.value = v.name;
+        o.textContent = v.name;
+        if(v.name === cur) o.selected = true;
+        og.appendChild(o);
+      });
+      sel.appendChild(og);
+    }
+    sel.onchange = function(){ game.selectedVoice = this.value || ''; };
   }
   function narrate(text, type){
     game.narrator.push({text:text, type:type||'explore'});
@@ -1734,6 +1870,17 @@ renderRules();
     $('status-gold').textContent = game.gold;
   }
 
+  function renderVisual(scene, sceneId){
+    var el = $('scene-visual');
+    if(!el) return;
+    var vis = SCENE_VISUALS[sceneId] || TYPE_VISUALS[scene.tipo] || TYPE_VISUALS.explore;
+    el.className = 'scene-visual visual-' + (vis.theme || 'default');
+    var artEl = el.querySelector('.visual-art');
+    var labelEl = el.querySelector('.visual-label');
+    if(artEl) artEl.textContent = vis.art || '✨';
+    if(labelEl) labelEl.textContent = vis.label || scene.nombre;
+  }
+
   function setLocation(name){
     $('game-location').textContent = name;
   }
@@ -1758,6 +1905,8 @@ renderRules();
     game.dungeonDepth = 0;
     game.scenePools = null;
     game.ttsEnabled = true;
+    var ttsBtn = $('btn-tts');
+    if(ttsBtn) ttsBtn.textContent = '🔊 Voz';
     $('game-menu').classList.add('hidden');
     $('game-view').classList.remove('hidden');
     narrate('Te encuentras en las afueras de una aldea. El viento trae el olor a hierba y hogueras. Una antigua cripta se alza en la colina cercana.', 'explore');
@@ -1819,6 +1968,7 @@ renderRules();
       scene = randomizeSceneOptions(scene);
     }
     setLocation(scene.nombre);
+    renderVisual(scene, sceneId);
     narrate(scene.desc, 'explore');
     // Random encounter check
     if(scene.encuentro && Math.random() < scene.encuentro.probabilidad){
@@ -2205,6 +2355,7 @@ renderRules();
     game.scene = null;
     game.combat = null;
     game.narrator = [];
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
     $('game-menu').classList.remove('hidden');
     $('game-view').classList.add('hidden');
     $('combat-tracker').classList.add('hidden');
@@ -2229,6 +2380,8 @@ renderRules();
     this.textContent = game.ttsEnabled ? '🔊 Voz' : '🔇 Voz';
     if(!game.ttsEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
   });
+
+  populateVoiceList();
 
   // Update tab handler for game
   const origTabHandler = document.querySelectorAll('.tab-btn');
