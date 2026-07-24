@@ -545,6 +545,97 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .visual-danger{background:linear-gradient(135deg,#2d0a0a,#4a1515,#6b1a1a)}
 .visual-default{background:linear-gradient(135deg,#1a1815,#252220,#3d3530)}
 
+/* ---- Typewriter ---- */
+.typing-cursor::after{
+  content:'▍';animation:blink 0.7s steps(1) infinite;
+  color:var(--accent);margin-left:2px;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* ---- Screen Shake ---- */
+.shake{animation:shake .3s ease-in-out}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  10%,50%,90%{transform:translateX(-4px)}
+  30%,70%{transform:translateX(4px)}
+}
+
+/* ---- Hit Flash ---- */
+.hit-flash{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:999;pointer-events:none;
+  animation:flash .3s ease-out forwards;
+}
+.hit-flash.damage{background:radial-gradient(circle,rgba(200,50,30,0.3),transparent 60%)}
+.hit-flash.crit{background:radial-gradient(circle,rgba(255,200,50,0.4),transparent 70%)}
+.hit-flash.heal{background:radial-gradient(circle,rgba(50,200,80,0.25),transparent 60%)}
+@keyframes flash{0%{opacity:1}100%{opacity:0}}
+@keyframes critFlash{
+  0%{opacity:1;transform:scale(1)}
+  50%{opacity:1;transform:scale(1.05)}
+  100%{opacity:0;transform:scale(1)}
+}
+.hit-flash.crit{animation:critFlash .5s ease-out forwards}
+
+/* ---- Damage Numbers ---- */
+.dmg-popup{
+  position:fixed;z-index:1000;pointer-events:none;
+  font-family:inherit;font-size:22px;font-weight:bold;
+  text-shadow:0 0 10px rgba(0,0,0,0.8),0 2px 4px rgba(0,0,0,0.5);
+  animation:dmgFloat 1s ease-out forwards;
+}
+.dmg-popup.damage{color:#ff4444}
+.dmg-popup.crit{color:#ffcc00;font-size:30px}
+.dmg-popup.heal{color:#44ff66}
+@keyframes dmgFloat{
+  0%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:0;transform:translateY(-60px) scale(1.2)}
+}
+
+/* ---- Ambient Particles ---- */
+#ambient-particles{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;overflow:hidden;z-index:1;
+}
+.particle{
+  position:absolute;width:6px;height:6px;border-radius:50%;
+  opacity:0;animation:particleFade linear infinite;
+}
+.particle.leaf{width:10px;height:6px;border-radius:2px;background:#5a8f3a;opacity:0.6}
+.particle.ember{width:4px;height:4px;background:#ff6622;box-shadow:0 0 6px #ff6622}
+.particle.spark{width:3px;height:3px;background:#ffcc00;box-shadow:0 0 8px #ffaa00}
+.particle.dust{width:8px;height:8px;background:#8a8075;opacity:0.2}
+.particle.mist{width:12px;height:12px;background:#aabbcc;opacity:0.08;border-radius:50%}
+.particle.firefly{width:5px;height:5px;background:#aaff66;box-shadow:0 0 10px #66ff33;opacity:0.7}
+.particle.orb{width:6px;height:6px;background:#88bbff;box-shadow:0 0 12px #4488ff;opacity:0.5}
+@keyframes particleFade{
+  0%{opacity:0;transform:translateY(0) translateX(0) scale(0.5)}
+  10%{opacity:var(--p-opacity,0.6)}
+  90%{opacity:var(--p-opacity,0.6)}
+  100%{opacity:0;transform:translateY(var(--p-fall,-120px)) translateX(var(--p-drift,30px)) scale(1)}
+}
+
+/* ---- Voice Controls ---- */
+.voice-controls{
+  display:flex;gap:6px;align-items:center;
+  padding:6px 8px;background:var(--bg);border-top:1px solid var(--border);
+}
+.voice-controls label{font-size:10px;margin:0;display:flex;align-items:center;gap:3px;color:var(--text-dim)}
+.voice-controls input[type=range]{
+  width:50px;height:3px;appearance:none;background:var(--border);
+  border-radius:2px;outline:none;cursor:pointer;
+}
+.voice-controls input[type=range]::-webkit-slider-thumb{
+  appearance:none;width:10px;height:10px;border-radius:50%;
+  background:var(--accent);cursor:pointer;
+}
+#btn-test-voice{
+  font-size:10px;padding:2px 6px;margin-left:auto;
+  background:var(--bg2);color:var(--text-dim);
+  border:1px solid var(--border);border-radius:3px;cursor:pointer;
+}
+#btn-test-voice:hover{color:var(--accent);border-color:var(--accent)}
+
 @media(max-width:400px){
   .status-bar{grid-template-columns:repeat(2,1fr);gap:6px;padding:8px}
   .action-grid{grid-template-columns:1fr}
@@ -552,6 +643,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   .initiative-entry{font-size:11px;padding:4px 8px}
   .scene-visual{height:100px}
   .scene-visual .visual-art{font-size:36px;padding:6px}
+  .voice-controls{flex-wrap:wrap}
+  .voice-controls input[type=range]{width:40px}
 }
 </style>
 </head>
@@ -661,6 +754,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         <!-- Game View -->
         <div id="game-view" class="hidden">
           <div id="scene-visual" class="scene-visual visual-default">
+            <div id="ambient-particles"></div>
             <div class="visual-art">✨</div>
             <div class="visual-label">Aventura</div>
           </div>
@@ -670,6 +764,11 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
               <span id="game-location" class="location-badge"></span>
               <select id="voice-select" class="voice-select" title="Seleccionar voz"></select>
               <button id="btn-tts" class="btn btn-sm" style="font-size:11px;padding:2px 8px" title="Activar/Desactivar voz">🔊 Voz</button>
+            </div>
+            <div class="voice-controls">
+              <label>🐢<input type="range" id="voice-rate" min="0.3" max="1.5" step="0.05" value="0.8"></label>
+              <label>🎵<input type="range" id="voice-pitch" min="0.5" max="2.0" step="0.05" value="1.15"></label>
+              <button id="btn-test-voice" title="Probar voz">🔊 Probar</button>
             </div>
             <div id="narrator-text" class="narrator-text"></div>
           </div>
@@ -1713,18 +1812,20 @@ renderRules();
     }
     window.speechSynthesis.cancel();
     var myId = ++_ttsId;
+    var rate = parseFloat($('voice-rate').value) || 0.8;
+    var pitch = parseFloat($('voice-pitch').value) || 1.15;
     var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
     var idx = 0;
     function speakNext(){
       if(idx >= sentences.length || myId !== _ttsId) return;
       var u = new SpeechSynthesisUtterance(sentences[idx].trim());
       u.lang = 'es-ES';
-      u.rate = 0.8;
-      u.pitch = 1.15;
+      u.rate = rate;
+      u.pitch = pitch;
       u.volume = 1.0;
       var voice = findBestVoice();
       if(voice) u.voice = voice;
-      u.onend = function(){ idx++; setTimeout(function(){ speakNext(); }, 100); };
+      u.onend = function(){ idx++; setTimeout(function(){ speakNext(); }, 80); };
       window.speechSynthesis.speak(u);
     }
     speakNext();
@@ -1879,16 +1980,43 @@ renderRules();
   }
 
   // ---- Game UI ----
+  // ---- Typewriter Narrator ----
   function renderNarrator(){
-    const el = $('narrator-text');
+    var el = $('narrator-text');
     if(!el) return;
-    el.innerHTML = game.narrator.map(n => 
-      '<div class="narrator-entry ' + (n.type||'explore') + '">' +
-      '<span class="type-tag">' + (n.type||'info') + '</span>' +
-      n.text +
-      '</div>'
-    ).join('');
-    el.scrollTop = el.scrollHeight;
+    var html = '';
+    for(var i=0; i<game.narrator.length-1; i++){
+      var n = game.narrator[i];
+      html += '<div class="narrator-entry ' + (n.type||'explore') + '">' +
+        '<span class="type-tag">' + (n.type||'info') + '</span>' +
+        n.text + '</div>';
+    }
+    el.innerHTML = html;
+    if(game.narrator.length){
+      var last = game.narrator[game.narrator.length-1];
+      var entryDiv = document.createElement('div');
+      entryDiv.className = 'narrator-entry ' + (last.type||'explore');
+      entryDiv.innerHTML = '<span class="type-tag">' + (last.type||'info') + '</span><span class="typing-text"></span><span class="typing-cursor"></span>';
+      el.appendChild(entryDiv);
+      el.scrollTop = el.scrollHeight;
+      var span = entryDiv.querySelector('.typing-text');
+      var t = last.text;
+      var ci = 0;
+      var speed = last.type === 'combat' ? 15 : 25;
+      if(game._typeTimer) clearInterval(game._typeTimer);
+      game._typeTimer = setInterval(function(){
+        if(ci < t.length){
+          span.textContent += t[ci];
+          ci++;
+          el.scrollTop = el.scrollHeight;
+        } else {
+          clearInterval(game._typeTimer);
+          game._typeTimer = null;
+          var cursor = entryDiv.querySelector('.typing-cursor');
+          if(cursor) cursor.style.display = 'none';
+        }
+      }, speed);
+    }
   }
 
   function updateStatusBar(){
@@ -1896,6 +2024,70 @@ renderRules();
     $('status-level').textContent = game.player.level;
     $('status-xp').textContent = game.xp;
     $('status-gold').textContent = game.gold;
+  }
+
+  // ---- Combat Visual Effects ----
+  function screenShake(intensity){
+    var el = $('game-view');
+    if(!el) return;
+    el.classList.remove('shake');
+    void el.offsetWidth;
+    el.classList.add('shake');
+  }
+
+  function hitFlash(type){
+    var div = document.createElement('div');
+    div.className = 'hit-flash ' + (type || 'damage');
+    document.body.appendChild(div);
+    setTimeout(function(){ div.remove(); }, 500);
+  }
+
+  function showDamageNumber(text, cls, x, y){
+    var div = document.createElement('div');
+    div.className = 'dmg-popup ' + (cls || 'damage');
+    div.textContent = text;
+    div.style.left = (x || 50) + '%';
+    div.style.top = (y || 35) + '%';
+    div.style.transform = 'translate(-50%,-50%)';
+    document.body.appendChild(div);
+    setTimeout(function(){ div.remove(); }, 1000);
+  }
+
+  // ---- Ambient Particles ----
+  var _particleInterval = null;
+  var PARTICLE_THEMES = {
+    village: { type:'leaf', count:3, speed:8, opacity:0.5 },
+    warm: { type:'ember', count:4, speed:5, opacity:0.7 },
+    market: { type:'dust', count:3, speed:10, opacity:0.3 },
+    forge: { type:'spark', count:5, speed:4, opacity:0.8 },
+    holy: { type:'orb', count:3, speed:7, opacity:0.4 },
+    dark: { type:'mist', count:2, speed:12, opacity:0.15 },
+    dungeon: { type:'mist', count:3, speed:10, opacity:0.2 },
+    forest: { type:'leaf', count:2, speed:9, opacity:0.4 },
+    danger: { type:'ember', count:3, speed:6, opacity:0.6 },
+    default: { type:'dust', count:2, speed:12, opacity:0.2 }
+  };
+
+  function spawnParticles(themeId){
+    var container = $('ambient-particles');
+    if(!container) return;
+    if(_particleInterval) clearInterval(_particleInterval);
+    container.innerHTML = '';
+    var cfg = PARTICLE_THEMES[themeId] || PARTICLE_THEMES.default;
+    _particleInterval = setInterval(function(){
+      if(!container || container.childNodes.length > 30) return;
+      var p = document.createElement('div');
+      p.className = 'particle ' + (cfg.type || 'dust');
+      p.style.left = (Math.random() * 100) + '%';
+      p.style.top = '100%';
+      p.style.setProperty('--p-fall', -(80 + Math.random() * 60) + 'px');
+      p.style.setProperty('--p-drift', (Math.random() * 60 - 30) + 'px');
+      p.style.setProperty('--p-opacity', cfg.opacity || 0.5);
+      p.style.animationDuration = (cfg.speed || 8) + 's';
+      p.style.animationDelay = '0s';
+      container.appendChild(p);
+      setTimeout(function(){ if(p.parentNode) p.remove(); }, (cfg.speed||8)*1000 + 200);
+    }, 300);
   }
 
   function renderVisual(scene, sceneId){
@@ -1907,6 +2099,7 @@ renderRules();
     var labelEl = el.querySelector('.visual-label');
     if(artEl) artEl.textContent = vis.art || '✨';
     if(labelEl) labelEl.textContent = vis.label || scene.nombre;
+    spawnParticles(vis.theme || 'default');
   }
 
   function setLocation(name){
@@ -2204,23 +2397,28 @@ renderRules();
     const bonus = getAttackBonus();
     const total = roll + bonus;
     const isCrit = roll === 20;
-    // Target first alive enemy
     const target = game.combat.enemies.find(e => !e.isDead);
     if(!target){ narrate('No hay enemigos para atacar.', 'combat'); return; }
     if(isCrit){
+      screenShake(3);
+      hitFlash('crit');
+      showDamageNumber('¡CRÍTICO!', 'crit', 50, 30);
       narrateRandom('combate_golpe_critico', 'combat');
     } else if(total >= target.ac){
+      screenShake(2);
+      hitFlash('damage');
+      showDamageNumber('¡Golpe!', 'damage', 50, 35);
       narrateRandom('combate_golpe_acertado', 'combat');
     } else {
       narrateRandom('combate_golpe_fallido', 'combat');
       endPlayerTurn();
       return;
     }
-    // Calculate damage
     let damage = parseDice(getWeaponDamage(game.player.weapon));
     if(isCrit) damage *= 2;
     target.hp -= damage;
     narrate(' (' + total + ' vs CA ' + target.ac + ') Causaste ' + damage + ' puntos de daño.', 'combat');
+    showDamageNumber('-' + damage, 'damage', 45 + Math.random()*10, 32);
     if(target.hp <= 0){
       target.isDead = true;
       narrateRandom('combate_muerte', 'combat');
@@ -2246,6 +2444,8 @@ renderRules();
     game.inventory = game.inventory.filter(i => i !== potion);
     const heal = parseDice('2d4+2');
     game.player.hp = Math.min(game.player.maxHp, game.player.hp + heal);
+    hitFlash('heal');
+    showDamageNumber('+' + heal, 'heal', 50, 35);
     narrate('Bebes la ' + potion.name + '. Recuperas ' + heal + ' puntos de golpe.', 'rest');
     updateStatusBar();
     endPlayerTurn();
@@ -2277,6 +2477,9 @@ renderRules();
       if(total >= game.player.ac){
         const damage = parseDice(enemy.damage);
         game.player.hp -= damage;
+        screenShake(2);
+        hitFlash('damage');
+        showDamageNumber('-' + damage, 'damage', 45 + Math.random()*10, 30);
         narrate('El ' + enemy.name + ' te ataca. (' + total + ' vs CA ' + game.player.ac + ') Recibes ' + damage + ' puntos de daño.', 'combat');
       } else {
         narrate('El ' + enemy.name + ' falla su ataque.', 'combat');
@@ -2408,6 +2611,10 @@ renderRules();
     game.ttsEnabled = !game.ttsEnabled;
     this.textContent = game.ttsEnabled ? '🔊 Voz' : '🔇 Voz';
     if(!game.ttsEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+  });
+  $('btn-test-voice').addEventListener('click', function(){
+    var testText = 'Bienvenido, aventurero. Que los dioses te guíen en tu travesía.';
+    speakText(testText);
   });
 
   populateVoiceList();
