@@ -13,7 +13,7 @@ class AIDirector {
   }
 
   async callAPI(messages) {
-    if (!this.apiKey || this.apiKey === 'sk-placeholder-replace-with-real-key') {
+    if (!this.apiKey) {
       return null;
     }
 
@@ -23,6 +23,8 @@ class AIDirector {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + this.apiKey,
+          'HTTP-Referer': 'https://github.com/lazaramolina17-stack/Mio',
+          'X-Title': 'RPG Platform',
         },
         body: JSON.stringify({
           model: this.model,

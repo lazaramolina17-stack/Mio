@@ -33,7 +33,7 @@ class SimulationManager {
       // Record major events based on simulation results if any significant changes occurred (e.g., war, natural disaster)
       // This is a simplified example, actual event generation needs more logic
       if (simResults.steps?.['politics']?.status === 'war_declared') { 
-        eventData = { ...eventData, type: 'war', title: 'War Declared', description: 'A new war has broken out!', importance: 8, entities: { factions: [...] }, location: { region_id: '...' } };
+        eventData = { ...eventData, type: 'war', title: 'War Declared', description: 'A new war has broken out!', importance: 8, entities: { factions: [] }, location: { region_id: '' } };
         await historyEngine.recordWorldEvent(eventData);
       }
       // More event recording logic based on simulation results...

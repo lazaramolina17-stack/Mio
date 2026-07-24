@@ -1,6 +1,4 @@
-const fetch = require('node-fetch'); // node-fetch for Node.js 18+ environments
-const config = require('../config/ai');
-const AIDirector = require('./AIDirector'); // Assuming AIDirector is in place
+const AIDirector = require('./AIDirector');
 
 class AIBuilder {
   constructor(worldId) {

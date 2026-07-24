@@ -177,9 +177,6 @@ class WorldSimulation {
    */
   async processPolitics() {
     const PoliticsEngine = require('./PoliticsEngine');
-const ReligionEngine = require('./ReligionEngine');
-const LegalSystem = require('./LegalSystem');
-const MagicSystem = require('./MagicSystem');
     const ReligionEngine = require('./ReligionEngine');
     const politics = new PoliticsEngine(this.worldId);
     await politics.processPoliticsTick();

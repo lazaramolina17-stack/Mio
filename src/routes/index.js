@@ -17,11 +17,6 @@ const magic = require('./magic');
 const buildings = require('./buildings');
 const city = require('./city');
 const worldGen = require('./worldGen');
-const weather = require('./weather');
-const ecosystem = require('./ecosystem');
-const factions = require('./factions');
-const religion = require('./religion');
-const justice = require('./justice');
 
 const router = Router();
 
@@ -43,12 +38,6 @@ router.use('/worlds', magic);
 router.use('/worlds', buildings);
 router.use('/worlds', city);
 router.use('/worlds', worldGen);
-router.use('/worlds', weather);
-router.use('/worlds', ecosystem);
-router.use('/worlds', factions);
-router.use('/worlds', religion);
-router.use('/worlds', justice);
-router.use('/worlds', magic);
 
 router.get('/health', function (req, res) {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
