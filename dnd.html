@@ -620,9 +620,10 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         <!-- Game View -->
         <div id="game-view" class="hidden">
           <div id="narrator-panel" class="game-panel narrator-panel">
-            <div class="narrator-header">
+             <div class="narrator-header">
               <span class="narrator-title">📜 Narrador</span>
               <span id="game-location" class="location-badge"></span>
+              <button id="btn-tts" class="btn btn-sm" style="margin-left:auto;font-size:11px;padding:2px 8px" title="Activar/Desactivar voz">🔊 Voz</button>
             </div>
             <div id="narrator-text" class="narrator-text"></div>
           </div>
@@ -1598,9 +1599,21 @@ renderRules();
   function modStr(mod){ return (mod>=0?'+':'')+mod; }
 
   // ---- Narrator ----
+  function speakText(text){
+    if(!game.ttsEnabled) return;
+    if('speechSynthesis' in window){
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = 'es-ES';
+      u.rate = 0.85;
+      u.pitch = 1.0;
+      window.speechSynthesis.speak(u);
+    }
+  }
   function narrate(text, type){
     game.narrator.push({text:text, type:type||'explore'});
     renderNarrator();
+    speakText(text);
   }
   function narrateRandom(pool, type){
     narrate(randArr(D.narrador[pool]||['El destino te guía...']), type);
@@ -1744,11 +1757,12 @@ renderRules();
     game.visitedScenes = [];
     game.dungeonDepth = 0;
     game.scenePools = null;
+    game.ttsEnabled = true;
     $('game-menu').classList.add('hidden');
     $('game-view').classList.remove('hidden');
-    narrate('Te adentras en la cripta. El aire es frío y húmedo. Las sombras cobran vida en la penumbra.', 'explore');
+    narrate('Te encuentras en las afueras de una aldea. El viento trae el olor a hierba y hogueras. Una antigua cripta se alza en la colina cercana.', 'explore');
     narrateRandom('ambiente_mazmorra', 'explore');
-    enterScene('entrada_mazmorra');
+    enterScene('entrada_aldea');
   }
 
   function buildScenePools(){
@@ -2209,6 +2223,11 @@ renderRules();
         startGame();
       } else { alert('No hay personaje guardado.'); }
     } catch(e){ alert('Error al cargar.'); }
+  });
+  $('btn-tts').addEventListener('click', function(){
+    game.ttsEnabled = !game.ttsEnabled;
+    this.textContent = game.ttsEnabled ? '🔊 Voz' : '🔇 Voz';
+    if(!game.ttsEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
   });
 
   // Update tab handler for game

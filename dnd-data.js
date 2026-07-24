@@ -1267,6 +1267,84 @@ var DND = {
     {nombre:'Stone Giant', tamaño:'Enorme', tipo:'Gigante', ca:15, pg:'138 (12d10+72)', velocidad:'40 pies', des:9, fuer:21, con:21, int:6, sab:10, car:10, habilidades:{Percepción:'+2', Intimidar:'+3'}, sentidos:'Visión en la oscuridad 60 pies', idiomas:'Gigante', cr:'4', acciones:[{nombre:'Puñetazo de Piedra', desc:'+7 a golpear, 3d10+7 contundente'},{nombre:'Lanzamiento de Rocas', desc:'Rango 60/120 pies. +7 a golpear, 3d10+7 contundente.'}], rasgos:[{nombre:'Piel de Piedra', desc:'Puede lanzarse rocas de su cuerpo.'}]}
   ],
   escenas: {
+
+    entrada_aldea: {
+      nombre: 'Entrada a la Aldea',
+      desc: 'Un cartel de madera reza "Aldea de Vallebruma — 2 km". El camino de tierra serpentea entre campos verdes. A lo lejos, ves el humo de chimeneas. Una colina con una cripta antigua se alza al este.',
+      tipo: 'explore',
+      opciones: [
+        { texto: 'Seguir el camino hacia la aldea', resultado: 'plaza_central', desc: 'Caminas entre los campos. El sonido de la vida campesina se acerca.' },
+        { texto: 'Investigar la cripta en la colina', resultado: 'camino_mazmorra', desc: 'Te desvías del camino principal y subes la colina cubierta de niebla.' },
+        { texto: 'Descansar junto al camino', resultado: 'entrada_aldea', desc: 'Te sientas bajo un roble y observas las nubes pasar.', checks: { habilidad: 'Percepción', cd: 10, fallo: 'No pasa nada digno de mención.' } }
+      ]
+    },
+    plaza_central: {
+      nombre: 'Plaza de Vallebruma',
+      desc: 'Una plaza empedrada con una fuente de piedra en el centro. Alrededor, los edificios principales: la taberna "El Dragón Dormido", el mercado, la herrería y el templo de la luz eterna. La gente va y viene, algunos te miran con curiosidad.',
+      tipo: 'explore',
+      opciones: [
+        { texto: 'Entrar a la taberna "El Dragón Dormido"', resultado: 'taberna', desc: 'Empujas la puerta de madera. El calor y el rumor de conversaciones te reciben.' },
+        { texto: 'Visitar el mercado', resultado: 'mercado', desc: 'Te acercas a los puestos del mercado, llenos de mercancías variadas.' },
+        { texto: 'Ir a la herrería', resultado: 'herrero', desc: 'El sonido del metal contra el metal te guía hasta la fragua.' },
+        { texto: 'Visitar el templo de la luz', resultado: 'templo', desc: 'La puerta del templo está abierta. Una luz cálida emana del interior.' },
+        { texto: 'Tomar el camino hacia la cripta', resultado: 'camino_mazmorra', desc: 'Abandonas la aldea por el camino este, hacia la colina.' }
+      ]
+    },
+    taberna: {
+      nombre: 'Taberna "El Dragón Dormido"',
+      desc: 'El interior es cálido y acogedor. Una chimenea crepita en una esquina. El tabernero, un hombre robusto llamado Gundren, limpia un vaso detrás de la barra. Algunos lugareños juegan a los dados en una mesa.',
+      tipo: 'rest',
+      opciones: [
+        { texto: 'Hablar con Gundren, el tabernero', resultado: 'plaza_central', desc: 'Gundren te cuenta que últimamente hay ruidos extraños en la cripta de la colina. Ofrece 50 mo a quien investigue.', checks: { habilidad: 'Persuasión', cd: 12, fallo: 'Gundren está ocupado y no le interesa hablar.' } },
+        { texto: 'Unirte a la partida de dados', resultado: 'plaza_central', desc: 'Te sientas con los lugareños. Las apuestas son pequeñas pero el ambiente es alegre.', checks: { habilidad: 'Destreza', cd: 13, fallo: 'Pierdes 5 mo en las apuestas.' } },
+        { texto: 'Pedir comida y descansar', resultado: 'plaza_central', desc: 'Gundren te sirve un guiso caliente y una jarra de hidromiel. Pagas 2 mo.' },
+        { texto: 'Volver a la plaza', resultado: 'plaza_central', desc: 'Sales de la taberna de vuelta a la plaza.' }
+      ]
+    },
+    mercado: {
+      nombre: 'Mercado de Vallebruma',
+      desc: 'Puestos de madera alineados en la plaza menor. Un comerciante medio elfo vende pociones y ungüentos. Una anciana ofrece amuletos de protección. Un mercader enano vende armas y armaduras usadas pero en buen estado.',
+      tipo: 'loot',
+      opciones: [
+        { texto: 'Comprar provisiones (5 mo)', resultado: 'plaza_central', desc: 'Compras pan, queso y una cantimplora. Te sientes preparado.', checks: { habilidad: 'Negociación', cd: 10, fallo: 'Pagas el precio completo.' } },
+        { texto: 'Examinar los amuletos de la anciana', resultado: 'plaza_central', desc: 'Revisas los amuletos. Algunos parecen tener propiedades mágicas menores.', checks: { habilidad: 'Arcano', cd: 13, fallo: 'No identificas ningún amuleto mágico.' } },
+        { texto: 'Regatear con el mercader enano', resultado: 'plaza_central', desc: 'El enano te ofrece una daga bien forjada por 15 mo.', checks: { habilidad: 'Persuasión', cd: 14, fallo: 'El enano no baja el precio.' } },
+        { texto: 'Volver a la plaza', resultado: 'plaza_central', desc: 'Te alejas del bullicio del mercado.' }
+      ]
+    },
+    herrero: {
+      nombre: 'Herrería "Martillo y Yunque"',
+      desc: 'El calor de la fragua te golpea al entrar. Herramientas cuelgan de las paredes. El herrero, un enano llamado Thorin, golpea una pieza de metal al rojo vivo sobre el yunque. El sonido es rítmico y ensordecedor.',
+      tipo: 'loot',
+      opciones: [
+        { texto: 'Pedir a Thorin que repare tu equipo (10 mo)', resultado: 'plaza_central', desc: 'Thorin examina tu equipo y asiente. Vuelve en una hora.', checks: { habilidad: 'Negociación', cd: 10, fallo: 'Thorin cobra 15 mo por las prisas.' } },
+        { texto: 'Comprar una espada corta de calidad (25 mo)', resultado: 'plaza_central', desc: 'Thorin te muestra una espada de acero forjado con runas en la hoja.' },
+        { texto: 'Preguntar por la cripta', resultado: 'plaza_central', desc: 'Thorin frunce el ceño. "Esa cripta está maldita. Tres aventureros entraron y solo dos volvieron. El tercero... bueno, aún se le oye gritar algunas noches."' },
+        { texto: 'Volver a la plaza', resultado: 'plaza_central', desc: 'Sales del calor de la herrería.' }
+      ]
+    },
+    templo: {
+      nombre: 'Templo de la Luz Eterna',
+      desc: 'Un santuario de piedra blanca con vitrales que representan escenas de luz y oscuridad. Una sacerdotisa de cabello plateado llamada Elara quema incienso frente al altar. Una sensación de paz te envuelve.',
+      tipo: 'rest',
+      opciones: [
+        { texto: 'Pedir curación (donativo 5 mo)', resultado: 'plaza_central', desc: 'Elara pone sus manos sobre ti. Una luz cálida recorre tu cuerpo. Recuperas 2d8+3 PG.' },
+        { texto: 'Rezar por protección', resultado: 'plaza_central', desc: 'Te arrodillas frente al altar. Una sensación de calma te invade y sientes que alguien te observa desde algún lugar.' },
+        { texto: 'Preguntar por la cripta', resultado: 'plaza_central', desc: 'Elara suspira. "La cripta ha estado activa últimamente. Los muertos... ya no descansan en paz. Ten cuidado ahí fuera."' },
+        { texto: 'Volver a la plaza', resultado: 'plaza_central', desc: 'Sales del templo reconfortado.' }
+      ]
+    },
+    camino_mazmorra: {
+      nombre: 'Camino a la Cripta',
+      desc: 'Un sendero pedregoso que asciende la colina. Árboles retorcidos flanquean el camino, sus ramas como dedos esqueléticos. La niebla se arremolina alrededor de la entrada de la cripta, visible más arriba.',
+      tipo: 'explore',
+      opciones: [
+        { texto: 'Entrar a la cripta', resultado: 'entrada_mazmorra', desc: 'La oscuridad te engulle al cruzar el umbral de piedra.' },
+        { texto: 'Buscar hierbas en el camino', resultado: 'camino_mazmorra', desc: 'Entre las rocas encuentras algunas hierbas medicinales.', checks: { habilidad: 'Sabiduría', cd: 12, fallo: 'No encuentras nada útil.' } },
+        { texto: 'Volver a la aldea', resultado: 'plaza_central', desc: 'Decides que la cripta puede esperar. Regresas a Vallebruma.' }
+      ],
+      encuentro: { monstruos: [{ nombre: 'Lobo', cantidad: 2 }], probabilidad: 0.3 }
+    },
     entrada_mazmorra: {
       nombre: 'Entrada a la Cripta',
       desc: 'Ante ti se alza una antigua cripta de piedra cubierta de musgo. La puerta de hierro está entreabierta, y un hedor a humedad y muerte escapa de su interior. El viento susurra entre las grietas de la mampostería.',
