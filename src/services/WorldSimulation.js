@@ -1,5 +1,6 @@
 const db = require('../../db/connection');
 const NPCRoutines = require('./NPCRoutines');
+const EconomyEngine = require('./EconomyEngine');
 
 /**
  * Engine that simulates a single world tick.
@@ -131,11 +132,15 @@ class WorldSimulation {
   }
 
   /**
-   * Stub – will delegate to EconomyEngine once implemented.
+   * Delegates to EconomyEngine for trade tick and taxation.
+   * Wrapped in try/catch per the tick loop's convention.
    * @returns {Promise<object>}
    */
   async processEconomy() {
-    return { status: 'stub', message: 'EconomyEngine not yet implemented' };
+    var engine = new EconomyEngine(this.worldId);
+    var trade = await engine.processTradeTick();
+    var tax = await engine.processTaxation();
+    return { trade: trade, tax: tax };
   }
 
   /**
