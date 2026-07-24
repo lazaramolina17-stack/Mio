@@ -808,6 +808,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
               <div class="voice-header-controls">
                 <button id="btn-voice-panel" class="btn-voice-toggle" title="Seleccionar voz">🎙️</button>
                 <button id="btn-tts" class="btn btn-sm" style="font-size:11px;padding:2px 8px" title="Activar/Desactivar voz">🔊 Voz</button>
+                <button id="btn-tts-mode" class="btn btn-sm" style="font-size:10px;padding:2px 6px" title="Cambiar motor de voz">🌐 Web</button>
               </div>
             </div>
             <div id="voice-panel" class="voice-panel hidden"></div>
@@ -1773,6 +1774,7 @@ renderRules();
     turnIndex: 0,
     lastCheck: null,
     ttsEnabled: true,
+    ttsMode: 'web',
     selectedVoice: ''
   };
 
@@ -1891,9 +1893,32 @@ renderRules();
   }
 
   var _ttsId = 0;
+  var _webTtsAudio = null;
+  // ---- Web TTS (Google Translate — voz natural, sin API key) ----
+  function speakViaGoogle(text){
+    var chunks = text.match(/[^.!?]{1,180}[.!?]?/g) || [text];
+    var idx = 0;
+    function playNext(){
+      if(idx >= chunks.length || _ttsId !== (_ttsId||0)) return;
+      var q = encodeURIComponent(chunks[idx].trim().substring(0,200));
+      _webTtsAudio = new Audio('https://translate.google.com/translate_tts?ie=UTF-8&q=' + q + '&tl=es&client=tw-ob&ttsspeed=0.8');
+      _webTtsAudio.onended = function(){ idx++; setTimeout(playNext, 120); };
+      _webTtsAudio.onerror = function(){ idx++; setTimeout(playNext, 120); };
+      _webTtsAudio.play().catch(function(){ /* ignored */ });
+    }
+    playNext();
+  }
+
   // ---- Narrator ----
   function speakText(text){
     if(!game.ttsEnabled) return;
+    _ttsId++;
+    if(game.ttsMode === 'web'){
+      if(!('Audio' in window)) return;
+      speakViaGoogle(text);
+      return;
+    }
+    // Local TTS (Web Speech API)
     if(!('speechSynthesis' in window)) return;
     if(!_voiceReady){
       _ttsQueue.push(text);
@@ -1905,11 +1930,10 @@ renderRules();
       }
     }
     window.speechSynthesis.cancel();
-    var myId = ++_ttsId;
+    var myId = _ttsId;
     var rate = parseFloat($('voice-rate').value) || 0.9;
     var pitch = parseFloat($('voice-pitch').value) || 1.0;
     var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-    // Limit rate range to avoid distortion
     rate = Math.max(0.5, Math.min(1.5, rate));
     pitch = Math.max(0.5, Math.min(1.5, pitch));
     var idx = 0;
@@ -1919,8 +1943,7 @@ renderRules();
       var voice = findBestVoice();
       if(voice){
         u.voice = voice;
-        u.lang = voice.lang; // CRITICAL: match utterance lang to voice lang
-        console.log('[TTS] Voz: ' + voice.name + ' (' + voice.lang + ')');
+        u.lang = voice.lang;
       } else {
         u.lang = 'es-MX';
       }
@@ -2253,9 +2276,12 @@ renderRules();
     game.dungeonDepth = 0;
     game.scenePools = null;
     game.ttsEnabled = true;
+    game.ttsMode = 'web';
     waitVoices(function(){ buildVoicePanel(); });
     var ttsBtn = $('btn-tts');
     if(ttsBtn) ttsBtn.textContent = '🔊 Voz';
+    var modeBtn = $('btn-tts-mode');
+    if(modeBtn) modeBtn.textContent = '🌐 Web';
     $('game-menu').classList.add('hidden');
     $('game-view').classList.remove('hidden');
     narrate('Te encuentras en las afueras de una aldea. El viento trae el olor a hierba y hogueras. Una antigua cripta se alza en la colina cercana.', 'explore');
@@ -2738,6 +2764,11 @@ renderRules();
     game.ttsEnabled = !game.ttsEnabled;
     this.textContent = game.ttsEnabled ? '🔊 Voz' : '🔇 Voz';
     if(!game.ttsEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+  });
+  $('btn-tts-mode').addEventListener('click', function(){
+    game.ttsMode = (game.ttsMode === 'web') ? 'local' : 'web';
+    this.textContent = game.ttsMode === 'web' ? '🌐 Web' : '📱 Local';
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
   });
   $('btn-test-voice').addEventListener('click', function(){
     var testText = 'Bienvenido, aventurero. Que los dioses te guíen en tu travesía.';
