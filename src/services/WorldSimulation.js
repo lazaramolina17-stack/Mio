@@ -1,4 +1,5 @@
 const db = require('../../db/connection');
+const NPCRoutines = require('./NPCRoutines');
 
 /**
  * Engine that simulates a single world tick.
