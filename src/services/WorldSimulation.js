@@ -1,6 +1,8 @@
 const db = require('../../db/connection');
 const NPCRoutines = require('./NPCRoutines');
 const EconomyEngine = require('./EconomyEngine');
+const WeatherSystem = require('./WeatherSystem');
+const Ecosystem = require('./Ecosystem');
 let socketManager;
 try { socketManager = require('./SocketManager'); } catch (e) { }
 
@@ -158,11 +160,15 @@ class WorldSimulation {
   }
 
   /**
-   * Stub – will process ecosystem creatures.
+   * Processes ecosystem: resource generation, migration, and hunting.
    * @returns {Promise<object>}
    */
   async processEcosystem() {
-    return { status: 'stub', message: 'Ecosystem simulation not yet implemented' };
+    var eco = new Ecosystem(this.worldId);
+    var tick = await eco.processEcosystemTick();
+    var migration = await eco.migrateCreatures();
+    var hunt = await eco.huntAndFeed();
+    return { tick: tick, migration: migration, hunt: hunt };
   }
 
   /**
@@ -170,7 +176,13 @@ class WorldSimulation {
    * @returns {Promise<object>}
    */
   async processPolitics() {
-    return { status: 'stub', message: 'Politics simulation not yet implemented' };
+    const PoliticsEngine = require('./PoliticsEngine');
+    const ReligionEngine = require('./ReligionEngine');
+    const politics = new PoliticsEngine(this.worldId);
+    await politics.processPoliticsTick();
+    await politics.processDiplomacy();
+    const religion = new ReligionEngine(this.worldId);
+    await religion.processReligion();
   }
 
   /**
