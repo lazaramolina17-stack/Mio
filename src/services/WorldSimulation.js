@@ -1,6 +1,8 @@
 const db = require('../../db/connection');
 const NPCRoutines = require('./NPCRoutines');
 const EconomyEngine = require('./EconomyEngine');
+let socketManager;
+try { socketManager = require('./SocketManager'); } catch (e) { }
 
 /**
  * Engine that simulates a single world tick.
@@ -55,6 +57,18 @@ class WorldSimulation {
     console.log(
       `[WorldSimulation:${this.worldId}] tick finished in ${elapsed}ms`
     );
+
+    if (socketManager && typeof socketManager.emitToWorld === 'function') {
+      try {
+        socketManager.emitToWorld(this.worldId, 'world:tick', {
+          tick: this.tickCount || 0,
+          elapsed: elapsed,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (e) {
+        // socket emission is non-critical
+      }
+    }
 
     return { elapsed, steps: results };
   }
