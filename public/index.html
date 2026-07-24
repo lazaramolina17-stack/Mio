@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>D&D 5e Toolkit</title>
+<script src="../dnd-data.js"></script>
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/tabs.css">
+<link rel="stylesheet" href="css/narrator.css">
+<link rel="stylesheet" href="css/combat.css">
+<link rel="stylesheet" href="css/scene-visual.css">
+<link rel="stylesheet" href="css/voice-controls.css">
+<link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+<div id="auth-screen"></div>
+<div id="app">
+  <div id="auth-header">
+    <span class="user-info" id="user-info"></span>
+    <button class="btn-logout" id="btn-logout">Cerrar Sesi\u00f3n</button>
+  </div>
+  <div id="header"><h1>D&amp;D 5e</h1><span>Toolkit</span></div>
+  <div id="content">
+    <div class="tab-content active" id="tab-personaje">
+      <div id="char-form">
+        <div class="form-row">
+          <div class="form-group"><label>Nombre</label><input type="text" id="char-name" placeholder="Ej: Thorgrim"></div>
+          <div class="form-group"><label>Nivel</label><input type="number" id="char-level" min="1" max="20" value="1"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Raza</label><select id="char-race"><option value="">\u2014 Seleccionar \u2014</option></select></div>
+          <div class="form-group" id="subrace-group" style="display:none"><label>Subraza</label><select id="char-subrace"><option value="">\u2014</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Clase</label><select id="char-class"><option value="">\u2014 Seleccionar \u2014</option></select></div>
+          <div class="form-group"><label>Trasfondo</label><select id="char-bg"><option value="">\u2014 Seleccionar \u2014</option></select></div>
+        </div>
+        <div class="form-group"><label>M\u00e9todo de stats</label>
+          <select id="stat-method">
+            <option value="4d6">4d6 descartar menor</option>
+            <option value="standard">Puntaje est\u00e1ndar (15,14,13,12,10,8)</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm mb-8" id="roll-stats-btn">Generar Stats</button>
+        <div class="stat-grid" id="stat-grid"></div>
+        <div class="form-group" id="assign-section" style="display:none">
+          <label>Asignar habilidades (clickea stat arriba, luego habilidad abajo)</label>
+          <div id="assign-grid"></div>
+        </div>
+        <button class="btn btn-primary" id="generate-btn" style="width:100%">Generar Personaje</button>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="btn btn-sm" id="save-char-btn" style="flex:1">Guardar</button>
+          <select id="load-char-select" style="flex:2;font-size:11px;padding:4px"><option value="">\u2014 Cargar personaje \u2014</option></select>
+          <button class="btn btn-sm btn-danger" id="delete-char-btn" style="flex:1">Eliminar</button>
+        </div>
+      </div>
+      <div id="char-output" class="hidden"></div>
+    </div>
+    <div class="tab-content" id="tab-dados">
+      <div class="dice-grid" id="dice-grid"></div>
+      <div class="form-row mb-8">
+        <div class="form-group"><label>Tirada personalizada</label><input type="text" id="custom-roll" placeholder="Ej: 2d20+4"></div>
+        <div style="display:flex;align-items:flex-end;flex-shrink:0"><button class="btn btn-primary" id="roll-custom-btn">\u00a1Tirada!</button></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button class="btn btn-sm" id="roll-adv-btn" style="flex:1">Ventaja</button>
+        <button class="btn btn-sm" id="roll-disadv-btn" style="flex:1">Desventaja</button>
+      </div>
+      <div class="dice-result"><div class="number" id="dice-number">\u2014</div><div class="detail" id="dice-detail"></div></div>
+      <div class="history" id="roll-history"></div>
+    </div>
+    <div class="tab-content" id="tab-hechizos">
+      <div class="filter-bar">
+        <select id="spell-class-filter"><option value="">Todas las clases</option></select>
+        <select id="spell-level-filter"><option value="">Todos los niveles</option></select>
+        <select id="spell-school-filter"><option value="">Todas las escuelas</option></select>
+      </div>
+      <input type="text" id="spell-search" placeholder="Buscar hechizo..." style="margin-bottom:10px">
+      <div id="spell-list"></div>
+    </div>
+    <div class="tab-content" id="tab-equipo">
+      <div class="filter-bar">
+        <select id="equip-category"><option value="">Todo el equipo</option><option value="armas_simples">Armas Simples</option><option value="armas_marciales">Armas Marciales</option><option value="armaduras">Armaduras</option><option value="equipo_aventurero">Equipo de Aventurero</option></select>
+        <input type="text" id="equip-search" placeholder="Buscar...">
+      </div>
+      <div id="equip-list"></div>
+    </div>
+    <div class="tab-content" id="tab-bestiario">
+      <div class="filter-bar">
+        <select id="monster-cr-filter"><option value="">Todos los CR</option></select>
+        <input type="text" id="monster-search" placeholder="Buscar monstruo...">
+      </div>
+      <div id="monster-list"></div>
+    </div>
+    <div class="tab-content" id="tab-reglas">
+      <h2 style="color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Habilidades por Atributo</h2>
+      <table class="rules-table" id="skill-table"><tbody></tbody></table>
+      <h2 style="color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:2px;margin:12px 0 8px">Modificadores</h2>
+      <table class="rules-table" id="mod-table"><tbody></tbody></table>
+      <h2 style="color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:2px;margin:12px 0 8px">Clases de Armadura</h2>
+      <table class="rules-table" id="ac-table"><tbody></tbody></table>
+      <h2 style="color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:2px;margin:12px 0 8px">Condiciones</h2>
+      <div class="condition-grid" id="condition-list"></div>
+    </div>
+    <div class="tab-content" id="tab-jugar">
+      <div id="game-screen">
+        <div id="game-menu" class="game-panel">
+          <h2 style="color:var(--accent);text-align:center;margin-bottom:16px">D&amp;D 5e \u00b7 Aventura</h2>
+          <div id="menu-buttons">
+            <button class="btn btn-primary" id="btn-new-game" style="width:100%;margin-bottom:8px">Nueva Partida</button>
+            <button class="btn" id="btn-load-game" style="width:100%;margin-bottom:8px">Cargar Partida</button>
+            <button class="btn" id="btn-back-to-toolkit" style="width:100%">Volver al Toolkit</button>
+          </div>
+        </div>
+        <div id="game-view" class="hidden">
+          <div id="scene-visual" class="scene-visual visual-default">
+            <div id="ambient-particles"></div>
+            <div class="visual-art">\u2728</div>
+            <div class="visual-label">Aventura</div>
+          </div>
+          <div id="narrator-panel" class="game-panel narrator-panel">
+            <div class="narrator-header">
+              <span class="narrator-title">\u{1F4DC} Narrador</span>
+              <span id="game-location" class="location-badge"></span>
+              <div class="voice-header-controls">
+                <button id="btn-voice-panel" class="btn-voice-toggle" title="Seleccionar voz">\u{1F399}\uFE0F</button>
+                <button id="btn-tts" class="btn btn-sm" style="font-size:11px;padding:2px 8px" title="Activar/Desactivar voz">\u{1F50A} Voz</button>
+                <button id="btn-tts-mode" class="btn btn-sm" style="font-size:10px;padding:2px 6px" title="Cambiar motor de voz">\u{1F310} Web</button>
+              </div>
+            </div>
+            <div id="voice-panel" class="voice-panel hidden"></div>
+            <div class="voice-controls">
+              <label>\u{1F422}<input type="range" id="voice-rate" min="0.5" max="1.3" step="0.05" value="0.9"></label>
+              <label>\u{1F3B5}<input type="range" id="voice-pitch" min="0.5" max="1.5" step="0.05" value="1.0"></label>
+              <button id="btn-test-voice" title="Probar voz">\u{1F50A} Probar</button>
+              <button id="btn-debug-voices" class="btn btn-sm" style="font-size:10px;padding:1px 6px;opacity:0.6" title="Ver voces disponibles en consola">\u{1F50D} Voces</button>
+            </div>
+            <div id="narrator-text" class="narrator-text"></div>
+          </div>
+          <div id="status-bar" class="status-bar">
+            <div class="status-item"><span class="status-label">\u2764\uFE0F PG</span><span id="status-hp" class="status-value">\u2014</span></div>
+            <div class="status-item"><span class="status-label">\u2B50 Nv</span><span id="status-level" class="status-value">\u2014</span></div>
+            <div class="status-item"><span class="status-label">\u2728 XP</span><span id="status-xp" class="status-value">\u2014</span></div>
+            <div class="status-item"><span class="status-label">\u{1F4B0} Oro</span><span id="status-gold" class="status-value">0</span></div>
+          </div>
+          <div id="combat-tracker" class="combat-tracker hidden">
+            <div class="combat-header">\u2694\uFE0F Combate \u2014 Iniciativa</div>
+            <div id="initiative-list"></div>
+          </div>
+          <div id="enemies-panel" class="enemies-panel hidden">
+            <div class="enemies-header">\u{1F479} Enemigos</div>
+            <div id="enemies-list"></div>
+          </div>
+          <div id="action-panel" class="game-panel action-panel">
+            <div id="action-buttons"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="tab-bar">
+    <button class="tab-btn active" data-tab="personaje">Personaje</button>
+    <button class="tab-btn" data-tab="dados">Dados</button>
+    <button class="tab-btn" data-tab="hechizos">Hechizos</button>
+    <button class="tab-btn" data-tab="equipo">Equipo</button>
+    <button class="tab-btn" data-tab="bestiario">Bestiario</button>
+    <button class="tab-btn" data-tab="reglas">Reglas</button>
+    <button class="tab-btn" data-tab="jugar">Jugar</button>
+  </div>
+</div>
+<script src="js/game/engine.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
