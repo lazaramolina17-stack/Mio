@@ -1741,6 +1741,9 @@ renderRules();
     game.xp = 0;
     game.combat = null;
     game.turnIndex = 0;
+    game.visitedScenes = [];
+    game.dungeonDepth = 0;
+    game.scenePools = null;
     $('game-menu').classList.add('hidden');
     $('game-view').classList.remove('hidden');
     narrate('Te adentras en la cripta. El aire es frío y húmedo. Las sombras cobran vida en la penumbra.', 'explore');
@@ -1748,10 +1751,59 @@ renderRules();
     enterScene('entrada_mazmorda');
   }
 
-  function enterScene(sceneId){
-    const scene = D.escenas[sceneId];
+  function buildScenePools(){
+    const pools = {};
+    Object.keys(D.escenas).forEach(function(id){
+      var s = D.escenas[id];
+      var type = s.tipo || 'explore';
+      if(!pools[type]) pools[type] = [];
+      pools[type].push({id:id, scene:s});
+    });
+    pools['all'] = Object.keys(D.escenas).map(function(id){return {id:id, scene:D.escenas[id]};});
+    return pools;
+  }
+
+  function getRandomSceneOfType(type, exclude, depth){
+    if(!game.scenePools) game.scenePools = buildScenePools();
+    var candidates = (game.scenePools[type] || game.scenePools.all || []).filter(function(item){
+      return exclude.indexOf(item.id) === -1 && item.id !== 'salida';
+    });
+    if(candidates.length === 0){
+      candidates = (game.scenePools[type] || game.scenePools.all || []).filter(function(item){
+        return item.id !== 'salida';
+      });
+    }
+    if(candidates.length === 0) return null;
+    return candidates[Math.floor(Math.random() * candidates.length)].id;
+  }
+
+  function randomizeSceneOptions(scene){
+    var types = ['explore', 'combat', 'loot', 'rest'];
+    var result = {_randomized:true, nombre:scene.nombre, desc:scene.desc, tipo:scene.tipo, opciones:[]};
+    scene.opciones.forEach(function(opt){
+      var r = Object.assign({}, opt);
+      if(!/^random_/.test(r.resultado) && r.resultado !== 'salida'){
+        // Replace with random destination of matching type if exists
+        var type = scene.tipo || 'explore';
+        if(Math.random() < 0.7){
+          r.resultado = 'random_' + type;
+        }
+      }
+      result.opciones.push(r);
+    });
+    return result;
+  }
+
+  function enterScene(sceneId, isRandom){
+    var scene = D.escenas[sceneId];
     if(!scene){ narrate('No hay nada más que explorar aquí.', 'explore'); return; }
     game.scene = sceneId;
+    if(game.visitedScenes.indexOf(sceneId) === -1) game.visitedScenes.push(sceneId);
+    game.dungeonDepth = game.visitedScenes.length;
+    if(isRandom || game.randomFlow){
+      game.randomFlow = true;
+      scene = randomizeSceneOptions(scene);
+    }
     setLocation(scene.nombre);
     narrate(scene.desc, 'explore');
     // Random encounter check
@@ -1801,18 +1853,42 @@ renderRules();
     } else {
       narrate(opt.desc, 'explore');
     }
+    // Resolve random scene destination
+    var targetId = opt.resultado;
+    var wasRandom = false;
+    if(typeof targetId === 'string' && targetId.indexOf('random_') === 0){
+      var type = targetId.replace('random_', '');
+      var randomId = getRandomSceneOfType(type, game.visitedScenes, game.dungeonDepth);
+      if(randomId){
+        targetId = randomId;
+        wasRandom = true;
+        narrate('Te adentras en lo desconocido...', 'explore');
+        narrateRandom('exploracion_exito', 'explore');
+      } else {
+        narrate('No encuentras nada nuevo por aquí.', 'explore');
+        renderActions(scene);
+        return;
+      }
+    }
     // Apply treasure
-    if(opt.resultado === scene.nombre.replace(/ /g,'_').toLowerCase()){
+    if(targetId === scene.nombre.replace(/ /g,'_').toLowerCase()){
       // Same scene, just narrate
     }
     // Move to next scene
-    if(D.escenas[opt.resultado]){
+    if(D.escenas[targetId]){
       // Random event chance
       if(Math.random() < 0.15){
         narrateRandom('evento_aleatorio', 'explore');
       }
-      enterScene(opt.resultado);
-    } else if(opt.resultado === scene.sceneId || !D.escenas[opt.resultado]){
+      // After depth 5+, occasionally force boss or exit
+      if(game.dungeonDepth >= 5 && Math.random() < 0.25){
+        narrate('Sientes que te acercas al final de este lugar...', 'explore');
+        if(D.escenas['sala_trono']) targetId = 'sala_trono';
+        else if(D.escenas['boveda_tesoro']) targetId = 'boveda_tesoro';
+        else if(D.escenas['salida']) targetId = 'salida';
+      }
+      enterScene(targetId, wasRandom);
+    } else if(targetId === scene.sceneId || !D.escenas[targetId]){
       // Stay in same scene
       renderActions(scene);
     }
