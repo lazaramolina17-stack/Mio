@@ -1734,7 +1734,7 @@ renderRules();
     }
     setupPlayer(char);
     game.state = 'explore';
-    game.scene = 'entrada_mazmorda';
+    game.scene = 'entrada_mazmorra';
     game.narrator = [];
     game.gold = 0;
     game.inventory = [];
@@ -1748,7 +1748,7 @@ renderRules();
     $('game-view').classList.remove('hidden');
     narrate('Te adentras en la cripta. El aire es frío y húmedo. Las sombras cobran vida en la penumbra.', 'explore');
     narrateRandom('ambiente_mazmorra', 'explore');
-    enterScene('entrada_mazmorda');
+    enterScene('entrada_mazmorra');
   }
 
   function buildScenePools(){
@@ -2137,11 +2137,32 @@ renderRules();
     game.combat = null;
     $('combat-tracker').classList.add('hidden');
     $('enemies-panel').classList.add('hidden');
+    if(victory){
+      var goldReward = Math.floor(Math.random() * 20) + 5;
+      game.gold += goldReward;
+      var xpReward = Math.floor(Math.random() * 30) + 10;
+      game.xp += xpReward;
+      narrate('Obtienes ' + goldReward + ' mo y ' + xpReward + ' XP del botín.', 'loot');
+      checkLevelUp();
+    }
     updateStatusBar();
     // Return to scene
     const scene = D.escenas[game.scene];
     if(scene){
       renderActions(scene);
+    }
+  }
+
+  function checkLevelUp(){
+    var xpNeeded = game.player.level * 100;
+    while(game.xp >= xpNeeded){
+      game.xp -= xpNeeded;
+      game.player.level++;
+      game.player.maxHp += Math.floor(Math.random() * 6) + 2;
+      game.player.hp = game.player.maxHp;
+      narrate('¡Has subido al nivel ' + game.player.level + '! Tus heridas se cierran.', 'loot');
+      narrateRandom('combate_victoria', 'combat');
+      xpNeeded = game.player.level * 100;
     }
   }
 

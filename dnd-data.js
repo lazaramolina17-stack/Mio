@@ -68,7 +68,7 @@ var DND = {
       subrazas: [],
       bonos: {str:2, con:1},
       velocidad: 30,
-      idiomas: ['Común', 'Orco'],
+      idiomas: ['Común', 'Orc'],
       rasgos: [
         {nombre: 'Visión en la Oscuridad', descripcion: 'Puedes ver en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue.'},
         {nombre: 'Aguante Incansable', descripcion: 'Cuando recibes daño que reduce tus puntos de golpe a 0 pero no te mata directamente, puedes reducir ese daño a 1. No puedes usar este rasgo de nuevo hasta que completes un descanso largo.'},
@@ -1297,7 +1297,7 @@ var DND = {
         { texto: 'Intentar negociar', resultado: 'cripta_arcana', desc: 'Intentas hablar con los esqueletos, pero solo responden con un escalofriante crujir de huesos. Se preparan para atacar.' },
         { texto: 'Huir de vuelta al pasillo', resultado: 'pasillo_principal', desc: 'Sales corriendo de vuelta al pasillo de las estatuas.' }
       ],
-      encuentro: { monstruos: [{ nombre: 'Esqueleto', cantidad: 2 }], probabilidad: 1 }
+      encuentro: { monstruos: [{ nombre: 'Skeleton Warrior', cantidad: 2 }], probabilidad: 1 }
     },
     cripta_arcana: {
       nombre: 'La Cripta Arcana',
@@ -1328,7 +1328,7 @@ var DND = {
         { texto: 'Luchar por el tesoro', resultado: 'salida', desc: 'Te abres paso entre los no-muertos para reclamar tu recompensa.' },
         { texto: 'Tomar lo que puedas y huir', resultado: 'salida', desc: 'Agarras un puñado de monedas y corres hacia la salida.' }
       ],
-      encuentro: { monstruos: [{ nombre: 'Esqueleto', cantidad: 1 }, { nombre: 'Zombi', cantidad: 1 }], probabilidad: 1 },
+      encuentro: { monstruos: [{ nombre: 'Skeleton Warrior', cantidad: 1 }, { nombre: 'Ghoul', cantidad: 1 }], probabilidad: 1 },
       tesoro: { oro: '100 mo', objetos: ['Gema', 'Anillo de Plata', 'Collar de Perlas'] }
     },
     salida: {
@@ -1343,6 +1343,7 @@ var DND = {
       nombre: 'Atrio Olvidado',
       desc: 'Una entrada lateral oculta entre la maleza. Columnas rotas yacen en el suelo formando un laberinto de piedra. Una brisa fría sale de una grieta en el muro norte.',
       tipo: 'explore',
+      encuentro: { monstruos: [{ nombre: 'Goblin', cantidad: 2 }], probabilidad: 0.4 },
       opciones: [
         { texto: 'Entrar por la grieta', resultado: 'galeria_runica', desc: 'Te deslizas por la angosta abertura. El pasaje se ensancha gradualmente.' },
         { texto: 'Investigar las columnas caídas', resultado: 'cripta_secreta', desc: 'Entre las columnas encuentras un cofre de piedra bien camuflado.', checks: { habilidad: 'Percepción', cd: 13, fallo: 'Las columnas parecen ordinarias.' } },
@@ -1353,6 +1354,7 @@ var DND = {
       nombre: 'Cripta Oculta',
       desc: 'Una pequeña cámara funeraria con tres sarcófagos de piedra alineados. El polvo se arremolina al entrar. En el centro, un altar con una gema incrustada.',
       tipo: 'loot',
+      encuentro: { monstruos: [{ nombre: 'Ghoul', cantidad: 2 }], probabilidad: 0.5 },
       opciones: [
         { texto: 'Abrir los sarcófagos', resultado: 'galeria_runica', desc: 'Los sarcófagos contienen restos y algunos objetos de valor.', checks: { habilidad: 'Religión', cd: 12, fallo: 'Al abrir el tercero, un gas pálido escapa. 1d6 daño de veneno.' } },
         { texto: 'Tomar la gema del altar', resultado: 'galeria_runica', desc: 'La gema se desprende fácilmente. El altar tiembla ligeramente.' }
@@ -1363,6 +1365,7 @@ var DND = {
       nombre: 'Galería de las Runas',
       desc: 'Un pasadizo cuyas paredes están cubiertas de runas brillantes que cambian de forma al mirarlas. El suelo tiene losas con símbolos que parecen formar un acertijo.',
       tipo: 'explore',
+      encuentro: { monstruos: [{ nombre: 'Gargantúa', cantidad: 1 }], probabilidad: 0.5 },
       opciones: [
         { texto: 'Intentar descifrar las runas', resultado: 'biblioteca_oscura', desc: 'Estudias las runas con atención. Parecen contar una historia de poder y traición.', checks: { habilidad: 'Arcano', cd: 14, fallo: 'Las runas te confunden más de lo que te iluminan.' } },
         { texto: 'Pisar las losas en orden', resultado: 'catalizador', desc: 'Caminas sobre las losas siguiendo el patrón de las runas. Un mecanismo se activa al fondo.' },
@@ -1373,6 +1376,7 @@ var DND = {
       nombre: 'Biblioteca Prohibida',
       desc: 'Una gran sala circular llena de estanterías podridas y libros desmoronados. En el centro, un atril sostiene un grimorio abierto que emite una luz pulsante violeta.',
       tipo: 'explore',
+      encuentro: { monstruos: [{ nombre: 'Skeleton Warrior', cantidad: 2 }], probabilidad: 0.6 },
       opciones: [
         { texto: 'Leer el grimorio', resultado: 'laboratorio_alquimico', desc: 'Las páginas contienen fórmulas arcanas y diagramas de criaturas.', checks: { habilidad: 'Arcano', cd: 15, fallo: 'El texto está en un idioma que no reconoces. Sientes un dolor de cabeza punzante.' } },
         { texto: 'Buscar entre las estanterías', resultado: 'laboratorio_alquimico', desc: 'Encuentras algunos libros en mejor estado y un mapa enrollado.' },
@@ -1384,6 +1388,7 @@ var DND = {
       nombre: 'Laboratorio del Alquimista',
       desc: 'Un taller lleno de frascos rotos, alambiques y instrumentos extraños. En las mesas, pociones burbujean en matraces. El olor a químicos es abrumador.',
       tipo: 'loot',
+      encuentro: { monstruos: [{ nombre: 'Gelatinous Cube', cantidad: 1 }], probabilidad: 0.5 },
       opciones: [
         { texto: 'Examinar las pociones', resultado: 'pozo_sagrado', desc: 'Identificas varias pociones útiles entre los frascos.', checks: { habilidad: 'Arcano', cd: 12, fallo: 'Una poción explota en tu cara. 1d6 daño de ácido.' } },
         { texto: 'Revisar los cuadernos del alquimista', resultado: 'pozo_sagrado', desc: 'Los cuadernos contienen fórmulas valiosas y pistas sobre las defensas de la mazmorra.' },
@@ -1410,7 +1415,7 @@ var DND = {
         { texto: 'Buscar una salida marcada', resultado: 'sala_trono', desc: 'Encuentras marcas en las paredes que parecen indicar un camino.', checks: { habilidad: 'Percepción', cd: 13, fallo: 'Las marcas te llevan en círculos.' } },
         { texto: 'Gritar para callar los susurros', resultado: 'sala_trono', desc: 'Tu voz retumba. Los susurros cesan por un momento. Aprovechas para orientarte.' }
       ],
-      encuentro: { monstruos: [{ nombre: 'Ghast', cantidad: 1 }, { nombre: 'Zombi', cantidad: 2 }], probabilidad: 0.7 }
+      encuentro: { monstruos: [{ nombre: 'Ghast', cantidad: 1 }, { nombre: 'Ghoul', cantidad: 2 }], probabilidad: 0.7 }
     },
     sala_trono: {
       nombre: 'Salón del Trono Olvidado',
@@ -1421,7 +1426,7 @@ var DND = {
         { texto: 'Intentar razonar con el rey esqueleto', resultado: 'boveda_tesoro', desc: 'Te diriges al trono. El esqueleto levanta la cabeza y te mira con cuencas vacías.', checks: { habilidad: 'Persuasión', cd: 16, fallo: 'El rey no está de humor para diálogos.' } },
         { texto: 'Rodear sigilosamente la sala', resultado: 'boveda_tesoro', desc: 'Te deslizas pegado a la pared, esquivando la mirada de los guardianes.', checks: { habilidad: 'Sigilo', cd: 14, fallo: 'Una losa suelta delata tu presencia.' } }
       ],
-      encuentro: { monstruos: [{ nombre: 'Espíritu', cantidad: 2 }, { nombre: 'Esqueleto', cantidad: 1 }], probabilidad: 1 }
+      encuentro: { monstruos: [{ nombre: 'Specter', cantidad: 2 }, { nombre: 'Skeleton Warrior', cantidad: 1 }], probabilidad: 1 }
     },
     boveda_tesoro: {
       nombre: 'Bóveda del Rey',
@@ -1438,6 +1443,7 @@ var DND = {
       nombre: 'Cámara del Catalizador',
       desc: 'Una sala circular con un enorme cristal flotante en el centro que pulsa con energía arcana. Alrededor, cinco pedestales con gemas de colores. El cristal parece ser la fuente de poder de la mazmorra.',
       tipo: 'explore',
+      encuentro: { monstruos: [{ nombre: 'Will-O-Wisp', cantidad: 2 }], probabilidad: 0.6 },
       opciones: [
         { texto: 'Tocar el cristal', resultado: 'sala_trono', desc: 'Una descarga de energía recorre tu cuerpo. Vislumbres de conocimiento antiguo inundan tu mente.' },
         { texto: 'Retirar las gemas de los pedestales', resultado: 'sala_trono', desc: 'Al retirar la primera gema, el cristal se atenúa. Las defensas de la mazmorra se debilitan.' },
@@ -1449,6 +1455,7 @@ var DND = {
       nombre: 'Paso Secreto',
       desc: 'Un angosto corredor detrás de una pared falsa. El polvo indica que nadie ha pasado aquí en décadas. Al final, una puerta de roble con incrustaciones de plata.',
       tipo: 'explore',
+      encuentro: { monstruos: [{ nombre: 'Mimic', cantidad: 1 }], probabilidad: 0.5 },
       opciones: [
         { texto: 'Abrir la puerta de roble', resultado: 'biblioteca_oscura', desc: 'La puerta se abre sin esfuerzo. Del otro lado, ves estanterías.' },
         { texto: 'Registrar el corredor antes de seguir', resultado: 'biblioteca_oscura', desc: 'Encuentras un cofre pequeño escondido bajo una losa suelta.', checks: { habilidad: 'Percepción', cd: 11, fallo: 'El corredor está vacío.' } }
@@ -1633,9 +1640,9 @@ var DND = {
       { monstruos: [{ nombre: 'Lobo Sombrio', cantidad: 1 }], desc: 'Un lobo sombrío emerge de entre las sombras, mostrando los colmillos.' }
     ],
     medio: [
-      { monstruos: [{ nombre: 'Orco', cantidad: 2 }], desc: 'Dos orcos armados con grandes hachas custodian el camino. Gruñen al verte.' },
-      { monstruos: [{ nombre: 'Esqueleto', cantidad: 3 }], desc: 'Tres esqueletos se levantan de entre los escombros, armados con espadas oxidadas.' },
-      { monstruos: [{ nombre: 'Ladrón', cantidad: 1 }, { nombre: 'Bandido', cantidad: 2 }], desc: 'Un ladrón con dos secuaces bandidos te tiende una emboscada.' }
+      { monstruos: [{ nombre: 'Orc', cantidad: 2 }], desc: 'Dos orcos armados con grandes hachas custodian el camino. Gruñen al verte.' },
+      { monstruos: [{ nombre: 'Skeleton Warrior', cantidad: 3 }], desc: 'Tres esqueletos se levantan de entre los escombros, armados con espadas oxidadas.' },
+      { monstruos: [{ nombre: 'Ladrón Expert', cantidad: 1 }, { nombre: 'Bandido', cantidad: 2 }], desc: 'Un ladrón con dos secuaces bandidos te tiende una emboscada.' }
     ],
     dificil: [
       { monstruos: [{ nombre: 'Minotauro', cantidad: 1 }], desc: 'Un minotauro furioso patea el suelo y carga contra ti con sus cuernos.' },
