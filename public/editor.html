@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Editor de Vallebruma</title>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/editor.css">
+</head>
+<body>
+<header id="editor-header">
+  <h1>Editor de Mapa — Vallebruma</h1>
+  <div id="editor-tools">
+    <button data-tool="select" class="tool-btn active" title="Seleccionar">🖱️</button>
+    <button data-tool="region" class="tool-btn" title="Añadir Región">🟦</button>
+    <button data-tool="settlement" class="tool-btn" title="Añadir Asentamiento">📍</button>
+    <button data-tool="move" class="tool-btn" title="Mover">✋</button>
+    <span class="tool-sep"></span>
+    <button id="btn-zoom-in" title="Zoom +">🔍+</button>
+    <button id="btn-zoom-out" title="Zoom -">🔍-</button>
+    <button id="btn-fit" title="Ajustar">⊞</button>
+    <span class="tool-sep"></span>
+    <button id="btn-save" title="Guardar">💾</button>
+    <button id="btn-export" title="Exportar JSON">📤</button>
+  </div>
+</header>
+<main id="editor-main">
+  <div id="canvas-container">
+    <svg id="connections-svg" class="connections-layer"></svg>
+    <div id="canvas"></div>
+  </div>
+  <aside id="props-panel" class="hidden">
+    <h2>Propiedades</h2>
+    <div id="props-content"></div>
+  </aside>
+</main>
+<div id="modal-overlay" class="hidden">
+  <div id="modal-box">
+    <h3 id="modal-title"></h3>
+    <div id="modal-body"></div>
+    <div id="modal-actions">
+      <button id="modal-cancel">Cancelar</button>
+      <button id="modal-ok">Guardar</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="hidden"></div>
+<script src="../../dnd-data.js"></script>
+<script type="module" src="../js/editor.js"></script>
+</body>
+</html>
